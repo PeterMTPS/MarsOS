@@ -1,0 +1,29 @@
+#!/bin/sh
+# MarsOS (English) - live-build configuration (Debian 13 "trixie")
+set -e
+
+# Live session user, language and keyboard
+MARSOS_APPEND="hostname=marte username=astronauta user-fullname=Astronaut locales=en_US.UTF-8 keyboard-layouts=us timezone=Etc/UTC"
+
+# Martian 16-colour palette for the text console (vt.default_*)
+MARSOS_VT="vt.default_red=26,172,143,217,90,142,111,232,81,229,184,255,143,199,159,255 vt.default_grn=17,47,154,122,111,74,163,201,50,68,196,137,176,122,214,241 vt.default_blu=23,68,74,43,140,106,160,168,62,56,106,51,217,154,208,220"
+
+lb config noauto \
+	--mode debian \
+	--distribution trixie \
+	--architectures amd64 \
+	--archive-areas "main contrib non-free-firmware" \
+	--binary-images iso-hybrid \
+	--debian-installer none \
+	--memtest none \
+	--firmware-chroot false \
+	--firmware-binary false \
+	--apt-recommends false \
+	--apt-indices false \
+	--iso-application "MarsOS" \
+	--iso-publisher "MarsOS Project" \
+	--iso-volume "MarsOS 1.0 EN" \
+	--image-name marsos-1.0-en \
+	--bootappend-live "boot=live components ${MARSOS_APPEND} ${MARSOS_VT}" \
+	--bootappend-live-failsafe "boot=live components memtest noapic noapm nodma nomce nosmp nosplash vga=normal ${MARSOS_APPEND}" \
+	"${@}"

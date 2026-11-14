@@ -6,25 +6,26 @@ import tkinter as tk
 
 sys.path.insert(0, "/usr/lib/marsos")
 import marstime  # noqa: E402
+from marsi18n import _  # noqa: E402
 from marstk import AMBAR, AREIA, FONTE, FUNDO, PlanetaGirando, estrelas, janela  # noqa: E402
 
 ZOOM = 3
 L, A = 100 * ZOOM + 80, 100 * ZOOM + 110
 
-root = janela("MarsGlobo", "Globo de Marte")
+root = janela("MarsGlobo", _("Globo de Marte"))
 root.resizable(False, False)
 c = tk.Canvas(root, width=L, height=A, bg=FUNDO, highlightthickness=0)
 c.pack()
 estrelas(c, L, A, 160, semente=9)
 PlanetaGirando(c, L // 2, 40 + 50 * ZOOM, zoom=ZOOM)
-c.create_text(L // 2, 20, text="M A R T E", fill=AMBAR, font=(FONTE, -24, "bold"))
+c.create_text(L // 2, 20, text=_("M A R T E"), fill=AMBAR, font=(FONTE, -24, "bold"))
 info = c.create_text(L // 2, A - 34, text="", fill=AREIA, font=(FONTE, -16), justify="center")
 
 
 def tick():
     h = marstime.calcular()
-    c.itemconfig(info, text=f"Sol {marstime.milhar(h.sol)}  ·  {h.mtc_hms} MTC\n"
-                            f"Ano marciano {h.ano}  ·  {h.estacao_norte} (norte)")
+    c.itemconfig(info, text=_("Sol {sol}  ·  {mtc} MTC\nAno marciano {ano}  ·  {est} (norte)").format(
+        sol=marstime.milhar(h.sol), mtc=h.mtc_hms, ano=h.ano, est=h.estacao_norte))
     root.after(1000, tick)
 
 

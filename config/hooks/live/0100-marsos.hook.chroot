@@ -58,13 +58,23 @@ fi
 # Som: garante que o PipeWire sobe sozinho na sessao de cada usuario
 systemctl --global enable pipewire.socket pipewire-pulse.socket wireplumber.service >/dev/null 2>&1 || true
 
+# Idioma desta ISO (pt ou en), definido em /etc/marsos/idioma
+IDIOMA=$(cat /etc/marsos/idioma 2>/dev/null || echo pt)
+if [ "$IDIOMA" = en ]; then
+	PASTAS="Downloads Documents Pictures"
+	FIREFOX_LOCALE="en-US"
+else
+	PASTAS="Downloads Documentos Imagens"
+	FIREFOX_LOCALE="pt-BR"
+fi
+
 # Pastas padrao do usuario (o Firefox e o Dillo salvam em ~/Downloads)
-mkdir -p /etc/skel/Downloads /etc/skel/Documentos /etc/skel/Imagens
+for p in $PASTAS; do mkdir -p "/etc/skel/$p"; done
 
 # Firefox: abre na pagina inicial do MarsOS e salva em ~/Downloads sem perguntar
 if [ -d /usr/lib/firefox-esr ]; then
 	mkdir -p /usr/lib/firefox-esr/defaults/pref
-	cat > /usr/lib/firefox-esr/defaults/pref/marsos.js <<'EOF'
+	cat > /usr/lib/firefox-esr/defaults/pref/marsos.js <<EOF
 pref("browser.startup.homepage", "file:///usr/share/marsos/inicio.html");
 pref("browser.download.useDownloadDir", true);
 pref("browser.download.folderList", 1);
@@ -74,7 +84,7 @@ pref("trailhead.firstrun.didSeeAboutWelcome", true);
 pref("browser.startup.homepage_override.mstone", "ignore");
 pref("startup.homepage_welcome_url", "");
 pref("startup.homepage_welcome_url.additional", "");
-pref("intl.locale.requested", "pt-BR");
+pref("intl.locale.requested", "${FIREFOX_LOCALE}");
 pref("datareporting.policy.dataSubmissionPolicyBypassNotification", true);
 EOF
 fi

@@ -1,6 +1,22 @@
 // MarsOS - relogio marciano do site (mesmo algoritmo Mars24 do comando `sol`)
+// Mars clock for the website (same Mars24 algorithm as the `sol` command)
 (function () {
   "use strict";
+
+  var EN = (document.documentElement.lang || "").toLowerCase().indexOf("en") === 0;
+  var T = EN ? {
+    titulo: "MarsOS · Mars Clock",
+    msd: "Mars Sol Date (MSD)", mtc: "Coordinated Mars Time", ano: "Mars year",
+    ls: "Solar longitude (Ls)", estacao: "Season", terra: "Earth (UTC)", local: "local time",
+    norte: ["Spring", "Summer", "Autumn", "Winter"], sul: ["Autumn", "Winter", "Spring", "Summer"],
+    noNorte: " in the north", noSul: " in the south"
+  } : {
+    titulo: "MarsOS · Relógio Marciano",
+    msd: "Sol marciano (MSD)", mtc: "Hora coordenada (MTC)", ano: "Ano marciano",
+    ls: "Longitude solar (Ls)", estacao: "Estação", terra: "Terra (UTC)", local: "hora local",
+    norte: ["Primavera", "Verão", "Outono", "Inverno"], sul: ["Outono", "Inverno", "Primavera", "Verão"],
+    noNorte: " no norte", noSul: " no sul"
+  };
 
   var TT_UTC = 69.184;
   var PBS = [
@@ -32,10 +48,8 @@
     function d(n) { return (n < 10 ? "0" : "") + n; }
     return d(Math.floor(s / 3600)) + ":" + d(Math.floor(s % 3600 / 60)) + ":" + d(s % 60);
   }
-  function milhar(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
-  var NORTE = ["Primavera", "Verão", "Outono", "Inverno"];
-  var SUL = ["Outono", "Inverno", "Primavera", "Verão"];
-
+  function milhar(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, EN ? "," : "."); }
+  function dec(x, casas) { var s = x.toFixed(casas); return EN ? s : s.replace(".", ","); }
   function pad(rotulo) { var s = rotulo + " "; while (s.length < 26) s += "."; return s; }
 
   function atualizar() {
@@ -50,22 +64,22 @@
     }
     var term = document.getElementById("terminal-sol");
     if (term) {
+      var a = function (r) { return '  <span class="a">' + pad(r) + "</span> "; };
       var linhas = [
         '<span class="p">astronauta@marte</span>:<span class="h">~</span>$ sol',
         "",
-        '  <span class="p">MarsOS · Relógio Marciano</span>',
+        '  <span class="p">' + T.titulo + "</span>",
         '  <span class="a">────────────────────────────────────────────</span>',
-        '  <span class="a">' + pad("Sol marciano (MSD)") + '</span> <span class="h">' + sol + "</span>  (" + m.msd.toFixed(4) + ")",
-        '  <span class="a">' + pad("Hora coordenada (MTC)") + '</span> <span class="h">' + hms(m.mtc) + "</span>",
-        '  <span class="a">' + pad("Ano marciano") + "</span> " + m.ano,
-        '  <span class="a">' + pad("Longitude solar (Ls)") + "</span> " + m.ls.toFixed(1).replace(".", ",") + "°",
-        '  <span class="a">' + pad("Estação") + "</span> " + NORTE[est] + " no norte · " + SUL[est] + " no sul"
+        a(T.msd) + '<span class="h">' + sol + "</span>  (" + dec(m.msd, 4) + ")",
+        a(T.mtc) + '<span class="h">' + hms(m.mtc) + "</span>",
+        a(T.ano) + m.ano,
+        a(T.ls) + dec(m.ls, 1) + "°",
+        a(T.estacao) + T.norte[est] + T.noNorte + " · " + T.sul[est] + T.noSul
       ];
       LOCAIS.forEach(function (l) {
-        linhas.push('  <span class="a">' + pad(l[0]) + "</span> " + hms(m.mtc + l[1] / 15).slice(0, 5) + " (hora local)");
+        linhas.push(a(l[0]) + hms(m.mtc + l[1] / 15).slice(0, 5) + " (" + T.local + ")");
       });
-      linhas.push('  <span class="a">' + pad("Terra (UTC)") + "</span> " +
-        new Date(agora).toISOString().replace("T", " ").slice(0, 19));
+      linhas.push(a(T.terra) + new Date(agora).toISOString().replace("T", " ").slice(0, 19));
       linhas.push("", '<span class="p">astronauta@marte</span>:<span class="h">~</span>$ <span class="cursor"></span>');
       term.innerHTML = linhas.join("\n");
     }
@@ -76,10 +90,10 @@
     }
   }
 
-  // som de inicializacao
+  // som de inicializacao / startup sound
   var botaoSom = document.getElementById("tocar-som");
   if (botaoSom) {
-    var audio = new Audio("img/inicio.wav");
+    var audio = new Audio(botaoSom.getAttribute("data-som") || "img/inicio.wav");
     botaoSom.addEventListener("click", function () {
       audio.currentTime = 0;
       audio.play();

@@ -6,12 +6,14 @@ import sys
 import tkinter as tk
 
 sys.path.insert(0, "/usr/lib/marsos")
+from marsi18n import _  # noqa: E402
 from marstk import AREIA, CREME, FONTE, FUNDO, LARANJA, ROCHA, VERMELHO, janela  # noqa: E402
 
 acao = sys.argv[1] if len(sys.argv) > 1 else "poweroff"
 if acao not in ("poweroff", "reboot"):
     sys.exit("uso: marsos-energia poweroff|reboot")
-verbo = "Desligar" if acao == "poweroff" else "Reiniciar"
+verbo = _("Desligar") if acao == "poweroff" else _("Reiniciar")
+pergunta = _("Desligar o MarsOS agora?") if acao == "poweroff" else _("Reiniciar o MarsOS agora?")
 
 
 def executar():
@@ -23,13 +25,12 @@ def executar():
 
 root = janela("MarsOSEnergia", verbo)
 root.resizable(False, False)
-tk.Label(root, text=f"{verbo} o MarsOS agora?", fg=LARANJA, bg=FUNDO,
-         font=(FONTE, -20, "bold"), padx=24, pady=16).pack()
-tk.Label(root, text="Na sessão live, o que não foi salvo\nnum disco será perdido.",
+tk.Label(root, text=pergunta, fg=LARANJA, bg=FUNDO, font=(FONTE, -20, "bold"), padx=24, pady=16).pack()
+tk.Label(root, text=_("Na sessão live, o que não foi salvo\nnum disco será perdido."),
          fg=AREIA, bg=FUNDO, padx=24).pack()
 b = tk.Frame(root, bg=FUNDO, pady=14)
 b.pack()
 tk.Button(b, text=verbo, width=11, command=executar, bg=VERMELHO, fg=CREME).pack(side="left", padx=6)
-tk.Button(b, text="Cancelar", width=11, command=root.destroy, bg=ROCHA, fg=CREME).pack(side="left", padx=6)
+tk.Button(b, text=_("Cancelar"), width=11, command=root.destroy, bg=ROCHA, fg=CREME).pack(side="left", padx=6)
 root.bind("<Escape>", lambda e: root.destroy())
 root.mainloop()

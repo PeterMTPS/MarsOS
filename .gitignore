@@ -17,3 +17,4 @@ saida/
 # ferramentas locais
 __pycache__/
 *.pyc
+build-*/

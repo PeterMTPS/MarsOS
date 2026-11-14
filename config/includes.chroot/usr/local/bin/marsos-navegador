@@ -5,4 +5,7 @@ for b in firefox-esr firefox dillo netsurf-gtk netsurf; do
 		exec "$b" "$@"
 	fi
 done
-exec xmessage -center "Nenhum navegador instalado. Tente: sudo apt install firefox-esr"
+case "$LANG" in
+	en*) exec xmessage -center "No web browser installed. Try: sudo apt install firefox-esr" ;;
+	*)   exec xmessage -center "Nenhum navegador instalado. Tente: sudo apt install firefox-esr" ;;
+esac

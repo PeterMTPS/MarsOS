@@ -6,6 +6,8 @@
 
 **Um Linux retrô com a poeira vermelha de Marte.**
 
+🇧🇷 Português · 🇺🇸 [English](README.en.md)
+
 [![Baixar a ISO](https://img.shields.io/badge/baixar-ISO%20641%20MB-e54438?style=for-the-badge&labelColor=3d2836)](https://github.com/PeterMTPS/MarsOS/releases/latest/download/marsos-1.0-amd64.hybrid.iso)
 [![Site](https://img.shields.io/badge/site-MarsOS-ff8933?style=for-the-badge&labelColor=3d2836)](https://PeterMTPS.github.io/MarsOS/)
 
@@ -77,7 +79,8 @@ as cinco cores do planeta do logo:
 
 ```bash
 sudo apt install live-build
-sudo ./build.sh
+sudo ./build.sh        # ISO em português
+sudo ./build.sh en     # ISO em inglês
 ```
 
 ### No Windows (com VirtualBox)
@@ -85,7 +88,7 @@ sudo ./build.sh
 ```powershell
 # 1. VM construtora (Debian 13 mínimo, instalado sozinho). Só uma vez:
 powershell -ExecutionPolicy Bypass -File tools\construtora\criar-vm-construtora.ps1
-# 2. Gera a ISO dentro da VM e traz para saida\
+# 2. Gera a ISO dentro da VM e traz para saida\  (use -Idioma en para a versão em inglês)
 powershell -ExecutionPolicy Bypass -File tools\construir.ps1
 # 3. Testa numa VM (use -Uefi para testar UEFI)
 powershell -ExecutionPolicy Bypass -File tools\testar.ps1
@@ -115,6 +118,7 @@ assets/logo/                 o logo (PNG, GIF girando e sprites)
 assets/gerar_arte.py         gera papéis de parede, splash, ícones e o /etc/issue a partir do logo
 assets/gerar_som.py          sintetiza os sons do sistema
 assets/boot/                 menus de boot (isolinux e GRUB)
+idiomas/en/                  camada em inglês (só os arquivos que mudam; build.sh en monta a cópia)
 docs/                        site de download (GitHub Pages)
 tools/                       scripts do Windows (VM construtora, build, teste)
 ```

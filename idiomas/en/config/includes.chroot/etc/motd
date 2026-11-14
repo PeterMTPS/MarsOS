@@ -1,0 +1,10 @@
+
+  Welcome to MarsOS 1.0 "Olympus" (based on Debian GNU/Linux 13).
+
+  Martian commands:
+    sol ........... date and time on Mars
+    marsfetch ..... system information
+    startx ........ start the window system (FVWM)
+    mc ............ file manager in the terminal
+    sudo -i ....... become root  (live user: astronauta / password: live)
+

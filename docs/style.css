@@ -72,6 +72,15 @@ code, kbd { font-family: var(--mono); color: var(--creme); background: var(--fun
   box-shadow: inset 2px 2px 0 #0e0a12, inset -2px -2px 0 var(--rocha);
 }
 .relogio-painel b { color: var(--laranja); font-weight: 400; }
+.idiomas {
+  display: flex; align-items: stretch;
+  box-shadow: inset 2px 2px 0 #0e0a12, inset -2px -2px 0 var(--rocha);
+  font-family: var(--pixel); font-size: 14px;
+}
+.idiomas b, .idiomas a { display: flex; align-items: center; padding: 0 10px; text-decoration: none; }
+.idiomas b { background: var(--vermelho); color: var(--creme); font-weight: 400; }
+.idiomas a { color: var(--areia); background: var(--fundo); }
+.idiomas a:hover { color: var(--creme); background: var(--rocha); }
 
 /* ---------- janelas estilo FVWM ---------- */
 .janela {

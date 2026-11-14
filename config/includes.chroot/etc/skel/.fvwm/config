@@ -67,11 +67,6 @@ ButtonStyle 6 Vector 4 25x68@3 75x68@3 75x74@4 25x74@3
 #----------------------------------------------------------------------
 # Funcoes
 #----------------------------------------------------------------------
-DestroyFunc StartFunction
-AddToFunc StartFunction
-+ I Module FvwmButtons -g $[vp.width]x38+0-0 MarsBar
-+ I Test (Init) Exec exec xterm -title "Bem-vindo a Marte" -geometry 82x24+40+40 -e sh -c "marsfetch; exec bash"
-
 DestroyFunc MoverOuElevar
 AddToFunc MoverOuElevar
 + I Raise
@@ -100,88 +95,8 @@ MenuStyle * TitleFont "-*-terminus-bold-r-normal-*-16-*-*-*-*-*-iso10646-1"
 MenuStyle * PopupOffset -4 100, PopupDelay 150, TrianglesSolid
 MenuStyle * VerticalItemSpacing 2 3, VerticalTitleSpacing 4 4, SeparatorsLong
 
-DestroyMenu MenuMars
-AddToMenu MenuMars "MarsOS 1.0  Olympus" Title
-+ "%terminal.xpm%Terminal" Exec exec xterm
-+ "%pasta.xpm%Arquivos" Exec exec xfe
-+ "%editor.xpm%Editor de texto" Exec exec xfw
-+ "%globo.xpm%Navegador (Firefox)" Exec exec marsos-navegador
-+ "%globo.xpm%Navegador retrô (Dillo)" Exec exec dillo
-+ "%pasta.xpm%Meus downloads" Exec exec xfe $[HOME]/Downloads
-+ "" Nop
-+ "%mini-marte.xpm%Marte" Popup MenuMarte
-+ "%relogio.xpm%Acessórios" Popup MenuAcessorios
-+ "%sistema.xpm%Sistema" Popup MenuSistema
-+ "%globo.xpm%Áreas de trabalho" Popup MenuAreas
-+ "" Nop
-+ "%engrenagem.xpm%Configurações" Exec exec marsos-config
-+ "%sobre.xpm%Sobre o MarsOS" Exec exec marsos-sobre
-+ "%desligar.xpm%Sair" Popup MenuSair
-
-DestroyMenu MenuMarte
-AddToMenu MenuMarte "Marte" Title
-+ "%mini-marte.xpm%Globo de Marte" Exec exec marsos-globo
-+ "%relogio.xpm%Relógio Marciano" Exec exec marsclock
-+ "%terminal.xpm%Sol de hoje (terminal)" Exec exec xterm -hold -title "Sol marciano" -geometry 64x16 -e sol
-+ "" Nop
-+ "Papel de parede: Órbita" Exec exec marsos-papel-de-parede orbita
-+ "Papel de parede: Crepúsculo em Gale" Exec exec marsos-papel-de-parede crepusculo
-+ "Papel de parede: Meio-dia em Jezero" Exec exec marsos-papel-de-parede dia
-+ "Papel de parede: Noite em Olympus" Exec exec marsos-papel-de-parede noite
-
-DestroyMenu MenuAcessorios
-AddToMenu MenuAcessorios "Acessórios" Title
-+ "Calculadora" Exec exec xcalc
-+ "Relógio" Exec exec xclock
-+ "Olhos" Exec exec xeyes
-+ "Carga do sistema" Exec exec xload
-+ "Visualizador de imagens" Exec exec xfi
-+ "" Nop
-+ "Midnight Commander" Exec exec xterm -title "Midnight Commander" -geometry 100x32 -e mc
-+ "Vim" Exec exec xterm -title "Vim" -e vim
-
-DestroyMenu MenuSistema
-AddToMenu MenuSistema "Sistema" Title
-+ "%engrenagem.xpm%Configurações" Exec exec marsos-config
-+ "%som.xpm%Volume" Exec exec marsos-volume
-+ "%som.xpm%Mixer de som (alsamixer)" Exec exec xterm -title "Mixer de som" -geometry 100x28 -e alsamixer
-+ "%sistema.xpm%Monitor (htop)" Exec exec xterm -title "htop" -geometry 100x30 -e htop
-+ "%rede.xpm%Rede (nmtui)" Exec exec xterm -title "Rede" -e nmtui
-+ "%terminal.xpm%Informações (marsfetch)" Exec exec xterm -hold -title "marsfetch" -geometry 82x24 -e marsfetch
-+ "%terminal.xpm%Terminal de root" Exec exec xterm -title "root@marte" -e sudo -i
-+ "" Nop
-+ "Lista de janelas" WindowList
-+ "Reiniciar o FVWM" Restart
-
-DestroyMenu MenuAreas
-AddToMenu MenuAreas "Áreas de trabalho" Title
-+ "Olympus" GotoDesk 0 0
-+ "Valles" GotoDesk 0 1
-+ "Gale" GotoDesk 0 2
-+ "Jezero" GotoDesk 0 3
-
-DestroyMenu MenuSair
-AddToMenu MenuSair "Sair" Title
-+ "Voltar ao console" Quit
-+ "%desligar.xpm%Reiniciar o computador" Exec exec marsos-energia reboot
-+ "%desligar.xpm%Desligar o computador" Exec exec marsos-energia poweroff
-
-DestroyMenu MenuJanela
-AddToMenu MenuJanela
-+ "Mover" Move
-+ "Redimensionar" Resize
-+ "Minimizar" Iconify
-+ "Maximizar" Maximize 100 100
-+ "Enrolar" WindowShade
-+ "Fixar em todas as áreas" Stick
-+ "" Nop
-+ "Enviar para Olympus" MoveToDesk 0 0
-+ "Enviar para Valles" MoveToDesk 0 1
-+ "Enviar para Gale" MoveToDesk 0 2
-+ "Enviar para Jezero" MoveToDesk 0 3
-+ "" Nop
-+ "Fechar" Close
-+ "Destruir" Destroy
+# Menus e textos (portugues/ingles) ficam em ~/.fvwm/textos
+Read textos
 
 #----------------------------------------------------------------------
 # Mouse e teclado

@@ -693,16 +693,28 @@ def gerar_logo_assets(logo):
 ANSI16 = {"a": "1;30", "b": "1;30", "c": "0;31", "d": "1;31", "e": "1;33"}
 
 
-def gerar_issue(logo):
-    """/etc/issue com o planeta em blocos (cores da paleta do console)."""
-    letras = logo_para_letras(reduzir_moda(logo, 22, 11))
-    texto = {
+TEXTOS_ISSUE = {
+    "pt": {
         2: r'\e[1;31mMarsOS 1.0 \e[0;33m"Olympus"\e[0m',
         4: r"\e[0;37mBase Debian GNU/Linux 13 - kernel \r (\m)\e[0m",
         5: r"\e[0;37mTerminal \l em \n\e[0m",
         7: r"\e[1;33mUsuário: astronauta    Senha: live\e[0m",
         8: r"\e[0;33mDepois do login digite startx para abrir as janelas.\e[0m",
-    }
+    },
+    "en": {
+        2: r'\e[1;31mMarsOS 1.0 \e[0;33m"Olympus"\e[0m',
+        4: r"\e[0;37mBased on Debian GNU/Linux 13 - kernel \r (\m)\e[0m",
+        5: r"\e[0;37mTerminal \l on \n\e[0m",
+        7: r"\e[1;33mUser: astronauta    Password: live\e[0m",
+        8: r"\e[0;33mAfter logging in, type startx to start the windows.\e[0m",
+    },
+}
+
+
+def gerar_issue(logo, idioma="pt"):
+    """/etc/issue com o planeta em blocos (cores da paleta do console)."""
+    letras = logo_para_letras(reduzir_moda(logo, 22, 11))
+    texto = TEXTOS_ISSUE[idioma]
     linhas = [""]
     for i, l in enumerate(letras):
         s, atual = "  ", None
@@ -723,9 +735,10 @@ def gerar_issue(logo):
             s += "   " + texto[i]
         linhas.append(s)
     linhas += ["", ""]
-    (CHROOT / "etc").mkdir(parents=True, exist_ok=True)
-    (CHROOT / "etc" / "issue").write_text("\n".join(linhas), encoding="utf-8")
-    print("  /etc/issue")
+    base = CHROOT if idioma == "pt" else RAIZ / "idiomas" / idioma / "config" / "includes.chroot"
+    (base / "etc").mkdir(parents=True, exist_ok=True)
+    (base / "etc" / "issue").write_text("\n".join(linhas), encoding="utf-8")
+    print(f"  /etc/issue ({idioma})")
 
 
 def main():
@@ -733,7 +746,8 @@ def main():
     print("Gerando arte do MarsOS...")
     gerar_logo_assets(logo)
     gerar_icones(logo)
-    gerar_issue(logo)
+    gerar_issue(logo, "pt")
+    gerar_issue(logo, "en")
     gerar_splash(logo)
     gerar_papeis_de_parede(logo)
     print("Pronto.")

@@ -34,6 +34,10 @@ FUSOS = [
     ("America/Rio_Branco", "Acre"),
     ("America/Noronha", "Fernando de Noronha"),
     ("Europe/Lisbon", "Portugal (Lisboa)"),
+    ("America/New_York", "Nova York (EUA, leste)"),
+    ("America/Chicago", "Chicago (EUA, centro)"),
+    ("America/Los_Angeles", "Los Angeles (EUA, Pacífico)"),
+    ("Europe/London", "Londres (Reino Unido)"),
     ("UTC", "UTC (tempo universal)"),
 ]
 

@@ -6,11 +6,13 @@ import time
 
 sys.path.insert(0, "/usr/lib/marsos")
 import marstime  # noqa: E402
+from marsi18n import _, num  # noqa: E402
 
 h = marstime.calcular()
 
 if "--curto" in sys.argv:
-    print(f"Sol {marstime.milhar(h.sol)} · {h.mtc_hms[:5]} MTC · Ano {h.ano} · {h.estacao_norte} no norte")
+    print(_("Sol {sol} · {mtc} MTC · Ano {ano} · {est} no norte").format(
+        sol=marstime.milhar(h.sol), mtc=h.mtc_hms[:5], ano=h.ano, est=h.estacao_norte))
     sys.exit(0)
 
 cor = sys.stdout.isatty()
@@ -25,14 +27,14 @@ def linha(rotulo, valor):
 
 
 print()
-print(f"  {V}MarsOS · Relógio Marciano{N}")
+print(f"  {V}{_('MarsOS · Relógio Marciano')}{N}")
 print(f"  {A}{'─' * 44}{N}")
-linha("Sol marciano (MSD) ", f"{L}{marstime.milhar(h.sol)}{N}  ({h.msd:.4f})")
-linha("Hora coordenada (MTC) ", f"{L}{h.mtc_hms}{N}")
-linha("Ano marciano ", f"{h.ano}")
-linha("Longitude solar (Ls) ", f"{h.ls:.1f}°".replace(".", ","))
-linha("Estação ", f"{h.estacao_norte} no norte · {h.estacao_sul} no sul")
+linha(_("Sol marciano (MSD) "), f"{L}{marstime.milhar(h.sol)}{N}  ({num(h.msd, 4)})")
+linha(_("Hora coordenada (MTC) "), f"{L}{h.mtc_hms}{N}")
+linha(_("Ano marciano "), f"{h.ano}")
+linha(_("Longitude solar (Ls) "), f"{num(h.ls, 1)}°")
+linha(_("Estação "), _("{n} no norte · {s} no sul").format(n=h.estacao_norte, s=h.estacao_sul))
 for nome, lon in marstime.LOCAIS:
-    linha(nome + " ", f"{h.hms(h.lmst(lon))[:5]} (hora local)")
-linha("Terra (UTC) ", time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(h.unix)))
+    linha(nome + " ", _("{h} (hora local)").format(h=h.hms(h.lmst(lon))[:5]))
+linha(_("Terra (UTC) "), time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(h.unix)))
 print()

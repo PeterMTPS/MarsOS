@@ -13,6 +13,15 @@ import math
 import time
 from dataclasses import dataclass
 
+try:
+    from marsi18n import _, milhar  # noqa: F401  (milhar e reexportado)
+except ImportError:  # usado fora do MarsOS
+    def _(t):
+        return t
+
+    def milhar(n):
+        return f"{n:,}".replace(",", ".")
+
 TT_MENOS_UTC = 69.184  # segundos (37 s de leap seconds + 32,184 s) - valido desde 2017
 
 # Perturbacoes planetarias (Allison & McEwen 2000, tabela 5)
@@ -63,11 +72,11 @@ class HoraMarciana:
 
     @property
     def estacao_norte(self) -> str:
-        return ("Primavera", "Verão", "Outono", "Inverno")[int(self.ls // 90) % 4]
+        return _(("Primavera", "Verão", "Outono", "Inverno")[int(self.ls // 90) % 4])
 
     @property
     def estacao_sul(self) -> str:
-        return ("Outono", "Inverno", "Primavera", "Verão")[int(self.ls // 90) % 4]
+        return _(("Outono", "Inverno", "Primavera", "Verão")[int(self.ls // 90) % 4])
 
 
 def calcular(unix: float | None = None) -> HoraMarciana:
@@ -89,10 +98,6 @@ def calcular(unix: float | None = None) -> HoraMarciana:
     mtc = (24.0 * msd) % 24.0
     ano = 36 + round(((msd - MSD_INICIO_MY36) - (ls / 360.0) * ANO_MARCIANO_SOLS) / ANO_MARCIANO_SOLS)
     return HoraMarciana(unix=unix, msd=msd, mtc=mtc, ls=ls, ano=int(ano))
-
-
-def milhar(n: int) -> str:
-    return f"{n:,}".replace(",", ".")
 
 
 if __name__ == "__main__":

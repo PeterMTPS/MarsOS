@@ -10,6 +10,7 @@ import tkinter as tk
 
 sys.path.insert(0, "/usr/lib/marsos")
 import marssom  # noqa: E402
+from marsi18n import _  # noqa: E402
 from marstk import AREIA, CREME, FONTE, FUNDO, LARANJA, NOITE, ROCHA, VERMELHO, janela  # noqa: E402
 
 # Clicar de novo no alto-falante fecha a janela que ja esta aberta
@@ -32,7 +33,7 @@ vol, mudo = marssom.volume()
 
 tk.Label(root, text="VOLUME", fg=LARANJA, bg=FUNDO, font=(FONTE, -16, "bold"), pady=6).pack()
 if vol is None:
-    tk.Label(root, text="Nenhuma saída\nde som", fg=VERMELHO, bg=FUNDO, padx=16, pady=20).pack()
+    tk.Label(root, text=_("Nenhuma saída\nde som"), fg=VERMELHO, bg=FUNDO, padx=16, pady=20).pack()
 else:
     v = tk.IntVar(value=vol)
     agendado = [None]
@@ -46,7 +47,7 @@ else:
              bg=FUNDO, fg=CREME, troughcolor=ROCHA, activebackground=VERMELHO, highlightthickness=0,
              sliderlength=22, width=18, bd=2, font=(FONTE, -14)).pack(padx=22)
     m = tk.BooleanVar(value=mudo)
-    tk.Checkbutton(root, text="Mudo", variable=m, command=lambda: marssom.mudo(m.get()),
+    tk.Checkbutton(root, text=_("Mudo"), variable=m, command=lambda: marssom.mudo(m.get()),
                    bg=FUNDO, fg=AREIA, selectcolor=NOITE, activebackground=FUNDO,
                    activeforeground=CREME).pack(pady=(4, 0))
 
@@ -56,6 +57,6 @@ def mais():
     root.destroy()
 
 
-tk.Button(root, text="Mais...", command=mais, fg=CREME).pack(pady=8)
+tk.Button(root, text=_("Mais..."), command=mais, fg=CREME).pack(pady=8)
 root.bind("<Escape>", lambda e: root.destroy())
 root.mainloop()

@@ -17,6 +17,7 @@ sys.path.insert(0, "/usr/lib/marsos")
 import marsconf  # noqa: E402
 import marssom  # noqa: E402
 import marstime  # noqa: E402
+from marsi18n import _, data_extenso, num  # noqa: E402
 from marstk import (AMBAR, AREIA, CREME, FONTE, FUNDO, LARANJA, NOITE, ROCHA,  # noqa: E402
                     VERMELHO, janela)
 
@@ -35,6 +36,7 @@ PAGINAS = [
     ("rede", "Rede", "rede"),
     ("sistema", "Sistema", "engrenagem"),
 ]
+NOMES = {chave: nome for chave, nome, _ic in PAGINAS}
 
 PAPEIS = [
     ("orbita", "Órbita"),
@@ -54,7 +56,7 @@ def ler(caminho):
 
 class Configuracoes:
     def __init__(self, inicial):
-        self.root = janela("MarsOSConfig", "Configurações do MarsOS")
+        self.root = janela("MarsOSConfig", _("Configurações do MarsOS"))
         self.root.geometry("780x540")
         self.root.minsize(720, 500)
         self.conf = marsconf.ler()
@@ -67,7 +69,7 @@ class Configuracoes:
         tk.Label(lado, text="MarsOS", fg=LARANJA, bg=NOITE, font=(FONTE, -20, "bold"), pady=8).pack(fill="x")
         for chave, nome, icone in PAGINAS:
             img = self.icone(icone)
-            b = tk.Button(lado, text="  " + nome, image=img, compound="left", anchor="w", relief="flat",
+            b = tk.Button(lado, text="  " + _(nome), image=img, compound="left", anchor="w", relief="flat",
                           bd=0, padx=10, pady=5, width=190, bg=NOITE, fg=AREIA, activebackground=ROCHA,
                           activeforeground=CREME, highlightthickness=0,
                           command=lambda k=chave: self.mostrar(k))
@@ -85,10 +87,10 @@ class Configuracoes:
         rodape.pack(fill="x", pady=(8, 0))
         self.status = tk.Label(rodape, text="", fg=VERDE, bg=FUNDO, anchor="w")
         self.status.pack(side="left", fill="x", expand=True)
-        tk.Button(rodape, text="Fechar", width=10, command=self.root.destroy, fg=CREME).pack(side="right")
+        tk.Button(rodape, text=_("Fechar"), width=10, command=self.root.destroy, fg=CREME).pack(side="right")
 
         self.root.bind("<Escape>", lambda e: self.root.destroy())
-        self.mostrar(inicial if inicial in dict((p[0], 1) for p in PAGINAS) else "aparencia")
+        self.mostrar(inicial if inicial in NOMES else "aparencia")
 
     # ------------------------------------------------------------ util
     def icone(self, nome, zoom=2):
@@ -150,13 +152,13 @@ class Configuracoes:
             w.destroy()
         for k, b in self.botoes.items():
             b.config(bg=VERMELHO if k == chave else NOITE, fg=CREME if k == chave else AREIA)
-        self.titulo.config(text=dict((p[0], p[1]) for p in PAGINAS)[chave])
+        self.titulo.config(text=_(NOMES[chave]))
         self.aviso("")
         getattr(self, "pagina_" + chave)()
 
     # ------------------------------------------------------------ paginas
     def pagina_aparencia(self):
-        self.secao("Papel de parede")
+        self.secao(_("Papel de parede"))
         atual = ler(os.path.expanduser("~/.config/marsos/papel-de-parede")).strip() or "orbita"
         grade = tk.Frame(self.corpo, bg=FUNDO)
         grade.pack(anchor="w")
@@ -168,11 +170,11 @@ class Configuracoes:
                 except tk.TclError:
                     self.imagens[chave] = tk.PhotoImage(width=170, height=128)
             sel = nome == atual
-            tk.Button(grade, image=self.imagens[chave], text=rotulo, compound="top", bd=3,
+            tk.Button(grade, image=self.imagens[chave], text=_(rotulo), compound="top", bd=3,
                       relief="sunken" if sel else "raised", bg=VERMELHO if sel else NOITE,
                       fg=CREME, activebackground=ROCHA, padx=4, pady=4,
                       command=lambda n=nome: self.trocar_papel(n)).grid(row=i // 2, column=i % 2, padx=6, pady=6)
-        self.texto("O papel de parede escolhido fica salvo para as próximas vezes.", AREIA2)
+        self.texto(_("O papel de parede escolhido fica salvo para as próximas vezes."), AREIA2)
 
     def trocar_papel(self, nome):
         marsconf.abrir(["marsos-papel-de-parede", nome])
@@ -181,11 +183,11 @@ class Configuracoes:
     def pagina_tela(self):
         saida, atual, modos = marsconf.xrandr()
         if not saida:
-            self.texto("Não consegui ler as informações da tela.", VERMELHO)
+            self.texto(_("Não consegui ler as informações da tela."), VERMELHO)
             return
         self.texto(f"Monitor: {saida}")
-        self.texto(f"Resolução atual: {atual or '?'}")
-        self.secao("Escolha a resolução")
+        self.texto(_("Resolução atual: {r}").format(r=atual or "?"))
+        self.secao(_("Escolha a resolução"))
         lb = self.lista(modos, altura=8, largura=20)
         if atual in modos:
             lb.selection_set(modos.index(atual))
@@ -199,66 +201,67 @@ class Configuracoes:
             if marsconf.aplicar_modo(modo):
                 self.conf["tela"]["modo"] = modo
                 self.salvar()
-                self.aviso(f"Resolução {modo} aplicada e salva.")
+                self.aviso(_("Resolução {r} aplicada e salva.").format(r=modo))
                 self.root.after(400, lambda: (marsconf.abrir(["marsos-papel-de-parede", "--restaurar"]),
                                               marsconf.reiniciar_fvwm()))
                 self.root.after(1500, lambda: self.mostrar("tela"))
             else:
-                self.aviso("Não foi possível usar essa resolução.", erro=True)
+                self.aviso(_("Não foi possível usar essa resolução."), erro=True)
 
         def automatica():
             self.conf["tela"]["modo"] = ""
             self.salvar()
-            self.aviso("Pronto: na próxima vez o MarsOS escolhe a resolução sozinho.")
+            self.aviso(_("Pronto: na próxima vez o MarsOS escolhe a resolução sozinho."))
 
         linha = tk.Frame(self.corpo, bg=FUNDO)
         linha.pack(anchor="w", pady=4)
-        self.botao("Aplicar resolução", aplicar, linha, "left")
-        self.botao("Voltar ao automático", automatica, linha, "left")
+        self.botao(_("Aplicar resolução"), aplicar, linha, "left")
+        self.botao(_("Voltar ao automático"), automatica, linha, "left")
 
     def pagina_som(self):
         nome = marssom.nome_saida()
         if nome:
-            self.texto(f"Saída de som: {nome}")
+            self.texto(_("Saída de som: {s}").format(s=nome))
         else:
-            self.texto("Nenhuma saída de som encontrada. Numa máquina virtual, ligue o áudio "
-                       "nas configurações da VM.", VERMELHO)
+            self.texto(_("Nenhuma saída de som encontrada. Numa máquina virtual, ligue o áudio "
+                         "nas configurações da VM."), VERMELHO)
         vol, mudo = marssom.volume()
-        self.secao("Volume")
+        self.secao(_("Volume"))
         v = tk.IntVar(value=vol or 0)
         agendado = [None]
 
-        def mudou(_=None):
+        def mudou(_valor=None):
             if agendado[0]:
                 self.root.after_cancel(agendado[0])
             agendado[0] = self.root.after(120, lambda: marssom.definir_volume(v.get()))
 
         self.escala(v, 0, 100, mudou)
         m = tk.BooleanVar(value=mudo)
-        self.check("Sem som (mudo)", m, lambda: marssom.mudo(m.get()))
+        self.check(_("Sem som (mudo)"), m, lambda: marssom.mudo(m.get()))
         linha = tk.Frame(self.corpo, bg=FUNDO)
         linha.pack(anchor="w", pady=4)
-        self.botao("Testar som", lambda: marssom.tocar("teste"), linha, "left")
-        self.botao("Ouvir o som de inicialização", lambda: marssom.tocar("inicio"), linha, "left")
+        self.botao(_("Testar som"), lambda: marssom.tocar("teste"), linha, "left")
+        self.botao(_("Ouvir o som de inicialização"), lambda: marssom.tocar("inicio"), linha, "left")
 
-        self.secao("Sons do sistema")
+        self.secao(_("Sons do sistema"))
         ini = tk.BooleanVar(value=self.conf.get("som", "inicio") == "sim")
 
         def salvar_inicio():
             self.conf["som"]["inicio"] = "sim" if ini.get() else "nao"
             self.salvar()
-            self.aviso("Som de inicialização " + ("ligado." if ini.get() else "desligado."))
+            self.aviso(_("Som de inicialização ligado.") if ini.get() else _("Som de inicialização desligado."))
 
-        self.check("Tocar o som de inicialização do MarsOS", ini, salvar_inicio)
-        self.botao("Mixer avançado (alsamixer)",
-                   lambda: marsconf.abrir(["xterm", "-title", "Mixer de som", "-geometry", "100x28", "-e", "alsamixer"]))
+        self.check(_("Tocar o som de inicialização do MarsOS"), ini, salvar_inicio)
+        self.botao(_("Mixer avançado (alsamixer)"),
+                   lambda: marsconf.abrir(["xterm", "-title", _("Mixer de som"), "-geometry", "100x28",
+                                           "-e", "alsamixer"]))
 
     def pagina_teclado(self):
         lay_conf = self.conf.get("teclado", "layout")
         atual = (lay_conf, self.conf.get("teclado", "variante")) if lay_conf else marsconf.layout_atual()
-        self.secao("Layout do teclado")
+        self.secao(_("Layout do teclado"))
         escolha = tk.IntVar(value=-1)
-        for i, (lay, var, rotulo) in enumerate(marsconf.LAYOUTS):
+        for i, (lay, var, _rot) in enumerate(marsconf.LAYOUTS):
             if (lay, var) == tuple(atual):
                 escolha.set(i)
 
@@ -268,53 +271,54 @@ class Configuracoes:
                 self.conf["teclado"]["layout"] = lay
                 self.conf["teclado"]["variante"] = var
                 self.salvar()
-                self.aviso(f"Teclado: {rotulo}.")
+                self.aviso(_("Teclado: {t}.").format(t=_(rotulo)))
             else:
-                self.aviso("Não foi possível trocar o teclado.", erro=True)
+                self.aviso(_("Não foi possível trocar o teclado."), erro=True)
 
-        for i, (_, _, rotulo) in enumerate(marsconf.LAYOUTS):
-            tk.Radiobutton(self.corpo, text=rotulo, variable=escolha, value=i, command=aplicar, bg=FUNDO,
+        for i, (_lay, _var, rotulo) in enumerate(marsconf.LAYOUTS):
+            tk.Radiobutton(self.corpo, text=_(rotulo), variable=escolha, value=i, command=aplicar, bg=FUNDO,
                            fg=AREIA, selectcolor=NOITE, activebackground=FUNDO, activeforeground=CREME,
                            anchor="w").pack(fill="x", pady=1)
-        self.secao("Teste aqui")
+        self.secao(_("Teste aqui"))
         e = tk.Entry(self.corpo, width=44, bg=NOITE, fg=CREME, insertbackground=LARANJA, bd=2,
                      relief="sunken", highlightthickness=0)
         e.pack(anchor="w", pady=4)
-        e.insert(0, "Ação, coração, pão e maçã em Marte")
+        e.insert(0, _("Ação, coração, pão e maçã em Marte"))
 
     def pagina_mouse(self):
-        self.secao("Velocidade do ponteiro")
+        self.secao(_("Velocidade do ponteiro"))
         vel = tk.IntVar(value=self.conf.getint("mouse", "velocidade", fallback=3))
         can = tk.BooleanVar(value=self.conf.get("mouse", "canhoto") == "sim")
 
-        def aplicar(_=None):
+        def aplicar(_valor=None):
             self.conf["mouse"]["velocidade"] = str(vel.get())
             self.conf["mouse"]["canhoto"] = "sim" if can.get() else "nao"
             self.salvar()
             marsconf.aplicar_mouse(vel.get(), can.get())
-            self.aviso("Mouse ajustado.")
+            self.aviso(_("Mouse ajustado."))
 
         self.escala(vel, 1, 5, aplicar, 260)
-        self.texto("1 = devagar     3 = normal     5 = rápido", AREIA2)
-        self.secao("Botões")
-        self.check("Mouse para canhotos (troca os botões)", can, aplicar)
-        self.secao("Dicas")
-        self.texto("• Segure Alt e arraste qualquer parte de uma janela para movê-la.")
-        self.texto("• Clique duas vezes no título para maximizar.")
-        self.texto("• Clique no fundo da tela para abrir o menu do MarsOS.")
+        self.texto(_("1 = devagar     3 = normal     5 = rápido"), AREIA2)
+        self.secao(_("Botões"))
+        self.check(_("Mouse para canhotos (troca os botões)"), can, aplicar)
+        self.secao(_("Dicas"))
+        self.texto(_("• Segure Alt e arraste qualquer parte de uma janela para movê-la."))
+        self.texto(_("• Clique duas vezes no título para maximizar."))
+        self.texto(_("• Clique no fundo da tela para abrir o menu do MarsOS."))
 
     def pagina_hora(self):
         hora = tk.Label(self.corpo, text="", fg=LARANJA, bg=FUNDO, font=(FONTE, -32, "bold"), anchor="w")
         hora.pack(fill="x")
         data = self.texto("")
         marte = self.texto("", AMBAR)
-        self.secao("Fuso horário")
+        self.secao(_("Fuso horário"))
         atual = marsconf.fuso_atual()
-        self.texto(f"Fuso atual: {atual}", AREIA2)
-        lb = self.lista([rot for _, rot in marsconf.FUSOS], altura=6, largura=46)
-        for i, (fuso, _) in enumerate(marsconf.FUSOS):
+        self.texto(_("Fuso atual: {f}").format(f=atual), AREIA2)
+        lb = self.lista([_(rot) for _fuso, rot in marsconf.FUSOS], altura=6, largura=46)
+        for i, (fuso, _rot) in enumerate(marsconf.FUSOS):
             if fuso == atual:
                 lb.selection_set(i)
+                lb.see(i)
 
         def aplicar():
             sel = lb.curselection()
@@ -322,25 +326,22 @@ class Configuracoes:
                 return
             fuso = marsconf.FUSOS[sel[0]][0]
             if marsconf.aplicar_fuso(fuso):
-                self.aviso(f"Fuso horário: {fuso}.")
+                self.aviso(_("Fuso horário: {f}.").format(f=fuso))
                 marsconf.reiniciar_fvwm()   # o relogio do painel recarrega o fuso
                 self.root.after(1200, lambda: self.mostrar("hora"))
             else:
-                self.aviso("Não foi possível mudar o fuso (precisa de permissão de administrador).", erro=True)
+                self.aviso(_("Não foi possível mudar o fuso (precisa de permissão de administrador)."), erro=True)
 
-        self.botao("Aplicar fuso horário", aplicar)
-        dias = ["segunda", "terça", "quarta", "quinta", "sexta", "sábado", "domingo"]
-        meses = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto",
-                 "setembro", "outubro", "novembro", "dezembro"]
+        self.botao(_("Aplicar fuso horário"), aplicar)
 
         def tick():
-            getattr(time, "tzset", lambda: None)()   # relê o fuso depois de uma troca
+            getattr(time, "tzset", lambda: None)()   # rele o fuso depois de uma troca
             t = time.localtime()
             hora.config(text=time.strftime("%H:%M:%S", t))
-            data.config(text=f"{dias[t.tm_wday]}-feira, {t.tm_mday} de {meses[t.tm_mon - 1]} de {t.tm_year}"
-                        .replace("sábado-feira", "sábado").replace("domingo-feira", "domingo"))
+            data.config(text=data_extenso(t))
             h = marstime.calcular()
-            marte.config(text=f"Em Marte: sol {marstime.milhar(h.sol)}, {h.mtc_hms[:5]} MTC, ano marciano {h.ano}")
+            marte.config(text=_("Em Marte: sol {sol}, {mtc} MTC, ano marciano {ano}").format(
+                sol=marstime.milhar(h.sol), mtc=h.mtc_hms[:5], ano=h.ano))
             self.timer = self.root.after(1000, tick)
 
         tick()
@@ -351,7 +352,7 @@ class Configuracoes:
                    "unavailable": ("indisponível", AREIA2), "unmanaged": ("não gerenciado", AREIA2),
                    "connecting": ("conectando...", AMBAR)}
         tipos = {"ethernet": "cabo", "wifi": "Wi-Fi", "loopback": "interno"}
-        self.secao("Conexões")
+        self.secao(_("Conexões"))
         achou = False
         for linha in out.splitlines():
             partes = re.split(r"(?<!\\):", linha)
@@ -360,14 +361,15 @@ class Configuracoes:
             achou = True
             dev, tipo, est, con = partes[:4]
             nome_est, cor = next((v for k, v in estados.items() if est.startswith(k)), (est, AREIA))
-            self.texto(f"{dev}  ({tipos.get(tipo, tipo)}):  {nome_est}" + (f"  —  {con}" if con else ""), cor)
+            tipo_txt = _(tipos.get(tipo, tipo))
+            self.texto(f"{dev}  ({tipo_txt}):  {_(nome_est)}" + (f"  —  {con}" if con else ""), cor)
         if not achou:
-            self.texto("Nenhuma placa de rede encontrada." if code == 0 else
-                       "O NetworkManager não respondeu.", VERMELHO)
-        self.secao("Ações")
-        self.botao("Configurar rede e Wi-Fi (nmtui)",
-                   lambda: marsconf.abrir(["xterm", "-title", "Rede", "-geometry", "90x28", "-e", "nmtui"]))
-        self.botao("Atualizar", lambda: self.mostrar("rede"))
+            self.texto(_("Nenhuma placa de rede encontrada.") if code == 0 else
+                       _("O NetworkManager não respondeu."), VERMELHO)
+        self.secao(_("Ações"))
+        self.botao(_("Configurar rede e Wi-Fi (nmtui)"),
+                   lambda: marsconf.abrir(["xterm", "-title", _("Rede"), "-geometry", "90x28", "-e", "nmtui"]))
+        self.botao(_("Atualizar"), lambda: self.mostrar("rede"))
 
     def pagina_sistema(self):
         d = dict(re.findall(r'^(\w+)="?([^"\n]*)"?', ler("/etc/os-release"), re.M))
@@ -375,36 +377,39 @@ class Configuracoes:
         try:
             total = int(mem["MemTotal"]) // 1024
             livre = int(mem.get("MemAvailable", mem["MemFree"])) // 1024
-            memoria = f"{total - livre} de {total} MiB em uso"
+            memoria = _("{u} de {t} MiB em uso").format(u=total - livre, t=total)
         except KeyError:
             memoria = "?"
         disco = shutil.disk_usage("/")
+        espaco = _("{u} de {t} GiB usados").format(u=num((disco.total - disco.free) / 2**30, 1),
+                                                    t=num(disco.total / 2**30, 1))
         persist = "persistence" in ler("/proc/cmdline")
-        self.secao("Este computador")
-        self.texto(f"Sistema:  {d.get('PRETTY_NAME', 'MarsOS')}")
-        self.texto(f"Base:     Debian GNU/Linux {ler('/etc/debian_version').strip()}")
-        self.texto(f"Kernel:   {platform.release()}")
-        self.texto(f"Memória:  {memoria}")
-        self.texto(f"Espaço:   {(disco.total - disco.free) / 2**30:.1f} de {disco.total / 2**30:.1f} GiB usados")
+        self.secao(_("Este computador"))
+        self.texto(_("Sistema:  {v}").format(v=d.get("PRETTY_NAME", "MarsOS")))
+        self.texto(_("Base:     {v}").format(v="Debian GNU/Linux " + ler("/etc/debian_version").strip()))
+        self.texto(_("Kernel:   {v}").format(v=platform.release()))
+        self.texto(_("Memória:  {v}").format(v=memoria))
+        self.texto(_("Espaço:   {v}").format(v=espaco))
         if persist:
-            self.texto("Persistência: LIGADA — seus arquivos e programas ficam salvos.", VERDE)
+            self.texto(_("Persistência: LIGADA — seus arquivos e programas ficam salvos."), VERDE)
         else:
-            self.texto("Persistência: desligada — tudo some ao desligar. Use \"MarsOS com "
-                       "persistência\" no menu de boot para salvar.", AMBAR)
-        self.secao("Ferramentas")
+            self.texto(_("Persistência: desligada — tudo some ao desligar. Use \"MarsOS com persistência\" "
+                         "no menu de boot para salvar."), AMBAR)
+        self.secao(_("Ferramentas"))
         linha1 = tk.Frame(self.corpo, bg=FUNDO)
         linha1.pack(anchor="w")
-        self.botao("Monitor do sistema",
+        self.botao(_("Monitor do sistema"),
                    lambda: marsconf.abrir(["xterm", "-title", "htop", "-geometry", "100x30", "-e", "htop"]),
                    linha1, "left")
-        self.botao("Terminal de root", lambda: marsconf.abrir(["xterm", "-title", "root@marte", "-e", "sudo", "-i"]),
+        self.botao(_("Terminal de root"),
+                   lambda: marsconf.abrir(["xterm", "-title", "root@marte", "-e", "sudo", "-i"]),
                    linha1, "left")
         linha2 = tk.Frame(self.corpo, bg=FUNDO)
         linha2.pack(anchor="w")
-        self.botao("Atualizar lista de programas",
+        self.botao(_("Atualizar lista de programas"),
                    lambda: marsconf.abrir(["xterm", "-hold", "-title", "apt update", "-e", "sudo", "apt", "update"]),
                    linha2, "left")
-        self.botao("Sobre o MarsOS", lambda: marsconf.abrir(["marsos-sobre"]), linha2, "left")
+        self.botao(_("Sobre o MarsOS"), lambda: marsconf.abrir(["marsos-sobre"]), linha2, "left")
 
 
 if __name__ == "__main__":
