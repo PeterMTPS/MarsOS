@@ -208,6 +208,9 @@ footer img { width: 32px; height: 32px; vertical-align: middle; }
 
 section { padding: 0 16px; scroll-margin-top: 70px; }
 
+@media (max-width: 1020px) {
+  .painel .links { display: none; }
+}
 @media (max-width: 760px) {
   body { font-size: 20px; }
   .hero { padding-top: 26px; }
