@@ -1,0 +1,25 @@
+/* XPM */
+static char *rede[] = {
+"16 16 5 1",
+". c None",
+"a c #ac2f44",
+"b c #1a1117",
+"c c #51323e",
+"d c #5a6f8c",
+"................",
+"....aaaaaaaa....",
+".......b........",
+".......b........",
+"..bbbbbbbbbbbb..",
+"..bccccccccccb..",
+"..bcddddddddcb..",
+"..bcddddddddcb..",
+"..bcddddddddcb..",
+"..bcddddddddcb..",
+"..bcddddddddcb..",
+"..bcddddddddcb..",
+"..bccccccccccb..",
+"..bbbbbbbbbbbb..",
+"................",
+"................"
+};

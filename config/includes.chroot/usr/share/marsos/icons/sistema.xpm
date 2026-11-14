@@ -1,0 +1,26 @@
+/* XPM */
+static char *sistema[] = {
+"16 16 6 1",
+". c None",
+"a c #1a1117",
+"b c #251820",
+"c c #ff8933",
+"d c #e54438",
+"e c #51323e",
+"................",
+"................",
+".aaaaaaaaaaaaaa.",
+".abbbbbbbbbbbba.",
+".abbbbbcbbbbbba.",
+".abcbbbcbbbbbba.",
+".abcbbbcbbbcbba.",
+".abcbdbcbbbcbba.",
+".abcbdbcbdbcbba.",
+".abcbdbcbdbcbba.",
+".abcbdbcbdbcbba.",
+".aaaaaaaaaaaaaa.",
+"......eeee......",
+"......eeee......",
+"....eeeeeeee....",
+"................"
+};

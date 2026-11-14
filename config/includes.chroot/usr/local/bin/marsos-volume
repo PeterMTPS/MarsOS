@@ -1,0 +1,61 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""marsos-volume - controle de volume rapido (abre/fecha pelo alto-falante do painel)."""
+import atexit
+import os
+import signal
+import subprocess
+import sys
+import tkinter as tk
+
+sys.path.insert(0, "/usr/lib/marsos")
+import marssom  # noqa: E402
+from marstk import AREIA, CREME, FONTE, FUNDO, LARANJA, NOITE, ROCHA, VERMELHO, janela  # noqa: E402
+
+# Clicar de novo no alto-falante fecha a janela que ja esta aberta
+TRAVA = os.path.join(os.environ.get("XDG_RUNTIME_DIR", "/tmp"), "marsos-volume.pid")
+try:
+    with open(TRAVA) as f:
+        os.kill(int(f.read().strip()), signal.SIGTERM)
+    os.remove(TRAVA)
+    sys.exit(0)
+except (OSError, ValueError):
+    pass
+with open(TRAVA, "w") as f:
+    f.write(str(os.getpid()))
+atexit.register(lambda: os.path.exists(TRAVA) and os.remove(TRAVA))
+signal.signal(signal.SIGTERM, lambda *a: sys.exit(0))
+
+root = janela("MarsOSVolume", "Volume")
+root.resizable(False, False)
+vol, mudo = marssom.volume()
+
+tk.Label(root, text="VOLUME", fg=LARANJA, bg=FUNDO, font=(FONTE, -16, "bold"), pady=6).pack()
+if vol is None:
+    tk.Label(root, text="Nenhuma saída\nde som", fg=VERMELHO, bg=FUNDO, padx=16, pady=20).pack()
+else:
+    v = tk.IntVar(value=vol)
+    agendado = [None]
+
+    def mudou(_=None):
+        if agendado[0]:
+            root.after_cancel(agendado[0])
+        agendado[0] = root.after(120, lambda: marssom.definir_volume(v.get()))
+
+    tk.Scale(root, from_=100, to=0, orient="vertical", length=170, variable=v, command=mudou,
+             bg=FUNDO, fg=CREME, troughcolor=ROCHA, activebackground=VERMELHO, highlightthickness=0,
+             sliderlength=22, width=18, bd=2, font=(FONTE, -14)).pack(padx=22)
+    m = tk.BooleanVar(value=mudo)
+    tk.Checkbutton(root, text="Mudo", variable=m, command=lambda: marssom.mudo(m.get()),
+                   bg=FUNDO, fg=AREIA, selectcolor=NOITE, activebackground=FUNDO,
+                   activeforeground=CREME).pack(pady=(4, 0))
+
+
+def mais():
+    subprocess.Popen(["marsos-config", "som"], start_new_session=True)
+    root.destroy()
+
+
+tk.Button(root, text="Mais...", command=mais, fg=CREME).pack(pady=8)
+root.bind("<Escape>", lambda e: root.destroy())
+root.mainloop()

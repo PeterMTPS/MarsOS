@@ -1,0 +1,24 @@
+label live-@FLAVOUR@
+	menu label ^Iniciar o MarsOS
+	menu default
+	linux @LINUX@
+	initrd @INITRD@
+	append @APPEND_LIVE@
+
+label live-@FLAVOUR@-persistence
+	menu label MarsOS com ^persistencia
+	linux @LINUX@
+	initrd @INITRD@
+	append @APPEND_LIVE@ persistence
+
+label live-@FLAVOUR@-toram
+	menu label MarsOS na ^RAM (sem pendrive)
+	linux @LINUX@
+	initrd @INITRD@
+	append @APPEND_LIVE@ toram
+
+label live-@FLAVOUR@-failsafe
+	menu label MarsOS em ^modo seguro
+	linux @LINUX@
+	initrd @INITRD@
+	append @APPEND_LIVE_FAILSAFE@

@@ -1,0 +1,27 @@
+/* XPM */
+static char *terminal[] = {
+"16 16 7 1",
+". c None",
+"a c #1a1117",
+"b c #51323e",
+"c c #e54438",
+"d c #251820",
+"e c #ff8933",
+"f c #e8c9a8",
+"................",
+"aaaaaaaaaaaaaaaa",
+"abbbbbbbbbbbccba",
+"abbbbbbbbbbbccba",
+"adddddddddddddda",
+"adddddddddddddda",
+"addeddddddddddda",
+"adddedddddddddda",
+"addddeddddddddda",
+"adddedddddddddda",
+"addedddffffdddda",
+"adddddddddddddda",
+"adddddddddddddda",
+"adddddddddddddda",
+"aaaaaaaaaaaaaaaa",
+"................"
+};

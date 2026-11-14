@@ -1,0 +1,220 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""marsfetch - informacoes do sistema com o planeta do MarsOS ao lado."""
+import os
+import platform
+import re
+import shutil
+import subprocess
+import sys
+
+sys.path.insert(0, "/usr/lib/marsos")
+try:
+    import marstime
+except ImportError:  # pragma: no cover
+    marstime = None
+
+LOGO = "/usr/share/marsos/logo/marte-32.txt"
+RGB = {"a": (0x3d, 0x28, 0x36), "b": (0x51, 0x32, 0x3e), "c": (0xac, 0x2f, 0x44),
+       "d": (0xe5, 0x44, 0x38), "e": (0xff, 0x89, 0x33)}
+ANSI16 = {"a": 90, "b": 90, "c": 31, "d": 91, "e": 93}
+R = "\033[0m"
+CHAVE = "\033[1;33m"
+TITULO = "\033[1;31m"
+SEP = "\033[0;33m"
+
+
+def logo_linhas():
+    """Planeta em meio-blocos (2 pixels por caractere). Console usa 16 cores."""
+    try:
+        grade = [l.rstrip("\n") for l in open(LOGO, encoding="ascii")]
+    except OSError:
+        return []
+    console = os.environ.get("TERM", "") == "linux"
+    if console:  # console: 1 pixel por caractere, linhas puladas (sem fundo colorido)
+        out = []
+        for y in range(0, len(grade), 2):
+            s = ""
+            for ch in grade[y]:
+                s += " " if ch == "." else f"\033[{ANSI16[ch]}m█"
+            out.append(s + R)
+        return out
+
+    def fg(ch):
+        r, g, b = RGB[ch]
+        return f"\033[38;2;{r};{g};{b}m"
+
+    def bg(ch):
+        r, g, b = RGB[ch]
+        return f"\033[48;2;{r};{g};{b}m"
+
+    out = []
+    for y in range(0, len(grade), 2):
+        cima, baixo = grade[y], grade[y + 1] if y + 1 < len(grade) else "." * len(grade[y])
+        s = ""
+        for c, b in zip(cima, baixo):
+            if c == "." and b == ".":
+                s += R + " "
+            elif c == ".":
+                s += R + fg(b) + "▄"
+            elif b == ".":
+                s += R + fg(c) + "▀"
+            else:
+                s += fg(c) + bg(b) + "▀"
+        out.append(s + R)
+    return out
+
+
+def ler(caminho):
+    try:
+        with open(caminho, encoding="utf-8") as f:
+            return f.read()
+    except OSError:
+        return ""
+
+
+def os_release():
+    d = dict(re.findall(r'^(\w+)="?([^"\n]*)"?', ler("/etc/os-release"), re.M))
+    return d.get("PRETTY_NAME", "MarsOS")
+
+
+def uptime():
+    try:
+        s = int(float(ler("/proc/uptime").split()[0]))
+    except (IndexError, ValueError):
+        return "?"
+    d, s = divmod(s, 86400)
+    h, s = divmod(s, 3600)
+    m = s // 60
+    partes = ([f"{d} d"] if d else []) + ([f"{h} h"] if h else []) + [f"{m} min"]
+    return " ".join(partes)
+
+
+def pacotes():
+    try:
+        n = subprocess.run(["dpkg-query", "-f", ".\n", "-W"], capture_output=True, text=True).stdout.count("\n")
+        return f"{n} (dpkg)"
+    except OSError:
+        return "?"
+
+
+def memoria():
+    info = dict(re.findall(r"^(\w+):\s+(\d+)", ler("/proc/meminfo"), re.M))
+    try:
+        total = int(info["MemTotal"]) // 1024
+        livre = int(info.get("MemAvailable", info["MemFree"])) // 1024
+        return f"{total - livre} / {total} MiB"
+    except KeyError:
+        return "?"
+
+
+def cpu():
+    nomes = re.findall(r"^model name\s*:\s*(.+)$", ler("/proc/cpuinfo"), re.M)
+    if not nomes:
+        return platform.machine()
+    nome = re.sub(r"\((R|TM|tm|r)\)|CPU|Processor|@.*|\d+(th|st|nd|rd) Gen", "", nomes[0])
+    return f"{' '.join(nome.split())} ({len(nomes)})"
+
+
+def disco():
+    try:
+        u = shutil.disk_usage("/")
+        return f"{u.used / 2**30:.1f} / {u.total / 2**30:.1f} GiB"
+    except OSError:
+        return "?"
+
+
+def processo_rodando(*nomes):
+    for pid in os.listdir("/proc"):
+        if pid.isdigit():
+            if ler(f"/proc/{pid}/comm").strip() in nomes:
+                return True
+    return False
+
+
+def janelas():
+    if processo_rodando("fvwm", "fvwm3"):
+        return "FVWM"
+    return "console (digite startx)"
+
+
+def terminal():
+    if os.environ.get("DISPLAY") and os.environ.get("XTERM_VERSION"):
+        return os.environ["XTERM_VERSION"].replace("XTerm(", "XTerm ").rstrip(")")
+    return os.environ.get("TERM", "?")
+
+
+def shell():
+    sh = os.path.basename(os.environ.get("SHELL", "sh"))
+    if sh == "bash":
+        try:
+            v = subprocess.run(["bash", "--version"], capture_output=True, text=True).stdout.split()[3]
+            return "bash " + v.split("(")[0]
+        except (OSError, IndexError):
+            pass
+    return sh
+
+
+def main():
+    usuario = os.environ.get("USER") or os.environ.get("LOGNAME") or "astronauta"
+    host = platform.node() or "marte"
+    titulo = f"{TITULO}{usuario}{R}@{TITULO}{host}{R}"
+    campos = [
+        ("Sistema", f"{os_release()} {platform.machine()}"),
+        ("Base", "Debian GNU/Linux " + ler("/etc/debian_version").strip()),
+        ("Kernel", platform.release()),
+        ("Ligado há", uptime()),
+        ("Pacotes", pacotes()),
+        ("Shell", shell()),
+        ("Janelas", janelas()),
+        ("Terminal", terminal()),
+        ("CPU", cpu()),
+        ("Memória", memoria()),
+        ("Disco (/)", disco()),
+    ]
+    if marstime:
+        h = marstime.calcular()
+        campos += [("Sol", f"{marstime.milhar(h.sol)} · {h.mtc_hms[:5]} MTC · ano {h.ano}"),
+                   ("Estação", f"{h.estacao_norte} no norte")]
+    info = [titulo, SEP + "─" * (len(usuario) + len(host) + 1) + R]
+    info += [f"{CHAVE}{k + ':':<11}{R}{v}" for k, v in campos]
+    info += ["", "".join(f"\033[4{i}m   " for i in range(8)) + R,
+             "".join(f"\033[10{i}m   " for i in range(8)) + R]
+
+    logo = logo_linhas()
+    largura = 32
+    # corta o texto para nao quebrar linha em terminais estreitos
+    cabe = max(10, shutil.get_terminal_size((80, 24)).columns - (2 + largura + 3) - 1)
+    info = [cortar(l, cabe) for l in info]
+    total = max(len(logo), len(info))
+    topo = max(0, (total - len(info)) // 2)
+    print()
+    for i in range(total):
+        esq = logo[i] if i < len(logo) else " " * largura
+        j = i - topo
+        dir_ = info[j] if 0 <= j < len(info) else ""
+        print(f"  {esq}   {dir_}")
+    print()
+
+
+def cortar(texto, n):
+    """Corta 'texto' em n caracteres visiveis, preservando as sequencias ANSI."""
+    out, vis, i = "", 0, 0
+    while i < len(texto):
+        if texto[i] == "\033":
+            fim = texto.find("m", i)
+            if fim < 0:
+                break
+            out += texto[i:fim + 1]
+            i = fim + 1
+            continue
+        if vis >= n:
+            break
+        out += texto[i]
+        vis += 1
+        i += 1
+    return out + R
+
+
+if __name__ == "__main__":
+    main()

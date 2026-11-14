@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""marsos-aplicar-config - aplica as Configuracoes do MarsOS quando o X inicia (.xinitrc)."""
+import sys
+
+sys.path.insert(0, "/usr/lib/marsos")
+import marsconf  # noqa: E402
+import marssom  # noqa: E402
+
+c = marsconf.ler()
+
+layout = c.get("teclado", "layout", fallback="")
+if layout:
+    marsconf.aplicar_teclado(layout, c.get("teclado", "variante", fallback=""))
+
+marsconf.aplicar_mouse(c.getint("mouse", "velocidade", fallback=3),
+                       c.get("mouse", "canhoto", fallback="nao") == "sim")
+
+modo = c.get("tela", "modo", fallback="")
+if modo:
+    marsconf.aplicar_modo(modo)
+
+if c.get("som", "inicio", fallback="sim") == "sim" and "--sem-som" not in sys.argv:
+    marssom.tocar("inicio", atraso=2)

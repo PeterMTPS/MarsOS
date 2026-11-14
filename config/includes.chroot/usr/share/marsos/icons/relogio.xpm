@@ -1,0 +1,25 @@
+/* XPM */
+static char *relogio[] = {
+"16 16 5 1",
+". c None",
+"a c #3d2836",
+"b c #e8c9a8",
+"c c #1a1117",
+"d c #e54438",
+".....aaaaaa.....",
+"....abbbbbba....",
+"..aabbbbbbbbaa..",
+"..abbbbcbbbbba..",
+".abbbbbcbbbbbba.",
+"abbbbbbcbbbbbbba",
+"abbbbbbcbbbbbbba",
+"abbbbbbcbbbbbbba",
+"abbbbbbdccccbbba",
+"abbbbbbbbbbbbbba",
+"abbbbbbbbbbbbbba",
+".abbbbbbbbbbbba.",
+"..abbbbbbbbbba..",
+"..aabbbbbbbbaa..",
+"....abbbbbba....",
+".....aaaaaa....."
+};

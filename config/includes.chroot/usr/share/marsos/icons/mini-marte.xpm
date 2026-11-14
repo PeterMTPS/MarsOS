@@ -1,0 +1,26 @@
+/* XPM */
+static char *mini_marte[] = {
+"16 16 6 1",
+". c None",
+"a c #3d2836",
+"b c #51323e",
+"c c #e54438",
+"d c #ac2f44",
+"e c #ff8933",
+"......aabbb.....",
+"....acdbabbba...",
+"...addddbdddbb..",
+"..abbbdccccccdb.",
+".abbbbccccccccc.",
+".abdddccecccccee",
+"abbdcccceecccccc",
+"bbddcccceecccccc",
+"bbddcccceecceccc",
+"bbbdccccccceeeec",
+"bbbdccccccceeeec",
+".badcccccceeeec.",
+".bddccccccccccc.",
+"..bdcccccccccc..",
+"...ddddddcccd...",
+".....bbdddc....."
+};

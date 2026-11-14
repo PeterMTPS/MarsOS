@@ -1,0 +1,24 @@
+/* XPM */
+static char *pasta[] = {
+"16 16 4 1",
+". c None",
+"a c #3d2836",
+"b c #c9845a",
+"c c #ffb45e",
+"................",
+"................",
+".aaaaaa.........",
+".abbbba.........",
+".aaaaaaaaaaaaaa.",
+".abbbbbbbbbbbba.",
+".aaaaaaaaaaaaaaa",
+".aacccccccccccca",
+".aacccccccccccca",
+".aacccccccccccca",
+".acccccccccccca.",
+".acccccccccccca.",
+".acccccccccccca.",
+".aaaaaaaaaaaaaa.",
+"................",
+"................"
+};

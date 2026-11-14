@@ -1,0 +1,8 @@
+#!/bin/sh
+# marsos-navegador - abre o navegador disponivel (Firefox primeiro; Dillo e o retro)
+for b in firefox-esr firefox dillo netsurf-gtk netsurf; do
+	if command -v "$b" >/dev/null 2>&1; then
+		exec "$b" "$@"
+	fi
+done
+exec xmessage -center "Nenhum navegador instalado. Tente: sudo apt install firefox-esr"

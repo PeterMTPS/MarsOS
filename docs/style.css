@@ -1,0 +1,216 @@
+/* MarsOS - site de download. Paleta do logo: #3d2836 #51323e #ac2f44 #e54438 #ff8933 */
+:root {
+  --fundo: #1a1117;
+  --noite: #3d2836;
+  --rocha: #51323e;
+  --rocha-hi: #7a5262;
+  --carmim: #ac2f44;
+  --vermelho: #e54438;
+  --laranja: #ff8933;
+  --ambar: #ffb45e;
+  --areia: #e8c9a8;
+  --areia2: #c9a892;
+  --creme: #fff1dc;
+  --verde: #b8c46a;
+  --azul: #8fb0d9;
+  --pixel: "Silkscreen", "VT323", monospace;
+  --mono: "VT323", "Courier New", monospace;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--fundo) url("img/fundo.png") center top / cover fixed no-repeat;
+  image-rendering: pixelated;
+  color: var(--areia);
+  font: 22px/1.35 var(--mono);
+  min-height: 100vh;
+}
+/* escurece o papel de parede e adiciona linhas de CRT */
+body::before {
+  content: "";
+  position: fixed; inset: 0;
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 1px, transparent 1px 3px),
+    linear-gradient(rgba(26,17,23,.55), rgba(26,17,23,.80));
+  pointer-events: none;
+  z-index: 0;
+}
+main, header, footer { position: relative; z-index: 1; }
+img { image-rendering: pixelated; max-width: 100%; }
+a { color: var(--laranja); }
+a:hover { color: var(--ambar); }
+h1, h2, h3 { font-family: var(--pixel); font-weight: 400; margin: 0; }
+code, kbd { font-family: var(--mono); color: var(--creme); background: var(--fundo); padding: 0 6px; border: 1px solid var(--rocha); }
+
+/* ---------- painel superior (como o MarsBar do FVWM) ---------- */
+.painel {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: stretch; gap: 4px; flex-wrap: wrap;
+  background: var(--noite);
+  padding: 4px;
+  border-bottom: 2px solid var(--fundo);
+  box-shadow: inset 0 1px 0 var(--rocha-hi), 0 4px 0 rgba(0,0,0,.25);
+}
+.botao-painel {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 12px;
+  background: var(--rocha);
+  color: var(--creme);
+  text-decoration: none;
+  font-family: var(--pixel); font-size: 15px;
+  box-shadow: inset 2px 2px 0 var(--rocha-hi), inset -2px -2px 0 var(--fundo);
+}
+.botao-painel:hover { background: var(--vermelho); color: var(--creme); box-shadow: inset 2px 2px 0 var(--laranja), inset -2px -2px 0 var(--carmim); }
+.botao-painel img { width: 16px; height: 16px; }
+.painel .espaco { flex: 1; }
+.relogio-painel {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 0 12px; background: var(--fundo);
+  font-size: 18px; line-height: 1.05;
+  box-shadow: inset 2px 2px 0 #0e0a12, inset -2px -2px 0 var(--rocha);
+}
+.relogio-painel b { color: var(--laranja); font-weight: 400; }
+
+/* ---------- janelas estilo FVWM ---------- */
+.janela {
+  background: var(--fundo);
+  border: 5px solid var(--rocha);
+  box-shadow: inset 1px 1px 0 var(--rocha-hi), 0 0 0 1px #0e0a12, 6px 6px 0 rgba(0,0,0,.35);
+  margin: 0 auto 36px;
+  max-width: 1080px;
+}
+.janela:hover, .janela:focus-within { border-color: var(--vermelho); }
+.titulo {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--rocha);
+  color: var(--areia2);
+  padding: 2px 4px;
+  font-family: var(--pixel); font-size: 14px;
+  box-shadow: inset 1px 1px 0 var(--rocha-hi), inset -1px -1px 0 #1a1117;
+}
+.janela:hover .titulo, .janela:focus-within .titulo { background: var(--vermelho); color: var(--creme); }
+.titulo img { width: 16px; height: 16px; }
+.titulo span { flex: 1; text-align: center; }
+.titulo i {
+  width: 16px; height: 16px; display: inline-block;
+  box-shadow: inset 1px 1px 0 rgba(255,255,255,.35), inset -1px -1px 0 rgba(0,0,0,.45);
+}
+.conteudo { padding: 22px 26px; }
+.conteudo > h2 { color: var(--laranja); font-size: 26px; margin-bottom: 12px; }
+.conteudo p { margin: 8px 0; }
+
+/* ---------- hero ---------- */
+.hero { padding: 54px 16px 36px; }
+.hero .conteudo {
+  display: grid; grid-template-columns: 300px 1fr; gap: 36px; align-items: center;
+  background: radial-gradient(circle at 20% 50%, rgba(172,47,68,.22), transparent 60%);
+}
+.planeta { width: 300px; height: 300px; filter: drop-shadow(0 0 24px rgba(229,68,56,.35)); }
+.marca {
+  font-family: var(--pixel); font-size: clamp(48px, 9vw, 96px); line-height: 1;
+  background: linear-gradient(#ffd59a 0 18%, #ffb45e 18% 36%, #ff8933 36% 58%, #e54438 58% 84%, #ac2f44 84%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(5px 5px 0 #0e0a12);
+}
+.versao { font-family: var(--pixel); color: var(--areia); font-size: 20px; margin: 8px 0 14px; letter-spacing: 2px; }
+.slogan { font-size: 28px; color: var(--creme); margin: 0 0 22px; }
+.acoes { display: flex; flex-wrap: wrap; gap: 14px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 12px 22px;
+  font-family: var(--pixel); font-size: 17px;
+  color: var(--creme); text-decoration: none;
+  background: var(--rocha);
+  border: 0; cursor: pointer;
+  box-shadow: inset 3px 3px 0 var(--rocha-hi), inset -3px -3px 0 var(--fundo), 4px 4px 0 rgba(0,0,0,.4);
+}
+.btn:hover { color: var(--creme); filter: brightness(1.15); }
+.btn:active { box-shadow: inset 3px 3px 0 var(--fundo), inset -3px -3px 0 var(--rocha-hi); transform: translate(2px, 2px); }
+.btn.principal { background: var(--vermelho); box-shadow: inset 3px 3px 0 var(--laranja), inset -3px -3px 0 var(--carmim), 4px 4px 0 rgba(0,0,0,.4); }
+.btn.principal:active { box-shadow: inset 3px 3px 0 var(--carmim), inset -3px -3px 0 var(--laranja); }
+.btn small { font-family: var(--mono); font-size: 18px; opacity: .85; }
+.btn img { width: 16px; height: 16px; }
+
+/* ---------- recursos ---------- */
+.grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+.recurso {
+  background: var(--noite); padding: 16px;
+  box-shadow: inset 2px 2px 0 var(--rocha-hi), inset -2px -2px 0 #0e0a12;
+}
+.recurso img { width: 48px; height: 48px; }
+.recurso h3 { color: var(--ambar); font-size: 16px; margin: 8px 0 6px; }
+.recurso p { margin: 0; font-size: 20px; color: var(--areia); }
+
+/* ---------- telas ---------- */
+.galeria { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
+.galeria figure { margin: 0; background: var(--noite); padding: 8px; box-shadow: inset 2px 2px 0 var(--rocha-hi), inset -2px -2px 0 #0e0a12; }
+.galeria a { display: block; line-height: 0; }
+.galeria img { width: 100%; image-rendering: auto; border: 1px solid #0e0a12; }
+.galeria figcaption { font-size: 19px; padding: 8px 4px 2px; color: var(--areia); }
+
+/* ---------- download ---------- */
+.download { display: grid; grid-template-columns: 1.2fr 1fr; gap: 26px; align-items: start; }
+.ficha { width: 100%; border-collapse: collapse; font-size: 20px; }
+.ficha td { padding: 4px 8px; border-bottom: 1px dashed var(--rocha); vertical-align: top; }
+.ficha td:first-child { color: var(--ambar); white-space: nowrap; }
+.hash { word-break: break-all; font-size: 17px; color: var(--creme); }
+.requisitos { background: var(--noite); padding: 14px 18px; box-shadow: inset 2px 2px 0 var(--rocha-hi), inset -2px -2px 0 #0e0a12; }
+.requisitos h3 { color: var(--ambar); font-size: 16px; margin-bottom: 6px; }
+.requisitos ul { margin: 0; padding-left: 22px; }
+
+/* ---------- passos ---------- */
+.passos { counter-reset: passo; list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+.passos li { counter-increment: passo; position: relative; padding: 12px 14px 12px 66px; background: var(--noite); box-shadow: inset 2px 2px 0 var(--rocha-hi), inset -2px -2px 0 #0e0a12; }
+.passos li::before {
+  content: counter(passo);
+  position: absolute; left: 12px; top: 12px;
+  width: 40px; height: 40px; display: grid; place-items: center;
+  font-family: var(--pixel); color: var(--creme); background: var(--vermelho);
+  box-shadow: inset 2px 2px 0 var(--laranja), inset -2px -2px 0 var(--carmim);
+}
+.passos h3 { color: var(--ambar); font-size: 16px; margin-bottom: 4px; }
+
+/* ---------- terminal (relogio marciano) ---------- */
+.terminal {
+  background: #1a1117; color: var(--areia);
+  font: 23px/1.25 var(--mono);
+  padding: 14px 18px; overflow-x: auto; white-space: pre; margin: 0;
+  border: 2px solid #0e0a12;
+}
+.terminal .p { color: var(--vermelho); }
+.terminal .h { color: var(--ambar); }
+.terminal .a { color: #d97a2b; }
+.terminal .c { color: var(--creme); }
+.cursor { display: inline-block; width: 11px; height: 22px; background: var(--laranja); vertical-align: -4px; animation: piscar 1s steps(1) infinite; }
+@keyframes piscar { 50% { opacity: 0; } }
+
+/* ---------- FAQ ---------- */
+details { background: var(--noite); margin: 0 0 10px; box-shadow: inset 2px 2px 0 var(--rocha-hi), inset -2px -2px 0 #0e0a12; }
+summary { cursor: pointer; padding: 10px 14px; color: var(--creme); list-style: none; }
+summary::before { content: "▸ "; color: var(--laranja); }
+details[open] summary::before { content: "▾ "; }
+details > div { padding: 0 16px 12px 34px; }
+
+footer { text-align: center; padding: 10px 16px 46px; color: var(--areia2); font-size: 20px; }
+footer img { width: 32px; height: 32px; vertical-align: middle; }
+
+section { padding: 0 16px; scroll-margin-top: 70px; }
+
+@media (max-width: 760px) {
+  body { font-size: 20px; }
+  .hero { padding-top: 26px; }
+  .hero .conteudo { grid-template-columns: 1fr; text-align: center; gap: 12px; }
+  .planeta { width: 200px; height: 200px; margin: 0 auto; }
+  .acoes { justify-content: center; }
+  .download { grid-template-columns: 1fr; }
+  .conteudo { padding: 16px; }
+  .painel .links { display: none; }
+  .terminal { font-size: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cursor { animation: none; }
+  html { scroll-behavior: auto; }
+}

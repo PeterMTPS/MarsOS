@@ -1,0 +1,26 @@
+/* XPM */
+static char *editor[] = {
+"16 16 6 1",
+". c None",
+"a c #3d2836",
+"b c #fff1dc",
+"c c #8a4a3a",
+"d c #ff8933",
+"e c #1a1117",
+"................",
+"...aaaaaaaaaa...",
+"...abbbbbbbba...",
+"...abbbbbbbba...",
+"...abccccccba...",
+"...abbbbbbbba...",
+"...abccccccba...",
+"...abbbbbbbba...",
+"...abccccccbad..",
+"...abbbbbbbbddd.",
+"...abccccccddd..",
+"...abbbbbbddd...",
+"...abbbbbddda...",
+"...abbbbdddba...",
+"...aaaaaaeaaa...",
+"................"
+};

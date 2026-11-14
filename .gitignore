@@ -1,0 +1,19 @@
+# gerados pelo live-build
+.build/
+cache/
+chroot/
+binary/
+config/bootloaders/
+config/binary
+config/bootstrap
+config/chroot
+config/common
+config/source
+build.log
+*.iso
+*.sha256
+saida/
+
+# ferramentas locais
+__pycache__/
+*.pyc

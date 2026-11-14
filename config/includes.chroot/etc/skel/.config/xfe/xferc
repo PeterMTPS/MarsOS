@@ -1,0 +1,16 @@
+[SETTINGS]
+basecolor=#3d2836
+bordercolor=#1a1117
+backcolor=#1a1117
+forecolor=#e8c9a8
+selbackcolor=#e54438
+selforecolor=#fff1dc
+listbackcolor=#1a1117
+listforecolor=#e8c9a8
+highlightcolor=#51323e
+pbarcolor=#e54438
+attentioncolor=#ff8933
+scrollbarcolor=#51323e
+use_clearlooks=0
+single_click=0
+file_tooltips=1

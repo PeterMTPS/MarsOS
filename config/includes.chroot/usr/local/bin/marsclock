@@ -1,0 +1,75 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""marsclock - Relogio Marciano do MarsOS.   Uso: marsclock [--mini]"""
+import subprocess
+import sys
+import time
+import tkinter as tk
+
+sys.path.insert(0, "/usr/lib/marsos")
+import marstime  # noqa: E402
+from marstk import (AMBAR, AREIA, CARMIM, CREME, FONTE, FUNDO, LARANJA, NOITE,  # noqa: E402
+                    ROCHA, PlanetaGirando, estrelas, janela)
+
+
+def mini():
+    """Versao de 2 linhas que fica encaixada no painel do FVWM."""
+    root = janela("MarsClockMini", "MarsClockMini")
+    l1 = tk.Label(root, font=(FONTE, -14, "bold"), fg=LARANJA, bg=FUNDO, padx=4, pady=0, anchor="w")
+    l2 = tk.Label(root, font=(FONTE, -14), fg=AREIA, bg=FUNDO, padx=4, pady=0, anchor="w")
+    l1.pack(fill="both", expand=True)
+    l2.pack(fill="both", expand=True)
+
+    def tick():
+        h = marstime.calcular()
+        l1.config(text=f"SOL {marstime.milhar(h.sol)}")
+        l2.config(text=f"MTC {h.mtc_hms[:5]}")
+        root.after(1000, tick)
+
+    for w in (root, l1, l2):
+        w.bind("<Button-1>", lambda e: subprocess.Popen(["marsclock"]))
+    tick()
+    root.mainloop()
+
+
+def completo():
+    root = janela("MarsClock", "Relógio Marciano")
+    root.resizable(False, False)
+    topo = tk.Canvas(root, width=360, height=150, bg=FUNDO, highlightthickness=0)
+    topo.pack()
+    estrelas(topo, 360, 150, 60)
+    PlanetaGirando(topo, 70, 75, zoom=1)
+    topo.create_text(140, 38, anchor="w", text="HORA EM MARTE", fill=AMBAR, font=(FONTE, -16, "bold"))
+    hora = topo.create_text(138, 78, anchor="w", text="--:--:--", fill=LARANJA, font=(FONTE, -32, "bold"))
+    topo.create_text(140, 118, anchor="w", text="Coordinated Mars Time (MTC)", fill="#c9a892", font=(FONTE, -16))
+
+    corpo = tk.Frame(root, bg=NOITE, padx=14, pady=10, relief="sunken", bd=2)
+    corpo.pack(fill="both", padx=10, pady=(0, 10))
+    linhas = ["Sol marciano (MSD)", "Ano marciano", "Longitude solar (Ls)", "Estação (norte / sul)"]
+    linhas += [n for n, _ in marstime.LOCAIS] + ["Terra (UTC)"]
+    valores = {}
+    for i, rot in enumerate(linhas):
+        tk.Label(corpo, text=rot, bg=NOITE, fg=AREIA, anchor="w").grid(row=i, column=0, sticky="w", pady=1)
+        v = tk.Label(corpo, text="", bg=NOITE, fg=CREME, anchor="e", font=(FONTE, -16, "bold"))
+        v.grid(row=i, column=1, sticky="e", padx=(18, 0), pady=1)
+        valores[rot] = v
+    tk.Button(root, text="Fechar", command=root.destroy, fg=CREME).pack(pady=(0, 10))
+
+    def tick():
+        h = marstime.calcular()
+        topo.itemconfig(hora, text=h.mtc_hms)
+        valores["Sol marciano (MSD)"].config(text=marstime.milhar(h.sol))
+        valores["Ano marciano"].config(text=str(h.ano))
+        valores["Longitude solar (Ls)"].config(text=f"{h.ls:.1f}°".replace(".", ","))
+        valores["Estação (norte / sul)"].config(text=f"{h.estacao_norte} / {h.estacao_sul}")
+        for nome, lon in marstime.LOCAIS:
+            valores[nome].config(text=h.hms(h.lmst(lon))[:5])
+        valores["Terra (UTC)"].config(text=time.strftime("%d/%m/%Y %H:%M:%S", time.gmtime(h.unix)), fg=CARMIM)
+        root.after(1000, tick)
+
+    tick()
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    mini() if "--mini" in sys.argv else completo()

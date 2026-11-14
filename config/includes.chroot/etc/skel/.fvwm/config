@@ -1,0 +1,272 @@
+# ~/.fvwm/config  -  MarsOS 1.0 "Olympus"
+# Tema marciano retro para o FVWM (estilo Linux dos anos 90).
+# Paleta do logo: #3d2836 #51323e #ac2f44 #e54438 #ff8933
+
+#----------------------------------------------------------------------
+# Basico
+#----------------------------------------------------------------------
+ImagePath /usr/share/marsos/icons:+
+DefaultFont "-*-terminus-bold-r-normal-*-14-*-*-*-*-*-iso10646-1"
+IgnoreModifiers L25
+DesktopSize 1x1
+DesktopName 0 Olympus
+DesktopName 1 Valles
+DesktopName 2 Gale
+DesktopName 3 Jezero
+EdgeScroll 0 0
+EdgeResistance 0
+EdgeThickness 0
+ClickTime 250
+MoveThreshold 3
+OpaqueMoveSize unlimited
+SnapAttraction 8 SameType Screen
+EwmhBaseStruts 0 0 0 38
+
+#----------------------------------------------------------------------
+# Cores
+#----------------------------------------------------------------------
+Colorset 0 fg #e8c9a8, bg #3d2836, hi #6e4a58, sh #1a1117
+Colorset 1 fg #c9a892, bg #51323e, hi #7a5262, sh #1a1117
+Colorset 2 fg #fff1dc, bg #e54438, hi #ff8933, sh #ac2f44
+Colorset 3 fg #e8c9a8, bg #2a1c24, hi #51323e, sh #0e0a12
+Colorset 4 fg #fff1dc, bg #e54438, hi #ff8933, sh #ac2f44
+Colorset 5 fg #fff1dc, bg #ac2f44, hi #e54438, sh #1a1117
+Colorset 6 fg #ffb45e, bg #1a1117, hi #51323e, sh #0e0a12
+Colorset 7 fg #fff1dc, bg #ac2f44, hi #e54438, sh #3d2836
+Colorset 8 fg #fff1dc, bg #51323e, hi #7a5262, sh #1a1117
+Colorset 9 fg #fff1dc, bg #e54438, hi #ff8933, sh #ac2f44
+
+#----------------------------------------------------------------------
+# Janelas
+#----------------------------------------------------------------------
+Style * Colorset 1, HilightColorset 2, BorderColorset 1, HilightBorderColorset 9
+Style * Font "-*-terminus-bold-r-normal-*-14-*-*-*-*-*-iso10646-1"
+Style * BorderWidth 5, HandleWidth 5, MwmBorder, MwmButtons, DepressableBorder
+Style * ClickToFocus, MinOverlapPlacement, DecorateTransient
+Style * EWMHMaximizeUseWorkingArea, EWMHPlacementUseWorkingArea
+Style * MiniIcon mini-marte.xpm, NoIcon, ResizeOpaque, WindowShadeSteps 16
+
+Style MarsBar      !Title, !Borders, Sticky, WindowListSkip, CirculateSkip, StaysOnTop, NeverFocus, FixedPosition, FixedSize, !Iconifiable
+Style FvwmPager    !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
+Style FvwmIconMan  !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
+Style MarsClockMini !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
+Style xclock       !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
+Style MarsGlobo    !Maximizable
+Style MarsOSSobre  !Maximizable, PositionPlacement Center
+Style MarsOSEnergia !Maximizable, PositionPlacement Center, StaysOnTop
+Style MarsOSConfig PositionPlacement Center
+Style MarsOSVolume !Maximizable, !Iconifiable, StaysOnTop, PositionPlacement UnderMouse
+
+TitleStyle Centered Height 20 -- Raised
+ButtonStyle All -- UseTitleStyle
+ButtonStyle 1 MiniIcon
+ButtonStyle 2 Vector 4 28x28@3 72x72@3 72x28@4 28x72@3
+ButtonStyle 4 Vector 7 25x25@3 75x25@3 75x75@3 25x75@3 25x25@3 25x32@4 75x32@3
+ButtonStyle 6 Vector 4 25x68@3 75x68@3 75x74@4 25x74@3
+
+#----------------------------------------------------------------------
+# Funcoes
+#----------------------------------------------------------------------
+DestroyFunc StartFunction
+AddToFunc StartFunction
++ I Module FvwmButtons -g $[vp.width]x38+0-0 MarsBar
++ I Test (Init) Exec exec xterm -title "Bem-vindo a Marte" -geometry 82x24+40+40 -e sh -c "marsfetch; exec bash"
+
+DestroyFunc MoverOuElevar
+AddToFunc MoverOuElevar
++ I Raise
++ M Move
++ D Maximize 100 100
+
+DestroyFunc RedimOuElevar
+AddToFunc RedimOuElevar
++ I Raise
++ M Resize
++ D Lower
+
+DestroyFunc CliqueTarefa
+AddToFunc CliqueTarefa
++ I ThisWindow (Iconic) Iconify off
++ I ThisWindow Focus
++ I ThisWindow Raise
+
+#----------------------------------------------------------------------
+# Menus
+#----------------------------------------------------------------------
+MenuStyle * MenuColorset 3, ActiveColorset 4, GreyedColorset 3
+MenuStyle * Hilight3DThin, HilightBack, ActiveFore, BorderWidth 2
+MenuStyle * Font "-*-terminus-bold-r-normal-*-14-*-*-*-*-*-iso10646-1"
+MenuStyle * TitleFont "-*-terminus-bold-r-normal-*-16-*-*-*-*-*-iso10646-1"
+MenuStyle * PopupOffset -4 100, PopupDelay 150, TrianglesSolid
+MenuStyle * VerticalItemSpacing 2 3, VerticalTitleSpacing 4 4, SeparatorsLong
+
+DestroyMenu MenuMars
+AddToMenu MenuMars "MarsOS 1.0  Olympus" Title
++ "%terminal.xpm%Terminal" Exec exec xterm
++ "%pasta.xpm%Arquivos" Exec exec xfe
++ "%editor.xpm%Editor de texto" Exec exec xfw
++ "%globo.xpm%Navegador (Firefox)" Exec exec marsos-navegador
++ "%globo.xpm%Navegador retrô (Dillo)" Exec exec dillo
++ "%pasta.xpm%Meus downloads" Exec exec xfe $[HOME]/Downloads
++ "" Nop
++ "%mini-marte.xpm%Marte" Popup MenuMarte
++ "%relogio.xpm%Acessórios" Popup MenuAcessorios
++ "%sistema.xpm%Sistema" Popup MenuSistema
++ "%globo.xpm%Áreas de trabalho" Popup MenuAreas
++ "" Nop
++ "%engrenagem.xpm%Configurações" Exec exec marsos-config
++ "%sobre.xpm%Sobre o MarsOS" Exec exec marsos-sobre
++ "%desligar.xpm%Sair" Popup MenuSair
+
+DestroyMenu MenuMarte
+AddToMenu MenuMarte "Marte" Title
++ "%mini-marte.xpm%Globo de Marte" Exec exec marsos-globo
++ "%relogio.xpm%Relógio Marciano" Exec exec marsclock
++ "%terminal.xpm%Sol de hoje (terminal)" Exec exec xterm -hold -title "Sol marciano" -geometry 64x16 -e sol
++ "" Nop
++ "Papel de parede: Órbita" Exec exec marsos-papel-de-parede orbita
++ "Papel de parede: Crepúsculo em Gale" Exec exec marsos-papel-de-parede crepusculo
++ "Papel de parede: Meio-dia em Jezero" Exec exec marsos-papel-de-parede dia
++ "Papel de parede: Noite em Olympus" Exec exec marsos-papel-de-parede noite
+
+DestroyMenu MenuAcessorios
+AddToMenu MenuAcessorios "Acessórios" Title
++ "Calculadora" Exec exec xcalc
++ "Relógio" Exec exec xclock
++ "Olhos" Exec exec xeyes
++ "Carga do sistema" Exec exec xload
++ "Visualizador de imagens" Exec exec xfi
++ "" Nop
++ "Midnight Commander" Exec exec xterm -title "Midnight Commander" -geometry 100x32 -e mc
++ "Vim" Exec exec xterm -title "Vim" -e vim
+
+DestroyMenu MenuSistema
+AddToMenu MenuSistema "Sistema" Title
++ "%engrenagem.xpm%Configurações" Exec exec marsos-config
++ "%som.xpm%Volume" Exec exec marsos-volume
++ "%som.xpm%Mixer de som (alsamixer)" Exec exec xterm -title "Mixer de som" -geometry 100x28 -e alsamixer
++ "%sistema.xpm%Monitor (htop)" Exec exec xterm -title "htop" -geometry 100x30 -e htop
++ "%rede.xpm%Rede (nmtui)" Exec exec xterm -title "Rede" -e nmtui
++ "%terminal.xpm%Informações (marsfetch)" Exec exec xterm -hold -title "marsfetch" -geometry 82x24 -e marsfetch
++ "%terminal.xpm%Terminal de root" Exec exec xterm -title "root@marte" -e sudo -i
++ "" Nop
++ "Lista de janelas" WindowList
++ "Reiniciar o FVWM" Restart
+
+DestroyMenu MenuAreas
+AddToMenu MenuAreas "Áreas de trabalho" Title
++ "Olympus" GotoDesk 0 0
++ "Valles" GotoDesk 0 1
++ "Gale" GotoDesk 0 2
++ "Jezero" GotoDesk 0 3
+
+DestroyMenu MenuSair
+AddToMenu MenuSair "Sair" Title
++ "Voltar ao console" Quit
++ "%desligar.xpm%Reiniciar o computador" Exec exec marsos-energia reboot
++ "%desligar.xpm%Desligar o computador" Exec exec marsos-energia poweroff
+
+DestroyMenu MenuJanela
+AddToMenu MenuJanela
++ "Mover" Move
++ "Redimensionar" Resize
++ "Minimizar" Iconify
++ "Maximizar" Maximize 100 100
++ "Enrolar" WindowShade
++ "Fixar em todas as áreas" Stick
++ "" Nop
++ "Enviar para Olympus" MoveToDesk 0 0
++ "Enviar para Valles" MoveToDesk 0 1
++ "Enviar para Gale" MoveToDesk 0 2
++ "Enviar para Jezero" MoveToDesk 0 3
++ "" Nop
++ "Fechar" Close
++ "Destruir" Destroy
+
+#----------------------------------------------------------------------
+# Mouse e teclado
+#----------------------------------------------------------------------
+Mouse 1 R A Menu MenuMars
+Mouse 2 R A WindowList
+Mouse 3 R A Menu MenuMars
+Mouse 1 1 A Menu MenuJanela
+Mouse 1 2 A Close
+Mouse 1 4 A Maximize 100 100
+Mouse 1 6 A Iconify
+Mouse 1 T A MoverOuElevar
+Mouse 2 T A WindowShade
+Mouse 3 T A Menu MenuJanela
+Mouse 1 FS A RedimOuElevar
+Mouse 1 W M Move
+Mouse 3 W M Resize
+
+Key Tab   A M  WindowList Root c c NoDeskSort, SelectOnRelease Alt_L
+Key F4    A M  Close
+Key F1    A M  Menu MenuMars Root c c
+Key T     A CM Exec exec xterm
+Key Left  A CM GotoDesk -1 0 3
+Key Right A CM GotoDesk 1 0 3
+# Ctrl+Alt+Shift+R: reinicia o FVWM (as Configuracoes usam isso ao mudar a resolucao)
+Key R     A CMS Restart
+
+# Teclas de volume do teclado
+Key XF86AudioRaiseVolume A A Exec exec wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+
+Key XF86AudioLowerVolume A A Exec exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+Key XF86AudioMute        A A Exec exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+
+#----------------------------------------------------------------------
+# Painel "MarsBar" (rodape)
+#----------------------------------------------------------------------
+DestroyModuleConfig MarsBar: *
+*MarsBar: Colorset 0
+*MarsBar: Font "-*-terminus-bold-r-normal-*-14-*-*-*-*-*-iso10646-1"
+*MarsBar: Frame 1
+*MarsBar: Padding 2 2
+*MarsBar: Rows 1
+*MarsBar: Columns 64
+*MarsBar: (7x1, Icon mini-marte.xpm, Title "MarsOS", Colorset 8, ActiveColorset 9, Action(Mouse 1) "Menu MenuMars Mouse -8p -100m")
+*MarsBar: (2x1, Icon terminal.xpm, Colorset 8, ActiveColorset 9, Action(Mouse 1) "Exec exec xterm")
+*MarsBar: (2x1, Icon pasta.xpm, Colorset 8, ActiveColorset 9, Action(Mouse 1) "Exec exec xfe")
+*MarsBar: (2x1, Icon globo.xpm, Colorset 8, ActiveColorset 9, Action(Mouse 1) "Exec exec marsos-navegador")
+*MarsBar: (2x1, Icon editor.xpm, Colorset 8, ActiveColorset 9, Action(Mouse 1) "Exec exec xfw")
+*MarsBar: (8x1, Frame 0, Swallow (UseOld, NoKill) "FvwmPager" "Module FvwmPager 0 3")
+*MarsBar: (23x1, Frame 0, Swallow (UseOld, NoKill) "FvwmIconMan" "Module FvwmIconMan")
+*MarsBar: (2x1, Icon engrenagem.xpm, Colorset 8, ActiveColorset 9, Action(Mouse 1) "Exec exec marsos-config")
+*MarsBar: (2x1, Icon som.xpm, Colorset 8, ActiveColorset 9, Action(Mouse 1) "Exec exec marsos-volume", Action(Mouse 4) "Exec exec wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+", Action(Mouse 5) "Exec exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-")
+*MarsBar: (9x1, Frame -1, Swallow (UseOld, NoKill, Respawn) "MarsClockMini" "Exec exec marsclock --mini")
+*MarsBar: (5x1, Frame -1, Swallow (UseOld, NoKill, Respawn) "xclock" "Exec exec xclock -digital -norender -update 1 -strftime ' %H:%M ' -bg '#1a1117' -fg '#ffb45e' -font '-*-terminus-bold-r-normal-*-16-*-*-*-*-*-iso10646-1'")
+
+DestroyModuleConfig FvwmPager: *
+*FvwmPager: Colorset * 6
+*FvwmPager: HilightColorset * 7
+*FvwmPager: WindowColorsets 3 4
+*FvwmPager: Font none
+*FvwmPager: SmallFont none
+*FvwmPager: Rows 1
+*FvwmPager: UseSkipList
+
+DestroyModuleConfig FvwmIconMan: *
+*FvwmIconMan: NumManagers 1
+*FvwmIconMan: Resolution desk
+*FvwmIconMan: UseWinList true
+*FvwmIconMan: DrawIcons always
+*FvwmIconMan: Format "%t"
+*FvwmIconMan: Font "-*-terminus-bold-r-normal-*-14-*-*-*-*-*-iso10646-1"
+*FvwmIconMan: ManagerGeometry 1x1
+*FvwmIconMan: ButtonGeometry 540x30
+*FvwmIconMan: MaxButtonWidth 170
+*FvwmIconMan: Colorset 0
+*FvwmIconMan: PlainColorset 8
+*FvwmIconMan: FocusColorset 4
+*FvwmIconMan: SelectColorset 1
+*FvwmIconMan: FocusAndSelectColorset 4
+*FvwmIconMan: IconColorset 3
+*FvwmIconMan: PlainButton up
+*FvwmIconMan: SelectButton up
+*FvwmIconMan: FocusButton down
+*FvwmIconMan: FocusAndSelectButton down
+*FvwmIconMan: IconButton flat
+*FvwmIconMan: Sort none
+*FvwmIconMan: FollowFocus true
+*FvwmIconMan: Action Mouse 1 N sendcommand "Function CliqueTarefa"
+*FvwmIconMan: Action Mouse 3 N sendcommand "Menu MenuJanela Mouse -8p -100m"

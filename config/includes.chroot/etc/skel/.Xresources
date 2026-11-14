@@ -1,0 +1,78 @@
+! ~/.Xresources - MarsOS
+! Paleta do logo: #3d2836 #51323e #ac2f44 #e54438 #ff8933
+
+Xft.dpi: 96
+
+! ---------------- XTerm ----------------
+XTerm*locale:            true
+XTerm*renderFont:        false
+XTerm*font:              -*-terminus-medium-r-normal-*-16-*-*-*-*-*-iso10646-1
+XTerm*boldFont:          -*-terminus-bold-r-normal-*-16-*-*-*-*-*-iso10646-1
+XTerm*termName:          xterm-256color
+XTerm*background:        #1a1117
+XTerm*foreground:        #e8c9a8
+XTerm*cursorColor:       #ff8933
+XTerm*pointerColor:      #ff8933
+XTerm*highlightColor:    #ac2f44
+XTerm*internalBorder:    6
+XTerm*saveLines:         4096
+XTerm*scrollBar:         true
+XTerm*rightScrollBar:    true
+XTerm*scrollbar.width:   12
+XTerm*scrollbar.background: #3d2836
+XTerm*scrollbar.foreground: #e54438
+XTerm*scrollbar.thickness:  12
+XTerm*metaSendsEscape:   true
+XTerm*selectToClipboard: true
+XTerm*ptyInitialErase:   true
+XTerm*vt100.geometry:    86x26
+
+XTerm*color0:  #1a1117
+XTerm*color1:  #ac2f44
+XTerm*color2:  #8f9a4a
+XTerm*color3:  #d97a2b
+XTerm*color4:  #5a6f8c
+XTerm*color5:  #8e4a6a
+XTerm*color6:  #6fa3a0
+XTerm*color7:  #e8c9a8
+XTerm*color8:  #51323e
+XTerm*color9:  #e54438
+XTerm*color10: #b8c46a
+XTerm*color11: #ff8933
+XTerm*color12: #8fb0d9
+XTerm*color13: #c77a9a
+XTerm*color14: #9fd6d0
+XTerm*color15: #fff1dc
+
+! ---------------- Apps Athena/Xt classicos ----------------
+*background:   #3d2836
+*foreground:   #e8c9a8
+*borderColor:  #1a1117
+*international: true
+*fontSet:      -*-terminus-medium-r-normal-*-14-*-*-*-*-*-*-*
+
+XClock*background:  #1a1117
+XClock*foreground:  #ffb45e
+XClock*hourColor:   #ff8933
+XClock*minuteColor: #e54438
+XClock*majorColor:  #e8c9a8
+XClock*minorColor:  #51323e
+
+XLoad*background: #1a1117
+XLoad*foreground: #ff8933
+XLoad*highlight:  #51323e
+
+XEyes*background: #3d2836
+XEyes*outline:    #1a1117
+XEyes*center:     #fff1dc
+XEyes*foreground: #e54438
+
+XCalc*background: #3d2836
+XCalc*foreground: #fff1dc
+XCalc*ti.bevel.background: #51323e
+XCalc*ti.bevel.screen.background: #1a1117
+XCalc*ti.bevel.screen.LCD.foreground: #ff8933
+
+Xmessage*background: #3d2836
+Xmessage*foreground: #fff1dc
+Xmessage*Command.background: #51323e

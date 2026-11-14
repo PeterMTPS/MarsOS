@@ -1,0 +1,25 @@
+/* XPM */
+static char *globo[] = {
+"16 16 5 1",
+". c None",
+"a c #1a1117",
+"b c #8fb0d9",
+"c c #5a6f8c",
+"d c #cfe0f0",
+"................",
+"......abba......",
+"....aabccbaa....",
+"...adcbccbcca...",
+"..abbbbbbbbbba..",
+"..accbccccbcca..",
+".acccbccccbccca.",
+".abbbbbbbbbbbba.",
+".acccbccccbccca.",
+".acccbccccbccca.",
+"..accbccccbcca..",
+"..abbbbbbbbbba..",
+"...accbccbcca...",
+"....aabccbaa....",
+"......abba......",
+"................"
+};

@@ -1,0 +1,23 @@
+#!/bin/sh
+# marsos-papel-de-parede - troca o papel de parede.
+# Uso: marsos-papel-de-parede [orbita|crepusculo|dia|noite|--restaurar]
+DIR=/usr/share/marsos/wallpapers
+CONF="$HOME/.config/marsos"
+mkdir -p "$CONF"
+
+case "${1:---restaurar}" in
+	--restaurar) nome=$(cat "$CONF/papel-de-parede" 2>/dev/null || echo orbita) ;;
+	*) nome="$1"; echo "$nome" > "$CONF/papel-de-parede" ;;
+esac
+
+# 4:3 / 5:4 usam a versao 4x3; telas largas usam 16x9
+dims=$(xdpyinfo 2>/dev/null | awk '/dimensions:/ {print $2; exit}')
+w=${dims%x*}; h=${dims#*x}
+prop=16x9
+if [ -n "$w" ] && [ -n "$h" ] && [ $((w * 3)) -le $((h * 4 + h / 4)) ]; then
+	prop=4x3
+fi
+
+arquivo="$DIR/$nome-$prop.png"
+[ -f "$arquivo" ] || arquivo="$DIR/orbita-$prop.png"
+exec feh --no-fehbg --bg-fill --force-aliasing "$arquivo"

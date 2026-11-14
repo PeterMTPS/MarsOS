@@ -1,0 +1,8 @@
+PRETTY_NAME="MarsOS 1.0 (Olympus)"
+NAME="MarsOS"
+VERSION_ID="1.0"
+VERSION="1.0 (Olympus)"
+VERSION_CODENAME=olympus
+ID=marsos
+ID_LIKE=debian
+ANSI_COLOR="1;31"

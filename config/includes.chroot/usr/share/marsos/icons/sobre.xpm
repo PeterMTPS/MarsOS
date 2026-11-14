@@ -1,0 +1,24 @@
+/* XPM */
+static char *sobre[] = {
+"16 16 4 1",
+". c None",
+"a c #1a1117",
+"b c #51323e",
+"c c #fff1dc",
+".....aaaaaa.....",
+"....abbbbbba....",
+"..aabbbbbbbbaa..",
+"..abbbbccbbbba..",
+".abbbbbccbbbbba.",
+"abbbbbbbbbbbbbba",
+"abbbbbbccbbbbbba",
+"abbbbbbccbbbbbba",
+"abbbbbbccbbbbbba",
+"abbbbbbccbbbbbba",
+"abbbbbbccbbbbbba",
+".abbbbbccbbbbba.",
+"..abbbbccbbbba..",
+"..aabbbbbbbbaa..",
+"....abbbbbba....",
+".....aaaaaa....."
+};

@@ -1,0 +1,26 @@
+/* XPM */
+static char *engrenagem[] = {
+"16 16 6 1",
+". c None",
+"a c #1a1117",
+"b c #e8c9a8",
+"c c #fff1dc",
+"d c #8a4a3a",
+"e c #251820",
+"......aaaa......",
+"......abba......",
+"..aaa.aaaa.aaa..",
+"..abaabbbbaaba..",
+"..aacbbbbbbbaa..",
+"...abbbddbbba...",
+"aaabbbdeedbbbaaa",
+"ababbdeeeedbbaba",
+"ababbdeeeedbbaba",
+"aaabbbdeedbbbaaa",
+"...abbbddbbba...",
+"..aabbbbbbbbaa..",
+"..abaabbbbaaba..",
+"..aaa.aaaa.aaa..",
+"......abba......",
+"......aaaa......"
+};

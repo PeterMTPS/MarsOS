@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""marsos-sobre - janela "Sobre o MarsOS"."""
+import platform
+import re
+import sys
+import tkinter as tk
+
+sys.path.insert(0, "/usr/lib/marsos")
+from marstk import (AMBAR, AREIA, CREME, FONTE, FUNDO, LARANJA, NOITE, ROCHA,  # noqa: E402
+                    PlanetaGirando, estrelas, janela)
+
+
+def debian():
+    try:
+        return open("/etc/debian_version").read().strip()
+    except OSError:
+        return "13"
+
+
+root = janela("MarsOSSobre", "Sobre o MarsOS")
+root.resizable(False, False)
+c = tk.Canvas(root, width=470, height=230, bg=FUNDO, highlightthickness=0)
+c.pack()
+estrelas(c, 470, 230, 90, semente=2)
+PlanetaGirando(c, 115, 115, zoom=2)
+c.create_text(235, 70, anchor="w", text="MarsOS", fill=LARANJA, font=(FONTE, -32, "bold"))
+c.create_text(237, 108, anchor="w", text='1.0 "Olympus"', fill=AMBAR, font=(FONTE, -20, "bold"))
+c.create_text(237, 140, anchor="w", text="Um Linux retrô com a\npoeira vermelha de Marte.",
+              fill=AREIA, font=(FONTE, -16))
+
+dados = [
+    ("Base", f"Debian GNU/Linux {debian()}"),
+    ("Kernel", re.sub(r"\+deb.*", "", platform.release())),
+    ("Janelas", "FVWM"),
+    ("Terminal", "XTerm"),
+    ("Arquivos", "Xfe"),
+    ("Navegador", "Firefox · Dillo"),
+]
+f = tk.Frame(root, bg=NOITE, bd=2, relief="sunken", padx=14, pady=8)
+f.pack(fill="x", padx=12)
+for i, (k, v) in enumerate(dados):
+    tk.Label(f, text=k, bg=NOITE, fg=AREIA).grid(row=i, column=0, sticky="w")
+    tk.Label(f, text=v, bg=NOITE, fg=CREME, font=(FONTE, -16, "bold")).grid(row=i, column=1, sticky="w", padx=(16, 0))
+tk.Label(root, text="Feito com software livre.", fg="#c9a892", bg=FUNDO).pack(pady=(8, 2))
+tk.Button(root, text="OK", width=10, command=root.destroy, fg=CREME).pack(pady=(2, 12))
+root.bind("<Return>", lambda e: root.destroy())
+root.bind("<Escape>", lambda e: root.destroy())
+root.mainloop()
