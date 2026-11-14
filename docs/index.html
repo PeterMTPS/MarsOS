@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MarsOS 1.0 "Olympus" — um Linux retrô com a poeira de Marte</title>
-<meta name="description" content="MarsOS é um Linux retrô baseado no Debian 13, com visual dos anos 90 e toda a estética de Marte. Baixe a ISO e rode num pendrive ou numa máquina virtual.">
+<title>MarsOS 1.0 "Olympus" — a retro Linux covered in Martian dust</title>
+<meta name="description" content="MarsOS is a retro Linux based on Debian 13, with a 90s look and a full Martian aesthetic. Download the ISO and run it from a USB stick or a virtual machine.">
 <meta property="og:title" content="MarsOS 1.0 &quot;Olympus&quot;">
-<meta property="og:description" content="Um Linux retrô com a poeira vermelha de Marte. Base Debian 13, FVWM, som, relógio marciano.">
+<meta property="og:description" content="A retro Linux covered in red Martian dust. Debian 13 base, FVWM, sound, Mars clock.">
 <meta property="og:image" content="img/banner.png">
 <meta name="theme-color" content="#1a1117">
 <link rel="icon" type="image/png" href="img/favicon.png">
@@ -14,22 +14,22 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=VT323&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-<link rel="alternate" hreflang="pt-BR" href="https://petermtps.github.io/MarsOS/">
-<link rel="alternate" hreflang="en" href="https://petermtps.github.io/MarsOS/en/">
+<link rel="alternate" hreflang="pt-BR" href="https://petermtps.github.io/MarsOS/pt/">
+<link rel="alternate" hreflang="en" href="https://petermtps.github.io/MarsOS/">
 </head>
 <body>
 
 <header class="painel">
   <a class="botao-painel" href="#topo"><img src="img/icons/mini-marte.png" alt="">MarsOS</a>
-  <a class="botao-painel links" href="#recursos"><img src="img/icons/engrenagem.png" alt="">Recursos</a>
-  <a class="botao-painel links" href="#telas"><img src="img/icons/sistema.png" alt="">Telas</a>
-  <a class="botao-painel links" href="#baixar"><img src="img/icons/pasta.png" alt="">Baixar</a>
-  <a class="botao-painel links" href="#instalar"><img src="img/icons/terminal.png" alt="">Instalar</a>
-  <a class="botao-painel links" href="#faq"><img src="img/icons/sobre.png" alt="">Dúvidas</a>
+  <a class="botao-painel links" href="#features"><img src="img/icons/engrenagem.png" alt="">Features</a>
+  <a class="botao-painel links" href="#screens"><img src="img/icons/sistema.png" alt="">Screens</a>
+  <a class="botao-painel links" href="#download"><img src="img/icons/pasta.png" alt="">Download</a>
+  <a class="botao-painel links" href="#install"><img src="img/icons/terminal.png" alt="">Install</a>
+  <a class="botao-painel links" href="#faq"><img src="img/icons/sobre.png" alt="">FAQ</a>
   <span class="espaco"></span>
-  <span class="idiomas"><b>PT</b><a href="en/" hreflang="en" title="English version">EN</a></span>
-  <span class="relogio-painel" id="mini-sol" title="Hora em Marte (MTC)"><b>SOL —</b><span>MTC —</span></span>
-  <span class="relogio-painel" id="hora-terra" title="Hora na Terra">--:--</span>
+  <span class="idiomas"><b>EN</b><a href="pt/" hreflang="pt-BR" title="Versão em português">PT</a></span>
+  <span class="relogio-painel" id="mini-sol" title="Time on Mars (MTC)"><b>SOL —</b><span>MTC —</span></span>
+  <span class="relogio-painel" id="hora-terra" title="Time on Earth">--:--</span>
 </header>
 
 <main id="topo">
@@ -38,108 +38,107 @@
     <div class="janela">
       <div class="titulo"><img src="img/icons/mini-marte.png" alt=""><span>MarsOS 1.0 — Olympus</span><i></i><i></i><i></i></div>
       <div class="conteudo">
-        <img class="planeta" src="img/marte-girando.gif" width="300" height="300" alt="O planeta Marte em pixel art, girando">
+        <img class="planeta" src="img/marte-girando.gif" width="300" height="300" alt="Planet Mars in pixel art, spinning">
         <div>
           <h1 class="marca">MARSOS</h1>
           <p class="versao">1.0 OLYMPUS</p>
-          <p class="slogan">Um Linux retrô com a poeira vermelha de Marte.</p>
-          <p>Base Debian 13, cara de Linux dos anos 90: boot em texto, janelas FVWM, fontes bitmap, som chiptune e um relógio que marca a hora em Marte.</p>
+          <p class="slogan">A retro Linux covered in red Martian dust.</p>
+          <p>Debian 13 base with the look of 90s Linux: text-mode boot, FVWM windows, bitmap fonts, chiptune sound and a clock that tells the time on Mars.</p>
           <div class="acoes">
-            <a class="btn principal" href="https://github.com/PeterMTPS/MarsOS/releases/latest/download/marsos-1.0-amd64.hybrid.iso">
-              <img src="img/icons/pasta.png" alt="">Baixar a ISO <small>641 MB</small></a>
-            <a class="btn" href="https://github.com/PeterMTPS/MarsOS"><img src="img/icons/globo.png" alt="">Código no GitHub</a>
-            <button class="btn" id="tocar-som" type="button"><img src="img/icons/som.png" alt="">Ouvir o boot</button>
+            <a class="btn principal" href="https://github.com/PeterMTPS/MarsOS/releases/latest/download/marsos-1.0-en-amd64.hybrid.iso">
+              <img src="img/icons/pasta.png" alt="">Download ISO <small>641 MB</small></a>
+            <a class="btn" href="https://github.com/PeterMTPS/MarsOS"><img src="img/icons/globo.png" alt="">Code on GitHub</a>
+            <button class="btn" id="tocar-som" type="button" data-som="img/inicio.wav"><img src="img/icons/som.png" alt="">Hear the boot</button>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <section id="recursos">
+  <section id="features">
     <div class="janela">
-      <div class="titulo"><img src="img/icons/engrenagem.png" alt=""><span>Recursos</span><i></i><i></i><i></i></div>
+      <div class="titulo"><img src="img/icons/engrenagem.png" alt=""><span>Features</span><i></i><i></i><i></i></div>
       <div class="conteudo">
-        <h2>O que vem a bordo</h2>
+        <h2>What's on board</h2>
         <div class="grade">
-          <div class="recurso"><img src="img/icons/sistema.png" alt=""><h3>Boot retrô</h3><p>Menu com o planeta, mensagens do kernel em texto e console com paleta marciana de 16 cores.</p></div>
-          <div class="recurso"><img src="img/icons/mini-marte.png" alt=""><h3>Janelas FVWM</h3><p>O gerenciador clássico dos anos 90, com painel, 4 áreas de trabalho (Olympus, Valles, Gale e Jezero) e menus em português.</p></div>
-          <div class="recurso"><img src="img/icons/relogio.png" alt=""><h3>Hora em Marte</h3><p>Sol marciano, horário MTC, estação e hora local onde estão o Curiosity e o Perseverance, pelo algoritmo Mars24 da NASA.</p></div>
-          <div class="recurso"><img src="img/icons/som.png" alt=""><h3>Som</h3><p>PipeWire, volume no painel, teclas de volume e um som de inicialização chiptune.</p></div>
-          <div class="recurso"><img src="img/icons/engrenagem.png" alt=""><h3>Configurações</h3><p>Painel de controle retrô: papel de parede, resolução, som, teclado, mouse, fuso horário, rede e sistema.</p></div>
-          <div class="recurso"><img src="img/icons/globo.png" alt=""><h3>Internet</h3><p>Firefox em português para o dia a dia e o Dillo para quem quer navegar no estilo antigo.</p></div>
-          <div class="recurso"><img src="img/icons/pasta.png" alt=""><h3>Persistência</h3><p>Rode do pendrive e mantenha seus arquivos e programas entre um boot e outro.</p></div>
-          <div class="recurso"><img src="img/icons/terminal.png" alt=""><h3>Terminal de raiz</h3><p>XTerm com fonte Terminus, <code>marsfetch</code>, <code>sol</code>, Midnight Commander e htop.</p></div>
+          <div class="recurso"><img src="img/icons/sistema.png" alt=""><h3>Retro boot</h3><p>Boot menu with the planet, kernel messages in text mode and a 16-colour Martian console palette.</p></div>
+          <div class="recurso"><img src="img/icons/mini-marte.png" alt=""><h3>FVWM windows</h3><p>The classic 90s window manager, with a panel and 4 workspaces: Olympus, Valles, Gale and Jezero.</p></div>
+          <div class="recurso"><img src="img/icons/relogio.png" alt=""><h3>Time on Mars</h3><p>Mars Sol Date, MTC, season and local time where Curiosity and Perseverance are, using NASA's Mars24 algorithm.</p></div>
+          <div class="recurso"><img src="img/icons/som.png" alt=""><h3>Sound</h3><p>PipeWire, volume control in the panel, volume keys and a chiptune startup sound.</p></div>
+          <div class="recurso"><img src="img/icons/engrenagem.png" alt=""><h3>Settings</h3><p>A retro control panel: wallpaper, resolution, sound, keyboard, mouse, time zone, network and system.</p></div>
+          <div class="recurso"><img src="img/icons/globo.png" alt=""><h3>Internet</h3><p>Firefox for everyday browsing and Dillo for surfing the old-school way.</p></div>
+          <div class="recurso"><img src="img/icons/pasta.png" alt=""><h3>Persistence</h3><p>Run it from a USB stick and keep your files and programs from one boot to the next.</p></div>
+          <div class="recurso"><img src="img/icons/terminal.png" alt=""><h3>Proper terminal</h3><p>XTerm with the Terminus font, <code>marsfetch</code>, <code>sol</code>, Midnight Commander and htop.</p></div>
         </div>
       </div>
     </div>
   </section>
 
-  <section id="telas">
+  <section id="screens">
     <div class="janela">
-      <div class="titulo"><img src="img/icons/sistema.png" alt=""><span>Telas</span><i></i><i></i><i></i></div>
+      <div class="titulo"><img src="img/icons/sistema.png" alt=""><span>Screens</span><i></i><i></i><i></i></div>
       <div class="conteudo">
-        <h2>Como ele é</h2>
+        <h2>What it looks like</h2>
         <div class="galeria">
-          <figure><a href="img/boot.png"><img src="img/boot.png" alt="Menu de boot com o planeta e o letreiro MARSOS" loading="lazy"></a><figcaption>Menu de boot</figcaption></figure>
-          <figure><a href="img/boot-texto.png"><img src="img/boot-texto.png" alt="Mensagens de boot em texto, com cores marcianas" loading="lazy"></a><figcaption>Boot em texto, como antigamente</figcaption></figure>
-          <figure><a href="img/desktop.png"><img src="img/desktop.png" alt="Área de trabalho com o marsfetch no terminal" loading="lazy"></a><figcaption>Área de trabalho e marsfetch</figcaption></figure>
-          <figure><a href="img/menu.png"><img src="img/menu.png" alt="Menu do MarsOS aberto" loading="lazy"></a><figcaption>Menu do MarsOS</figcaption></figure>
-          <figure><a href="img/apps.png"><img src="img/apps.png" alt="Relógio marciano, globo de Marte e janela Sobre" loading="lazy"></a><figcaption>Relógio marciano, globo e Sobre</figcaption></figure>
-          <figure><a href="img/config-aparencia.png"><img src="img/config-aparencia.png" alt="Configurações, página Aparência" loading="lazy"></a><figcaption>Configurações: papel de parede</figcaption></figure>
-          <figure><a href="img/config-som.png"><img src="img/config-som.png" alt="Configurações, página Som" loading="lazy"></a><figcaption>Configurações: som</figcaption></figure>
+          <figure><a href="img/en/boot.png"><img src="img/en/boot.png" alt="Boot menu with the planet and the MARSOS logo" loading="lazy"></a><figcaption>Boot menu</figcaption></figure>
+          <figure><a href="img/boot-texto.png"><img src="img/boot-texto.png" alt="Text-mode boot messages in Martian colours" loading="lazy"></a><figcaption>Text-mode boot, the old way</figcaption></figure>
+          <figure><a href="img/en/desktop.png"><img src="img/en/desktop.png" alt="Desktop with marsfetch in the terminal" loading="lazy"></a><figcaption>Desktop and marsfetch</figcaption></figure>
+          <figure><a href="img/en/menu.png"><img src="img/en/menu.png" alt="The MarsOS menu" loading="lazy"></a><figcaption>The MarsOS menu</figcaption></figure>
+          <figure><a href="img/en/apps.png"><img src="img/en/apps.png" alt="Mars Clock, Mars Globe and About window" loading="lazy"></a><figcaption>Mars Clock, Globe and About</figcaption></figure>
+          <figure><a href="img/en/config.png"><img src="img/en/config.png" alt="Settings window" loading="lazy"></a><figcaption>Settings</figcaption></figure>
         </div>
       </div>
     </div>
   </section>
 
-  <section id="baixar">
+  <section id="download">
     <div class="janela">
-      <div class="titulo"><img src="img/icons/pasta.png" alt=""><span>Baixar</span><i></i><i></i><i></i></div>
+      <div class="titulo"><img src="img/icons/pasta.png" alt=""><span>Download</span><i></i><i></i><i></i></div>
       <div class="conteudo">
-        <h2>Baixe o MarsOS</h2>
+        <h2>Get MarsOS</h2>
         <div class="download">
           <div>
             <table class="ficha">
-              <tr><td>Arquivo</td><td>marsos-1.0-amd64.hybrid.iso</td></tr>
-              <tr><td>Tamanho</td><td>641 MB</td></tr>
-              <tr><td>Versão</td><td>1.0 "Olympus"</td></tr>
+              <tr><td>File</td><td>marsos-1.0-en-amd64.hybrid.iso</td></tr>
+              <tr><td>Size</td><td>641 MB</td></tr>
+              <tr><td>Version</td><td>1.0 "Olympus" (English)</td></tr>
               <tr><td>Base</td><td>Debian GNU/Linux 13.7 (trixie), kernel 6.12</td></tr>
-              <tr><td>Boot</td><td>BIOS e UEFI (ISO híbrida: CD, pendrive ou VM)</td></tr>
-              <tr><td>SHA-256</td><td class="hash">8236b66d19ec5d271ddbb29ecb724198595d89cac750a055b99823bbfe48b601</td></tr>
+              <tr><td>Boot</td><td>BIOS and UEFI (hybrid ISO: CD, USB stick or VM)</td></tr>
+              <tr><td>SHA-256</td><td class="hash">d3a98e5b32a7771889e9a607fe85090c9d81e3e65632ee8398abb8bfaa2cb7e4</td></tr>
             </table>
             <p class="acoes" style="margin-top:18px">
-              <a class="btn principal" href="https://github.com/PeterMTPS/MarsOS/releases/latest/download/marsos-1.0-amd64.hybrid.iso">
-                <img src="img/icons/pasta.png" alt="">Baixar a ISO <small>641 MB</small></a>
-              <a class="btn" href="https://github.com/PeterMTPS/MarsOS/releases/latest/download/marsos-1.0-en-amd64.hybrid.iso"><img src="img/icons/globo.png" alt="">ISO em inglês</a>
-              <a class="btn" href="https://github.com/PeterMTPS/MarsOS/releases"><img src="img/icons/sobre.png" alt="">Todas as versões</a>
+              <a class="btn principal" href="https://github.com/PeterMTPS/MarsOS/releases/latest/download/marsos-1.0-en-amd64.hybrid.iso">
+                <img src="img/icons/pasta.png" alt="">Download ISO <small>641 MB</small></a>
+              <a class="btn" href="https://github.com/PeterMTPS/MarsOS/releases/latest/download/marsos-1.0-amd64.hybrid.iso"><img src="img/icons/globo.png" alt="">Portuguese ISO</a>
+              <a class="btn" href="https://github.com/PeterMTPS/MarsOS/releases"><img src="img/icons/sobre.png" alt="">All releases</a>
             </p>
           </div>
           <div class="requisitos">
-            <h3>Requisitos</h3>
+            <h3>Requirements</h3>
             <ul>
-              <li>PC 64 bits (x86-64)</li>
-              <li>1,5 GB de RAM (2 GB recomendado)</li>
-              <li>Pendrive de 1 GB ou mais</li>
-              <li>Nada é instalado no seu disco: roda direto do pendrive</li>
+              <li>64-bit PC (x86-64)</li>
+              <li>1.5 GB of RAM (2 GB recommended)</li>
+              <li>A USB stick of 1 GB or more</li>
+              <li>Nothing gets installed on your disk: it runs straight from the USB stick</li>
             </ul>
             <h3 style="margin-top:12px">Login</h3>
-            <p>Entra sozinho como <code>astronauta</code>.<br>Senha, se pedir: <code>live</code></p>
+            <p>Logs in automatically as <code>astronauta</code>.<br>Password, if asked: <code>live</code></p>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <section id="instalar">
+  <section id="install">
     <div class="janela">
-      <div class="titulo"><img src="img/icons/terminal.png" alt=""><span>Instalar</span><i></i><i></i><i></i></div>
+      <div class="titulo"><img src="img/icons/terminal.png" alt=""><span>Install</span><i></i><i></i><i></i></div>
       <div class="conteudo">
-        <h2>Como usar</h2>
+        <h2>How to use it</h2>
         <ol class="passos">
-          <li><h3>Grave num pendrive</h3>No Windows use o <a href="https://rufus.ie">Rufus</a> (modo imagem DD) ou o <a href="https://etcher.balena.io">balenaEtcher</a>. No Linux: <code>sudo dd if=marsos-1.0-amd64.hybrid.iso of=/dev/sdX bs=4M status=progress</code></li>
-          <li><h3>Dê boot</h3>Reinicie o PC, escolha o pendrive no menu de boot (geralmente F12, F11 ou Esc) e selecione <b>Iniciar o MarsOS</b>.</li>
-          <li><h3>Ou use uma máquina virtual</h3>No VirtualBox: tipo Debian 64-bit, 2 GB de RAM, controladora gráfica VMSVGA e áudio Intel HD Audio. Coloque a ISO no drive de CD e ligue.</li>
-          <li><h3>Quer salvar seus arquivos?</h3>Crie no pendrive uma partição ext4 chamada <code>persistence</code> com um arquivo <code>persistence.conf</code> contendo <code>/ union</code>. Depois inicie com <b>MarsOS com persistência</b>.</li>
+          <li><h3>Write it to a USB stick</h3>On Windows use <a href="https://rufus.ie">Rufus</a> (DD image mode) or <a href="https://etcher.balena.io">balenaEtcher</a>. On Linux: <code>sudo dd if=marsos-1.0-en-amd64.hybrid.iso of=/dev/sdX bs=4M status=progress</code></li>
+          <li><h3>Boot it</h3>Restart the PC, pick the USB stick in the boot menu (usually F12, F11 or Esc) and choose <b>Start MarsOS</b>.</li>
+          <li><h3>Or use a virtual machine</h3>In VirtualBox: type Debian 64-bit, 2 GB of RAM, VMSVGA graphics and Intel HD Audio. Put the ISO in the CD drive and power it on.</li>
+          <li><h3>Want to keep your files?</h3>Create an ext4 partition labelled <code>persistence</code> on the USB stick with a <code>persistence.conf</code> file containing <code>/ union</code>. Then boot <b>MarsOS with persistence</b>.</li>
         </ol>
       </div>
     </div>
@@ -154,14 +153,14 @@
 
   <section id="faq">
     <div class="janela">
-      <div class="titulo"><img src="img/icons/sobre.png" alt=""><span>Dúvidas</span><i></i><i></i><i></i></div>
+      <div class="titulo"><img src="img/icons/sobre.png" alt=""><span>FAQ</span><i></i><i></i><i></i></div>
       <div class="conteudo">
-        <h2>Perguntas frequentes</h2>
-        <details><summary>O MarsOS apaga meu Windows?</summary><div>Não. Ele roda direto do pendrive (modo live) e não mexe no seu disco.</div></details>
-        <details><summary>Onde ficam os arquivos que eu baixo?</summary><div>Na pasta <code>Downloads</code> (menu → Meus downloads). No modo normal tudo some ao desligar; para guardar, use o modo com persistência.</div></details>
-        <details><summary>Como instalo outros programas?</summary><div>Abra um terminal e rode <code>sudo apt update</code> e depois <code>sudo apt install nome-do-programa</code>. Com persistência, o programa continua lá depois de reiniciar.</div></details>
-        <details><summary>Como mudo o teclado, o mouse ou a resolução?</summary><div>Clique na engrenagem no painel (Configurações). Tudo fica salvo para as próximas vezes.</div></details>
-        <details><summary>Dá para gerar a ISO eu mesmo?</summary><div>Sim. O código está no <a href="https://github.com/PeterMTPS/MarsOS">GitHub</a>: numa máquina Debian 13 é só rodar <code>sudo ./build.sh</code>. No Windows existem scripts que fazem tudo usando o VirtualBox.</div></details>
+        <h2>Frequently asked questions</h2>
+        <details><summary>Will MarsOS erase my Windows?</summary><div>No. It runs straight from the USB stick (live mode) and doesn't touch your disk.</div></details>
+        <details><summary>Where do my downloads go?</summary><div>To the <code>Downloads</code> folder (menu → My downloads). In normal mode everything is gone at shutdown; to keep things, use persistence mode.</div></details>
+        <details><summary>How do I install other programs?</summary><div>Open a terminal and run <code>sudo apt update</code>, then <code>sudo apt install program-name</code>. With persistence, the program is still there after a reboot.</div></details>
+        <details><summary>How do I change the keyboard, mouse or resolution?</summary><div>Click the gear in the panel (Settings). Everything is saved for next time.</div></details>
+        <details><summary>Can I build the ISO myself?</summary><div>Yes. The code is on <a href="https://github.com/PeterMTPS/MarsOS">GitHub</a>: on a Debian 13 machine just run <code>sudo ./build.sh en</code>. There are also Windows scripts that do everything using VirtualBox.</div></details>
       </div>
     </div>
   </section>
@@ -170,7 +169,7 @@
 
 <footer>
   <img src="img/marte.png" alt="">
-  MarsOS 1.0 "Olympus" · feito por <a href="https://github.com/PeterMTPS">Pedro</a> · baseado no Debian GNU/Linux
+  MarsOS 1.0 "Olympus" · made by <a href="https://github.com/PeterMTPS">Pedro</a> · based on Debian GNU/Linux
 </footer>
 
 <script src="marte.js"></script>
