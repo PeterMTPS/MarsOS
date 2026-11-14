@@ -119,9 +119,6 @@ docs/                        site de download (GitHub Pages)
 tools/                       scripts do Windows (VM construtora, build, teste)
 ```
 
-Para mudar a arte, edite `assets/gerar_arte.py` (ou troque o logo em `assets/logo/`) e rode
-`python assets/gerar_arte.py`.
-
 ---
 
 <div align="center">
