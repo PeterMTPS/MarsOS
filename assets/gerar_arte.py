@@ -516,6 +516,21 @@ def _splash(W, H, px0, py0, tx, ty):
     return ampliar(img.convert("RGB"), 2)
 
 
+def gerar_fundo_grub_instalado(logo):
+    """Fundo do menu do GRUB no sistema instalado: estrelas e o planeta num canto
+    (o menu padrao do GRUB ocupa o centro da tela, entao nada de letreiro)."""
+    W, H = 320, 240
+    lw = logo.size[0]
+    cx, cy = W - 40, H - 14
+    img = para_imagem(render_espaco(W, H, seed=33, planeta=(cx, cy, lw / 2 - 1)), W, H).convert("RGBA")
+    x0, y0 = cx - lw // 2, cy - lw // 2
+    img.alpha_composite(logo.crop((0, 0, min(lw, W - x0), min(lw, H - y0))), (x0, y0))
+    destino = SHARE / "boot"
+    destino.mkdir(parents=True, exist_ok=True)
+    ampliar(img.convert("RGB"), 2).save(destino / "grub.png", optimize=True)
+    print("  fundo do GRUB do sistema instalado")
+
+
 def gerar_splash(logo):
     BOOT.mkdir(parents=True, exist_ok=True)
     # isolinux (BIOS): 640x480; menu fica a direita do planeta
@@ -759,6 +774,7 @@ def main():
     gerar_icones(logo)
     gerar_issue(logo)
     gerar_splash(logo)
+    gerar_fundo_grub_instalado(logo)
     gerar_papeis_de_parede(logo)
     print("Pronto.")
 
