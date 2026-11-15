@@ -49,16 +49,18 @@ Style * MiniIcon mini-marte.xpm, NoIcon, ResizeOpaque, WindowShadeSteps 16
 Style MarsBar      !Title, !Borders, Sticky, WindowListSkip, CirculateSkip, StaysOnTop, NeverFocus, FixedPosition, FixedSize, !Iconifiable
 Style FvwmPager    !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
 Style FvwmIconMan  !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
-Style MarsClockMini !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
-Style MarsBandeja  !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
-Style MarsOSAviso  !Title, !Borders, Sticky, WindowListSkip, CirculateSkip, StaysOnTop, NeverFocus
-Style MarsPouso    !Maximizable, PositionPlacement Center
+# Apps Tk: o Tk muda o nome da classe (MarsPouso -> Marspouso), entao as regras usam o
+# nome de instancia, que fica como no codigo com a primeira letra minuscula (marsPouso).
+Style marsClockMini !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
+Style marsBandeja  !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
+Style marsOSAviso  !Title, !Borders, Sticky, WindowListSkip, CirculateSkip, StaysOnTop, NeverFocus
+Style marsPouso    !Maximizable, PositionPlacement Center
 Style xclock       !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
-Style MarsGlobo    !Maximizable
-Style MarsOSSobre  !Maximizable, PositionPlacement Center
-Style MarsOSEnergia !Maximizable, PositionPlacement Center, StaysOnTop
-Style MarsOSConfig PositionPlacement Center
-Style MarsOSVolume !Maximizable, !Iconifiable, StaysOnTop, PositionPlacement UnderMouse
+Style marsGlobo    !Maximizable
+Style marsOSSobre  !Maximizable, PositionPlacement Center
+Style marsOSEnergia !Maximizable, PositionPlacement Center, StaysOnTop
+Style marsOSConfig PositionPlacement Center
+Style marsOSVolume !Maximizable, !Iconifiable, StaysOnTop, PositionPlacement UnderMouse
 
 TitleStyle Centered Height 20 -- Raised
 ButtonStyle All -- UseTitleStyle

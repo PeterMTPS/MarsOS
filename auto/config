@@ -13,6 +13,7 @@ MARSOS_VT="vt.default_red=26,172,143,217,90,142,111,232,81,229,184,255,143,199,1
 
 # Installer (debian-installer, text mode): same palette, but color 4 - the installer's
 # blue background - becomes the Martian night #3d2836, so the dialogs look like Mars.
+# fb=false makes it use the plain console: the graphical terminal (bterm) ignores this palette.
 MARSOS_VT_INSTALLER="vt.default_red=26,172,143,217,61,142,111,232,81,229,184,255,143,199,159,255 vt.default_grn=17,47,154,122,40,74,163,201,50,68,196,137,176,122,214,241 vt.default_blu=23,68,74,43,54,106,160,168,62,56,106,51,217,154,208,220"
 
 lb config noauto \
@@ -34,5 +35,5 @@ lb config noauto \
 	--image-name marsos-1.1 \
 	--bootappend-live "boot=live components ${MARSOS_APPEND} ${MARSOS_VT}" \
 	--bootappend-live-failsafe "boot=live components memtest noapic noapm nodma nomce nosmp nosplash vga=normal ${MARSOS_APPEND}" \
-	--bootappend-install "${MARSOS_VT_INSTALLER}" \
+	--bootappend-install "fb=false ${MARSOS_VT_INSTALLER}" \
 	"${@}"
