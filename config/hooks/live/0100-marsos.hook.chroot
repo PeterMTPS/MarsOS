@@ -4,7 +4,7 @@ set -e
 
 echo "marte" > /etc/hostname
 
-# Locales usados pela sessao live (pt_BR) + en_US de reserva
+# Locales: ingles e portugues (escolhidos no menu de boot)
 sed -i -e 's/^# *\(pt_BR.UTF-8 UTF-8\)/\1/' -e 's/^# *\(en_US.UTF-8 UTF-8\)/\1/' /etc/locale.gen
 locale-gen
 
@@ -58,33 +58,34 @@ fi
 # Som: garante que o PipeWire sobe sozinho na sessao de cada usuario
 systemctl --global enable pipewire.socket pipewire-pulse.socket wireplumber.service >/dev/null 2>&1 || true
 
-# Idioma desta ISO (pt ou en), definido em /etc/marsos/idioma
-IDIOMA=$(cat /etc/marsos/idioma 2>/dev/null || echo pt)
-if [ "$IDIOMA" = en ]; then
-	PASTAS="Downloads Documents Pictures"
-	FIREFOX_LOCALE="en-US"
-else
-	PASTAS="Downloads Documentos Imagens"
-	FIREFOX_LOCALE="pt-BR"
-fi
+# Pastas padrao: ~/Downloads ja vem no skel; Documentos/Imagens (ou Documents/Pictures)
+# sao criadas pelo ~/.xinitrc no idioma da sessao
+mkdir -p /etc/skel/Downloads
 
-# Pastas padrao do usuario (o Firefox e o Dillo salvam em ~/Downloads)
-for p in $PASTAS; do mkdir -p "/etc/skel/$p"; done
-
-# Firefox: abre na pagina inicial do MarsOS e salva em ~/Downloads sem perguntar
+# Firefox: abre na pagina inicial do MarsOS e salva em ~/Downloads sem perguntar.
+# distribution.ini e o jeito que o Firefox oferece para distribuicoes mudarem o padrao
+# (um .js em defaults/pref e sobrescrito pelas preferencias do proprio navegador).
+# O idioma segue o sistema: o Debian ja define intl.locale.requested = "".
 if [ -d /usr/lib/firefox-esr ]; then
-	mkdir -p /usr/lib/firefox-esr/defaults/pref
-	cat > /usr/lib/firefox-esr/defaults/pref/marsos.js <<EOF
-pref("browser.startup.homepage", "file:///usr/share/marsos/inicio.html");
-pref("browser.download.useDownloadDir", true);
-pref("browser.download.folderList", 1);
-pref("browser.shell.checkDefaultBrowser", false);
-pref("browser.aboutwelcome.enabled", false);
-pref("trailhead.firstrun.didSeeAboutWelcome", true);
-pref("browser.startup.homepage_override.mstone", "ignore");
-pref("startup.homepage_welcome_url", "");
-pref("startup.homepage_welcome_url.additional", "");
-pref("intl.locale.requested", "${FIREFOX_LOCALE}");
-pref("datareporting.policy.dataSubmissionPolicyBypassNotification", true);
+	mkdir -p /usr/lib/firefox-esr/distribution
+	cat > /usr/lib/firefox-esr/distribution/distribution.ini <<'EOF'
+[Global]
+id=marsos
+version=1.1
+about=MarsOS
+
+[Preferences]
+browser.startup.homepage="file:///usr/share/marsos/inicio.html"
+browser.startup.page=1
+browser.startup.firstrunSkipsHomepage=false
+browser.download.useDownloadDir=true
+browser.download.folderList=1
+browser.shell.checkDefaultBrowser=false
+browser.aboutwelcome.enabled=false
+trailhead.firstrun.didSeeAboutWelcome=true
+browser.startup.homepage_override.mstone="ignore"
+startup.homepage_welcome_url=""
+startup.homepage_welcome_url.additional=""
+datareporting.policy.dataSubmissionPolicyBypassNotification=true
 EOF
 fi

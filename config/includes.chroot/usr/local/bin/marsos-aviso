@@ -1,0 +1,86 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+marsos-aviso - aviso que aparece no canto da tela, acima do painel, e some sozinho.
+
+Uso: marsos-aviso [--titulo T] [--icone NOME] [--som NOME] [--segundos N]
+                  [--botao TEXTO --comando "programa args"] TEXTO
+"""
+import argparse
+import os
+import shlex
+import subprocess
+import sys
+import tkinter as tk
+
+sys.path.insert(0, "/usr/lib/marsos")
+from marstk import AREIA, CREME, FONTE, FUNDO, LARANJA, NOITE, ROCHA, VERMELHO  # noqa: E402
+
+ICONES = "/usr/share/marsos/icons"
+ALTURA_PAINEL = 38
+
+ap = argparse.ArgumentParser()
+ap.add_argument("texto")
+ap.add_argument("--titulo", default="MarsOS")
+ap.add_argument("--icone", default="mini-marte")
+ap.add_argument("--som", default="")
+ap.add_argument("--segundos", type=float, default=6)
+ap.add_argument("--botao", default="")
+ap.add_argument("--comando", default="")
+a = ap.parse_args()
+
+if a.som:
+    subprocess.Popen(["marsos-tocar", a.som], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+root = tk.Tk(className="MarsOSAviso")
+root.overrideredirect(True)          # sem moldura: o FVWM nao decora nem rouba o foco
+root.attributes("-topmost", True)
+root.configure(bg=VERMELHO)
+moldura = tk.Frame(root, bg=FUNDO, padx=10, pady=8)
+moldura.pack(padx=2, pady=2)
+
+try:
+    img = tk.PhotoImage(file=os.path.join(ICONES, a.icone + ".png")).zoom(2)
+    tk.Label(moldura, image=img, bg=FUNDO).grid(row=0, column=0, rowspan=3, sticky="n", padx=(0, 10))
+except tk.TclError:
+    pass
+tk.Label(moldura, text=a.titulo, fg=LARANJA, bg=FUNDO, font=(FONTE, -16, "bold"),
+         anchor="w").grid(row=0, column=1, sticky="w")
+tk.Label(moldura, text=a.texto, fg=AREIA, bg=FUNDO, font=(FONTE, -14), justify="left",
+         anchor="w", wraplength=330).grid(row=1, column=1, sticky="w", pady=(2, 0))
+
+
+def fechar(_e=None):
+    root.destroy()
+
+
+if a.botao and a.comando:
+    def acao():
+        subprocess.Popen(shlex.split(a.comando), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                         start_new_session=True)
+        fechar()
+    tk.Button(moldura, text=a.botao, command=acao, bg=ROCHA, fg=CREME, activebackground=VERMELHO,
+              activeforeground=CREME, font=(FONTE, -14), padx=8, pady=1, bd=2,
+              highlightthickness=0).grid(row=2, column=1, sticky="w", pady=(6, 0))
+else:
+    for w in (root, moldura, *moldura.winfo_children()):
+        w.bind("<Button-1>", fechar)
+
+# canto inferior direito, logo acima do painel; desliza para cima ao aparecer
+root.update_idletasks()
+w, h = root.winfo_reqwidth(), root.winfo_reqheight()
+x = root.winfo_screenwidth() - w - 10
+y_fim = root.winfo_screenheight() - ALTURA_PAINEL - h - 10
+passos = 8
+
+
+def entrar(i=0):
+    y = y_fim + (passos - i) * 6
+    root.geometry(f"{w}x{h}+{x}+{y}")
+    if i < passos:
+        root.after(16, entrar, i + 1)
+
+
+entrar()
+root.after(int(a.segundos * 1000), fechar)
+root.mainloop()

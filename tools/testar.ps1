@@ -1,7 +1,7 @@
 # MarsOS - liga a ISO numa VM de teste do VirtualBox.
 # Uso:  powershell -ExecutionPolicy Bypass -File tools\testar.ps1 [-Uefi] [-Headless]
 param(
-    [string]$Iso      = (Join-Path (Split-Path -Parent $PSScriptRoot) "saida\marsos-1.0-amd64.hybrid.iso"),
+    [string]$Iso      = (Join-Path (Split-Path -Parent $PSScriptRoot) "saida\marsos-1.1-amd64.hybrid.iso"),
     [string]$VmName   = "MarsOS-Teste",
     [int]$MemoryMB    = 1536,
     [switch]$Uefi,

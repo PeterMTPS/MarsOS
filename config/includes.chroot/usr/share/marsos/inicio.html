@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<title>MarsOS - Início</title>
+<title>MarsOS</title>
 <style>
 body { background: #1a1117; color: #e8c9a8; font-family: monospace; margin: 24px; }
 h1 { color: #ff8933; margin-bottom: 0; }
@@ -12,15 +12,53 @@ a { color: #ff8933; }
 td { padding: 2px 14px 2px 0; vertical-align: top; }
 .cmd { color: #fff1dc; }
 .caixa { background: #3d2836; border: 2px solid #51323e; padding: 10px 16px; }
+.esconder { display: none; }
 </style>
+<script>
+// Shows only the session language (Firefox follows the system locale).
+// Without JavaScript (Dillo) both languages are shown.
+document.addEventListener("DOMContentLoaded", function () {
+  var pt = (navigator.language || "").toLowerCase().indexOf("pt") === 0;
+  document.documentElement.lang = pt ? "pt-BR" : "en";
+  document.title = pt ? "MarsOS - Início" : "MarsOS - Home";
+  document.getElementById(pt ? "en" : "pt").className = "esconder";
+});
+</script>
 </head>
 <body>
 <table><tr>
-<td><img src="logo/marte-100.png" width="100" height="100" alt="Marte"></td>
-<td><h1>MarsOS 1.0 &quot;Olympus&quot;</h1>
-<p class="sub">Um Linux retrô com a poeira vermelha de Marte &mdash; base Debian GNU/Linux 13.</p></td>
+<td><img src="logo/marte-100.png" width="100" height="100" alt="Mars"></td>
+<td><h1>MarsOS 1.1 &quot;Olympus&quot;</h1>
+<p class="sub">A retro Linux covered in red Martian dust &mdash; based on Debian GNU/Linux 13.<br>
+Um Linux retrô com a poeira vermelha de Marte &mdash; base Debian GNU/Linux 13.</p></td>
 </tr></table>
 
+<div id="en">
+<h2>Getting started</h2>
+<div class="caixa">
+<table>
+<tr><td class="cmd">Click the desktop</td><td>opens the MarsOS menu</td></tr>
+<tr><td class="cmd">Alt + Tab</td><td>switch windows</td></tr>
+<tr><td class="cmd">Ctrl + Alt + T</td><td>open a terminal</td></tr>
+<tr><td class="cmd">Ctrl + Alt + &larr; / &rarr;</td><td>switch workspace (Olympus, Valles, Gale, Jezero)</td></tr>
+<tr><td class="cmd">Print Screen</td><td>screenshot (Alt: window, Shift: pick an area) &rarr; Pictures</td></tr>
+<tr><td class="cmd">sol</td><td>date and time on Mars, and the signal delay to Earth</td></tr>
+<tr><td class="cmd">marsfetch</td><td>system information</td></tr>
+<tr><td class="cmd">Menu &rarr; Mars &rarr; Mars Touchdown</td><td>land a probe on Mars (game)</td></tr>
+</table>
+</div>
+
+<h2>On the web</h2>
+<p>
+<a href="https://petermtps.github.io/MarsOS/">MarsOS website</a><br>
+<a href="https://www.debian.org/doc/">Debian documentation</a><br>
+<a href="https://science.nasa.gov/mars/">NASA &mdash; Mars</a><br>
+<a href="https://www.giss.nasa.gov/tools/mars24/help/algorithm.html">The Mars clock algorithm (Mars24)</a>
+</p>
+<p class="sub">Made with free software &mdash; MarsOS is licensed under the GNU GPL 3.0.</p>
+</div>
+
+<div id="pt">
 <h2>Primeiros passos</h2>
 <div class="caixa">
 <table>
@@ -28,17 +66,21 @@ td { padding: 2px 14px 2px 0; vertical-align: top; }
 <tr><td class="cmd">Alt + Tab</td><td>troca de janela</td></tr>
 <tr><td class="cmd">Ctrl + Alt + T</td><td>abre um terminal</td></tr>
 <tr><td class="cmd">Ctrl + Alt + &larr; / &rarr;</td><td>muda de área de trabalho (Olympus, Valles, Gale, Jezero)</td></tr>
-<tr><td class="cmd">sol</td><td>hora e data em Marte, no terminal</td></tr>
+<tr><td class="cmd">Print Screen</td><td>captura a tela (Alt: janela, Shift: escolher área) &rarr; Imagens</td></tr>
+<tr><td class="cmd">sol</td><td>hora e data em Marte, e o atraso do sinal até a Terra</td></tr>
 <tr><td class="cmd">marsfetch</td><td>informações do sistema</td></tr>
+<tr><td class="cmd">Menu &rarr; Marte &rarr; Pouso Marciano</td><td>pouse uma sonda em Marte (jogo)</td></tr>
 </table>
 </div>
 
 <h2>Na rede</h2>
 <p>
+<a href="https://petermtps.github.io/MarsOS/pt/">Site do MarsOS</a><br>
 <a href="https://www.debian.org/doc/">Documentação do Debian</a><br>
 <a href="https://science.nasa.gov/mars/">NASA &mdash; Marte</a><br>
 <a href="https://www.giss.nasa.gov/tools/mars24/help/algorithm.html">Algoritmo do relógio marciano (Mars24)</a>
 </p>
-<p class="sub">Feito com software livre.</p>
+<p class="sub">Feito com software livre &mdash; o MarsOS é licenciado sob a GNU GPL 3.0.</p>
+</div>
 </body>
 </html>

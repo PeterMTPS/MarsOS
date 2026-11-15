@@ -6,10 +6,14 @@ gerar_som.py - sintetiza os sons do MarsOS (estilo chiptune, sem bibliotecas ext
   inicio.wav  - som de inicializacao (~3,5 s): zumbido grave + arpejo em la menor com eco
   teste.wav   - "plim" curto para testar a saida de som
   aviso.wav   - dois toques descendentes
+  eventos     - abrir, fechar, minimizar, restaurar, area, captura, erro, bateria,
+                conectado, desconectado, desligar (baixinhos, tocados pelo FvwmEvent e apps)
+  jogo        - pouso-motor, pouso-sucesso, pouso-explosao, pouso-alerta, pouso-inicio
 
 Uso:  python3 assets/gerar_som.py
 """
 import math
+import random
 import struct
 import wave
 from pathlib import Path
@@ -51,14 +55,22 @@ def renderizar(dur, eventos, drone=None, eco=(0.0, 0.0)):
             buf[i] += amp * env * (math.sin(2 * math.pi * f0 * vib * t)
                                    + 0.5 * math.sin(2 * math.pi * (f0 * 1.005) * t)
                                    + 0.25 * math.sin(2 * math.pi * f0 * 2 * t))
-    for inicio, f, d, amp, forma in eventos:
+    for ev in eventos:
+        inicio, f, d, amp, forma = ev[:5]
+        f2 = ev[5] if len(ev) > 5 else None       # glissando ate f2
         a = int(inicio * TAXA)
+        fase = 0.0
         for j in range(int(d * TAXA)):
             if a + j >= n:
                 break
             t = j / TAXA
             env = min(1.0, t / 0.005) * math.exp(-t * 6.0 / d)
-            onda = pulso(f, t) if forma == "p" else triangulo(f, t) if forma == "t" else math.sin(2 * math.pi * f * t)
+            if f2 is None:
+                onda = pulso(f, t) if forma == "p" else triangulo(f, t) if forma == "t" else math.sin(2 * math.pi * f * t)
+            else:
+                fase += (f + (f2 - f) * t / d) / TAXA
+                onda = (pulso(1.0, fase) if forma == "p" else triangulo(1.0, fase) if forma == "t"
+                        else math.sin(2 * math.pi * fase))
             buf[a + j] += amp * env * onda
     atraso, ganho = eco
     if ganho:
@@ -72,6 +84,37 @@ def renderizar(dur, eventos, drone=None, eco=(0.0, 0.0)):
         saida.append(ant)
     pico = max(1e-6, max(abs(v) for v in saida))
     return [v / pico * 0.7 for v in saida]
+
+
+def ruido(dur, ataque=0.005, queda=6.0, filtro=0.15, semente=1, pulsos=()):
+    """Ruido filtrado (motor, explosao, obturador). pulsos = [(inicio, duracao), ...]."""
+    rnd = random.Random(semente)
+    n = int(dur * TAXA)
+    buf = [0.0] * n
+    for inicio, d in (pulsos or [(0.0, dur)]):
+        a = int(inicio * TAXA)
+        for j in range(int(d * TAXA)):
+            if a + j >= n:
+                break
+            t = j / TAXA
+            env = min(1.0, t / ataque) * math.exp(-t * queda / d) * min(1.0, (d - t) / 0.02)
+            buf[a + j] += env * (rnd.random() * 2 - 1)
+    saida, ant, ant2 = [], 0.0, 0.0
+    for v in buf:
+        ant = ant + filtro * (v - ant)
+        ant2 = ant2 + filtro * (ant - ant2)
+        saida.append(ant2)
+    pico = max(1e-6, max(abs(v) for v in saida))
+    return [v / pico * 0.7 for v in saida]
+
+
+def volume(amostras, k):
+    return [v * k for v in amostras]
+
+
+def somar(*faixas):
+    n = max(len(f) for f in faixas)
+    return [sum(f[i] for f in faixas if i < len(f)) for i in range(n)]
 
 
 def salvar(nome, amostras):
@@ -96,6 +139,35 @@ def main():
     salvar("teste", renderizar(0.7, [(0.0, nota("E5"), 0.3, 0.5, "t"), (0.12, nota("A5"), 0.5, 0.5, "t")],
                                eco=(0.11, 0.25)))
     salvar("aviso", renderizar(0.6, [(0.0, nota("A5"), 0.25, 0.5, "p"), (0.16, nota("E5"), 0.35, 0.5, "p")]))
+
+    # --- Eventos do sistema (curtos e baixos, para nao cansar)
+    salvar("abrir", volume(renderizar(0.16, [(0.0, nota("E5"), 0.14, 0.5, "t", nota("A5"))]), 0.45))
+    salvar("fechar", volume(renderizar(0.16, [(0.0, nota("A5"), 0.14, 0.5, "t", nota("D5"))]), 0.45))
+    salvar("minimizar", volume(renderizar(0.22, [(0.0, nota("C6"), 0.2, 0.5, "s", nota("C5"))]), 0.40))
+    salvar("restaurar", volume(renderizar(0.22, [(0.0, nota("C5"), 0.2, 0.5, "s", nota("C6"))]), 0.40))
+    salvar("area", volume(renderizar(0.3, [(0.0, nota("E4"), 0.12, 0.5, "t"), (0.07, nota("B4"), 0.12, 0.5, "t"),
+                                           (0.14, nota("E5"), 0.16, 0.5, "t")], eco=(0.06, 0.2)), 0.40))
+    salvar("captura", volume(ruido(0.22, queda=9.0, filtro=0.5, semente=7, pulsos=[(0.0, 0.05), (0.09, 0.09)]), 0.55))
+    salvar("erro", volume(renderizar(0.35, [(0.0, nota("A2"), 0.32, 0.5, "p"), (0.0, nota("A#2"), 0.32, 0.3, "p")]), 0.55))
+    salvar("bateria", volume(renderizar(0.9, [(0.0, nota("E5"), 0.18, 0.5, "p"), (0.22, nota("C5"), 0.18, 0.5, "p"),
+                                              (0.5, nota("E5"), 0.18, 0.5, "p"), (0.72, nota("C5"), 0.18, 0.5, "p")]), 0.6))
+    salvar("conectado", volume(renderizar(0.4, [(0.0, nota("C5"), 0.15, 0.5, "t"), (0.1, nota("G5"), 0.25, 0.5, "t")],
+                                          eco=(0.08, 0.2)), 0.5))
+    salvar("desconectado", volume(renderizar(0.4, [(0.0, nota("G4"), 0.15, 0.5, "t"), (0.1, nota("C4"), 0.25, 0.5, "t")]), 0.5))
+    seq = ["E5", "C5", "A4", "E4", "A3"]
+    ev = [(i * 0.14, nota(n), 0.4, 0.32, "p") for i, n in enumerate(seq)]
+    salvar("desligar", volume(renderizar(1.6, ev, drone=(nota("A2"), 0.15), eco=(0.2, 0.3)), 0.8))
+
+    # --- Jogo "Pouso Marciano"
+    salvar("pouso-motor", volume(ruido(0.42, ataque=0.06, queda=0.6, filtro=0.06, semente=3), 0.55))
+    salvar("pouso-explosao", ruido(1.3, ataque=0.003, queda=5.0, filtro=0.09, semente=5))
+    salvar("pouso-alerta", volume(renderizar(0.3, [(0.0, nota("B5"), 0.1, 0.5, "p"), (0.15, nota("B5"), 0.1, 0.5, "p")]), 0.5))
+    salvar("pouso-inicio", volume(renderizar(0.5, [(0.0, nota("A4"), 0.12, 0.4, "p"), (0.1, nota("E5"), 0.12, 0.4, "p"),
+                                                   (0.2, nota("A5"), 0.25, 0.4, "p")], eco=(0.1, 0.25)), 0.7))
+    seq = ["C5", "E5", "G5", "C6"]
+    ev = [(i * 0.12, nota(n), 0.3, 0.35, "p") for i, n in enumerate(seq)]
+    ev += [(0.5, nota("C5"), 1.0, 0.3, "t"), (0.5, nota("E5"), 1.0, 0.25, "t"), (0.5, nota("G5"), 1.0, 0.2, "t")]
+    salvar("pouso-sucesso", volume(renderizar(1.7, ev, eco=(0.15, 0.3)), 0.8))
     print("Pronto.")
 
 

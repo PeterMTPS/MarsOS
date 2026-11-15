@@ -181,6 +181,8 @@ def main():
         campos += [("Sol", _("{sol} · {mtc} MTC · ano {ano}").format(
                         sol=marstime.milhar(h.sol), mtc=h.mtc_hms[:5], ano=h.ano)),
                    (_("Estação"), _("{est} no norte").format(est=h.estacao_norte))]
+        sinal = marstime.sinal(h.unix)
+        campos.append((_("Sinal"), _("{d} até a Terra").format(d=sinal.duracao(sinal.segundos))))
     info = [titulo, SEP + "─" * (len(usuario) + len(host) + 1) + R]
     info += [f"{CHAVE}{k + ':':<11}{R}{v}" for k, v in campos]
     info += ["", "".join(f"\033[4{i}m   " for i in range(8)) + R,

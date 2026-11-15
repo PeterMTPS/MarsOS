@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """marsos-energia - confirma e desliga/reinicia.   Uso: marsos-energia poweroff|reboot"""
+import os
 import subprocess
 import sys
+import time
 import tkinter as tk
 
 sys.path.insert(0, "/usr/lib/marsos")
@@ -18,6 +20,12 @@ pergunta = _("Desligar o MarsOS agora?") if acao == "poweroff" else _("Reiniciar
 
 def executar():
     root.destroy()
+    if acao == "poweroff":          # despedida: toca antes de o sistema comecar a parar
+        try:
+            subprocess.call(["marsos-tocar", "desligar"], timeout=3, stderr=subprocess.DEVNULL)
+        except (OSError, subprocess.SubprocessError):
+            pass
+    time.sleep(0.2)
     for cmd in (["systemctl", acao], ["sudo", "-n", "systemctl", acao]):
         if subprocess.call(cmd, stderr=subprocess.DEVNULL) == 0:
             return
@@ -26,8 +34,9 @@ def executar():
 root = janela("MarsOSEnergia", verbo)
 root.resizable(False, False)
 tk.Label(root, text=pergunta, fg=LARANJA, bg=FUNDO, font=(FONTE, -20, "bold"), padx=24, pady=16).pack()
-tk.Label(root, text=_("Na sessão live, o que não foi salvo\nnum disco será perdido."),
-         fg=AREIA, bg=FUNDO, padx=24).pack()
+if os.path.isdir("/run/live"):
+    tk.Label(root, text=_("Na sessão live, o que não foi salvo\nnum disco será perdido."),
+             fg=AREIA, bg=FUNDO, padx=24).pack()
 b = tk.Frame(root, bg=FUNDO, pady=14)
 b.pack()
 tk.Button(b, text=verbo, width=11, command=executar, bg=VERMELHO, fg=CREME).pack(side="left", padx=6)

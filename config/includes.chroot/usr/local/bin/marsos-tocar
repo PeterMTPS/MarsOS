@@ -1,0 +1,18 @@
+#!/bin/sh
+# marsos-tocar <som> [--sempre] - toca /usr/share/marsos/sons/<som>.wav
+# Usado pelo FVWM (FvwmEvent) e pelos apps. Respeita "Sons de eventos" nas Configuracoes,
+# a nao ser com --sempre.
+som="$1"
+arquivo="/usr/share/marsos/sons/$som.wav"
+[ -f "$arquivo" ] || exit 0
+if [ "$2" != "--sempre" ]; then
+	conf="$HOME/.config/marsos/config.ini"
+	if [ -f "$conf" ] && sed -n '/^\[som\]/,/^\[/p' "$conf" | grep -q '^eventos *= *nao'; then
+		exit 0
+	fi
+fi
+for prog in pw-play paplay; do
+	command -v "$prog" >/dev/null 2>&1 && exec "$prog" "$arquivo" 2>/dev/null
+done
+command -v aplay >/dev/null 2>&1 && exec aplay -q "$arquivo"
+exit 0

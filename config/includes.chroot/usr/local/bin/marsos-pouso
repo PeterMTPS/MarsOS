@@ -1,0 +1,799 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+marsos-pouso - "Pouso Marciano" / "Mars Touchdown", o jogo do MarsOS.
+
+Pouse a sonda numa plataforma sem bater: pouco combustivel, gravidade de Marte
+(3,71 m/s²) e rajadas de vento das tempestades de poeira. Cinco locais reais,
+cada um mais dificil, e depois tudo de novo com o vento mais forte.
+
+Teclas: ← →  girar    ↑ ou Espaco  motor    P  pausa    M  som    Esc  sair
+Uso: marsos-pouso [--demo]        (--demo = piloto automatico)
+     marsos-pouso --teste         (testa a fisica sem abrir janela)
+"""
+from __future__ import annotations
+
+import configparser
+import math
+import os
+import random
+import sys
+import time
+
+sys.path.insert(0, "/usr/lib/marsos")
+try:
+    from marsi18n import IDIOMA, _, num
+except ImportError:  # pragma: no cover
+    IDIOMA = "pt"
+
+    def _(t):
+        return t
+
+    def num(v, c=1):
+        return f"{v:.{c}f}".replace(".", ",")
+
+# ------------------------------------------------------------------ constantes
+LARGURA, ALTURA = 800, 560
+PX_POR_M = 3.0
+GRAVIDADE = 3.71              # m/s², Marte
+MOTOR = 9.0                   # aceleracao maxima do motor (m/s²)
+GIRO = 120.0                  # graus por segundo
+GASTO = 7.0                   # combustivel por segundo (de 100)
+LIMITE_VY, LIMITE_VX, LIMITE_ANG = 3.0, 2.0, 8.0
+CELULA = 4                    # terreno em degraus de 4 px (visual pixelado)
+ZOOM = 3
+
+CORES = {"o": "#3d2836", "l": "#c9a892", "b": "#e8c9a8", "c": "#c9a892", "d": "#5a6f8c",
+         "e": "#8fb0d9", "f": "#ffb45e", "g": "#d97a2b", "h": "#7a5262"}
+SONDA = [                      # 13 x 12, pivo no centro
+    "....ooooo....",
+    "...obbbbbo...",
+    "..obddeebbo..",
+    "..obddddcbo..",
+    "..obbbbbcbo..",
+    ".ooooooooooo.",
+    ".offfgfffgfo.",
+    ".ooooooooooo.",
+    "..l..oho..l..",
+    ".l..ohhho..l.",
+    "l...........l",
+    "ll.........ll",
+]
+PES = ((0.5, 11.5), (12.5, 11.5))          # coordenadas na grade da sonda
+CASCO = ((6.5, 0), (1, 5.5), (12, 5.5), (6.5, 9.5))
+BOCAL = (6.5, 10.0)
+
+# Locais: nome, ceu (topo, horizonte), rocha, borda iluminada, sombra, relevo, vento, estrelas
+LOCAIS = [
+    {"nome": "Jezero", "ceu": ("#2a1c24", "#d29a66"), "rocha": "#8a4a3a", "borda": "#c4543c",
+     "sombra": "#51323e", "relevo": "planicie", "vento": 0.0, "estrelas": 30},
+    {"nome": "Gale", "ceu": ("#07050a", "#251820"), "rocha": "#6e3a3a", "borda": "#ac2f44",
+     "sombra": "#3d2836", "relevo": "montanha", "vento": 0.4, "estrelas": 120, "terra": True},
+    {"nome": "Elysium", "ceu": ("#b4784e", "#e8bd8a"), "rocha": "#9a5a40", "borda": "#e8a070",
+     "sombra": "#6e3a3a", "relevo": "dunas", "vento": 0.7, "estrelas": 0},
+    {"nome": "Valles Marineris", "ceu": ("#1a1117", "#8e4a6a"), "rocha": "#7a3a3e", "borda": "#c77a9a",
+     "sombra": "#3d2836", "relevo": "canion", "vento": 0.9, "estrelas": 60},
+    {"nome": "Olympus Mons", "ceu": ("#0e0a12", "#3d2836"), "rocha": "#7a4a52", "borda": "#ff8933",
+     "sombra": "#3d2836", "relevo": "vulcao", "vento": 1.1, "estrelas": 160, "terra": True},
+]
+PLATAFORMAS = ((104, 2), (80, 3), (60, 5))   # largura em px, multiplicador de pontos
+
+
+# ------------------------------------------------------------------ mundo (sem Tk)
+class Mundo:
+    """Terreno, sonda e fisica. Nao depende do Tk (da para testar sem janela)."""
+
+    def __init__(self, nivel: int, semente: int | None = None):
+        self.nivel = nivel                               # 0, 1, 2... (cada 5 = uma volta)
+        self.local = LOCAIS[nivel % len(LOCAIS)]
+        self.volta = nivel // len(LOCAIS)                # dificuldade extra
+        self.rnd = random.Random(semente)
+        self.terreno, self.plataformas = self.gerar_terreno()
+        dif = 1.0 + 0.25 * self.volta
+        self.vento_max = self.local["vento"] * dif
+        self.fase_vento = self.rnd.uniform(0, 6.28), self.rnd.uniform(0, 6.28)
+        # sonda chega da orbita andando de lado
+        self.x = self.rnd.uniform(140, LARGURA - 140)
+        self.y = 70.0
+        lado = self.rnd.choice((-1, 1))
+        self.vx = lado * self.rnd.uniform(6, 12) * dif   # m/s
+        self.vy = self.rnd.uniform(3, 6)                 # m/s, positivo = descendo
+        self.angulo = 0.0                                # graus, positivo = horario
+        self.combustivel = max(45.0, 100.0 - 8 * self.volta)
+        self.t = 0.0
+        self.motor = False
+        self.resultado = None                            # None | ("pousou", plataforma) | ("bateu", motivo)
+
+    # ------------------------------------------------------------ terreno
+    def gerar_terreno(self):
+        n = LARGURA // CELULA + 1
+        r = self.rnd
+        tipo = self.local["relevo"]
+        base = []
+        for i in range(n):
+            u = i / (n - 1)
+            if tipo == "planicie":
+                y = 470 + 25 * math.sin(u * 6.0 + 1)
+            elif tipo == "montanha":
+                y = 480 - 150 * math.exp(-((u - 0.62) / 0.16) ** 2)
+            elif tipo == "dunas":
+                y = 460 + 30 * math.sin(u * 14) + 18 * math.sin(u * 31 + 2)
+            elif tipo == "canion":
+                y = 360 + 160 * math.exp(-((u - 0.45) / 0.14) ** 2)
+            else:  # vulcao: encosta subindo para a direita
+                y = 520 - 230 * u ** 1.4
+            base.append(y)
+        # irregularidade (deslocamento do ponto medio)
+        ruido = [0.0] * n
+        passo, amp = 64, 36.0 if tipo != "planicie" else 22.0
+        while passo >= 1:
+            for i in range(0, n, passo):
+                if i % (passo * 2):
+                    a, b = i - passo, min(n - 1, i + passo)
+                    ruido[i] = (ruido[a] + ruido[b]) / 2 + r.uniform(-amp, amp)
+            passo //= 2
+            amp *= 0.55
+        alturas = [min(ALTURA - 20, max(180, base[i] + ruido[i])) for i in range(n)]
+        # plataformas (planas), sem encostar umas nas outras
+        plataformas = []
+        celulas_livres = list(range(4, n - 4))
+        for largura, mult in PLATAFORMAS:
+            w = largura // CELULA
+            for _tentativa in range(200):
+                i0 = r.choice(celulas_livres)
+                if i0 + w + 2 >= n:
+                    continue
+                if all(not (i0 - 3 <= p["i1"] and p["i0"] - 3 <= i0 + w) for p in plataformas):
+                    break
+            y = sum(alturas[i0:i0 + w]) / w
+            for i in range(i0, i0 + w + 1):
+                alturas[i] = y
+            plataformas.append({"i0": i0, "i1": i0 + w, "x0": i0 * CELULA, "x1": (i0 + w) * CELULA,
+                                "y": round(y / CELULA) * CELULA, "mult": mult})
+        terreno = [round(a / CELULA) * CELULA for a in alturas]
+        for p in plataformas:
+            for i in range(p["i0"], p["i1"] + 1):
+                terreno[i] = p["y"]
+        return terreno, plataformas
+
+    def chao(self, x: float) -> float:
+        i = int(x // CELULA)
+        return self.terreno[max(0, min(len(self.terreno) - 1, i))]
+
+    def plataforma_em(self, x0: float, x1: float):
+        for p in self.plataformas:
+            if p["x0"] <= x0 and x1 <= p["x1"]:
+                return p
+        return None
+
+    # ------------------------------------------------------------ fisica
+    def vento(self) -> float:
+        if not self.vento_max:
+            return 0.0
+        a, b = self.fase_vento
+        return self.vento_max * (0.65 * math.sin(0.35 * self.t + a) + 0.35 * math.sin(1.3 * self.t + b))
+
+    def ponto(self, gx: float, gy: float) -> tuple[float, float]:
+        """Ponto da grade da sonda -> tela (girado)."""
+        dx, dy = (gx - 6.5) * ZOOM, (gy - 6.0) * ZOOM
+        a = math.radians(self.angulo)
+        return (self.x + dx * math.cos(a) - dy * math.sin(a), self.y + dx * math.sin(a) + dy * math.cos(a))
+
+    def altitude(self) -> float:
+        pe = max(self.ponto(*p)[1] for p in PES)
+        return max(0.0, (self.chao(self.x) - pe) / PX_POR_M)
+
+    def passo(self, dt: float, esquerda=False, direita=False, motor=False):
+        if self.resultado:
+            return
+        self.t += dt
+        if esquerda:
+            self.angulo -= GIRO * dt
+        if direita:
+            self.angulo += GIRO * dt
+        self.angulo = max(-90.0, min(90.0, self.angulo))
+        self.motor = motor and self.combustivel > 0
+        ax, ay = self.vento(), GRAVIDADE
+        if self.motor:
+            a = math.radians(self.angulo)
+            ax += MOTOR * math.sin(a)
+            ay -= MOTOR * math.cos(a)
+            self.combustivel = max(0.0, self.combustivel - GASTO * dt)
+        self.vx += ax * dt
+        self.vy += ay * dt
+        self.x += self.vx * dt * PX_POR_M
+        self.y += self.vy * dt * PX_POR_M
+        if self.x < -20:
+            self.x += LARGURA + 40
+        elif self.x > LARGURA + 20:
+            self.x -= LARGURA + 40
+        self.y = max(-300.0, self.y)
+        self.colisao()
+
+    def colisao(self):
+        pes = [self.ponto(*p) for p in PES]
+        casco = [self.ponto(*p) for p in CASCO]
+        if any(y >= self.chao(x) for x, y in casco):
+            self.resultado = ("bateu", "casco")
+            return
+        if not any(y >= self.chao(x) for x, y in pes):
+            return
+        x0, x1 = min(p[0] for p in pes), max(p[0] for p in pes)
+        plat = self.plataforma_em(x0, x1)
+        if abs(self.angulo) > LIMITE_ANG:
+            self.resultado = ("bateu", "angulo")
+        elif self.vy > LIMITE_VY:
+            self.resultado = ("bateu", "rapido")
+        elif abs(self.vx) > LIMITE_VX:
+            self.resultado = ("bateu", "lateral")
+        elif not plat:
+            self.resultado = ("bateu", "terreno")
+        else:
+            # assenta a sonda na plataforma
+            self.y += plat["y"] - max(y for _x, y in pes)
+            self.resultado = ("pousou", plat)
+
+    def pontos(self) -> int:
+        if not self.resultado or self.resultado[0] != "pousou":
+            return 0
+        plat = self.resultado[1]
+        suave = 50 if self.vy < 1.5 else 0
+        return int((100 + 2 * self.combustivel + suave) * plat["mult"]) + 50 * self.volta
+
+    # ------------------------------------------------------------ piloto automatico
+    def piloto(self):
+        """Controle simples para o modo demo/teste: (esquerda, direita, motor)."""
+        alvo = min(self.plataformas, key=lambda p: abs((p["x0"] + p["x1"]) / 2 - self.x) / p["mult"] ** 0.3)
+        cx = (alvo["x0"] + alvo["x1"]) / 2
+        dx = (cx - self.x) / PX_POR_M
+        alt = max(0.0, (alvo["y"] - self.y) / PX_POR_M - 5.5)
+        # folga sobre o relevo entre a sonda e o alvo (ou logo abaixo dela)
+        a, b = sorted((self.x - 25, cx))
+        trecho = self.terreno[int(max(0, a) // CELULA):int(min(LARGURA - 1, b + 25) // CELULA) + 1]
+        folga = ((min(trecho) if trecho else alvo["y"]) - self.y) / PX_POR_M - 6
+        # horizontal: chegar ao alvo antes do chao; perto dele, quase parado
+        t_solo = max(2.0, alt / max(1.0, self.vy))
+        vx_alvo = max(-10.0, min(10.0, dx / (t_solo * 0.7)))
+        if abs(dx) < 6:
+            vx_alvo = max(-1.0, min(1.0, dx * 0.4))
+        ax = (vx_alvo - self.vx) * 1.2 - self.vento()
+        ang_alvo = math.degrees(math.asin(max(-0.6, min(0.6, ax / MOTOR))))
+        if alt < 10:
+            ang_alvo = max(-6.0, min(6.0, ang_alvo))
+        esq, dir_ = self.angulo > ang_alvo + 1.5, self.angulo < ang_alvo - 1.5
+        # vertical: curva de frenagem (desce rapido no alto, devagar perto do chao)
+        vy_alvo = 1.0 + math.sqrt(2 * 3.2 * max(0.0, alt - 1))
+        if folga < 25 and abs(dx) > 8:
+            vy_alvo = min(vy_alvo, (folga - 5) * 0.25)
+        precisa_lado = abs(vx_alvo - self.vx) > 1.5 and abs(self.angulo - ang_alvo) < 10
+        motor = self.vy > vy_alvo or (precisa_lado and alt > 15)
+        return esq, dir_, motor
+
+
+# ------------------------------------------------------------------ recorde
+ARQ_RECORDE = os.path.expanduser("~/.config/marsos/pouso.ini")
+
+
+def ler_recorde() -> int:
+    c = configparser.ConfigParser()
+    c.read(ARQ_RECORDE, encoding="utf-8")
+    return c.getint("recorde", "pontos", fallback=0)
+
+
+def salvar_recorde(pontos: int):
+    c = configparser.ConfigParser()
+    c["recorde"] = {"pontos": str(pontos), "data": time.strftime("%Y-%m-%d")}
+    try:
+        os.makedirs(os.path.dirname(ARQ_RECORDE), exist_ok=True)
+        with open(ARQ_RECORDE, "w", encoding="utf-8") as f:
+            c.write(f)
+    except OSError:
+        pass
+
+
+# ------------------------------------------------------------------ fonte 5x7 (titulos)
+FONTE5X7 = {
+    "A": " ### |#   #|#   #|#####|#   #|#   #|#   #", "B": "#### |#   #|#   #|#### |#   #|#   #|#### ",
+    "C": " ### |#   #|#    |#    |#    |#   #| ### ", "D": "#### |#   #|#   #|#   #|#   #|#   #|#### ",
+    "E": "#####|#    |#    |#### |#    |#    |#####", "F": "#####|#    |#    |#### |#    |#    |#    ",
+    "G": " ### |#   #|#    |# ###|#   #|#   #| ####", "H": "#   #|#   #|#   #|#####|#   #|#   #|#   #",
+    "I": " ### |  #  |  #  |  #  |  #  |  #  | ### ", "J": "  ###|   # |   # |   # |   # |#  # | ##  ",
+    "K": "#   #|#  # |# #  |##   |# #  |#  # |#   #", "L": "#    |#    |#    |#    |#    |#    |#####",
+    "M": "#   #|## ##|# # #|# # #|#   #|#   #|#   #", "N": "#   #|##  #|# # #|#  ##|#   #|#   #|#   #",
+    "O": " ### |#   #|#   #|#   #|#   #|#   #| ### ", "P": "#### |#   #|#   #|#### |#    |#    |#    ",
+    "Q": " ### |#   #|#   #|#   #|# # #|#  # | ## #", "R": "#### |#   #|#   #|#### |# #  |#  # |#   #",
+    "S": " ####|#    |#    | ### |    #|    #|#### ", "T": "#####|  #  |  #  |  #  |  #  |  #  |  #  ",
+    "U": "#   #|#   #|#   #|#   #|#   #|#   #| ### ", "V": "#   #|#   #|#   #|#   #|#   #| # # |  #  ",
+    "W": "#   #|#   #|#   #|# # #|# # #|# # #| # # ", "X": "#   #|#   #| # # |  #  | # # |#   #|#   #",
+    "Y": "#   #|#   #| # # |  #  |  #  |  #  |  #  ", "Z": "#####|    #|   # |  #  | #   |#    |#####",
+    "0": " ### |#   #|#  ##|# # #|##  #|#   #| ### ", "1": "  #  | ##  |  #  |  #  |  #  |  #  | ### ",
+    "2": " ### |#   #|    #|   # |  #  | #   |#####", "3": "#####|   # |  #  |   # |    #|#   #| ### ",
+    "4": "   # |  ## | # # |#  # |#####|   # |   # ", "5": "#####|#    |#### |    #|    #|#   #| ### ",
+    "6": "  ## | #   |#    |#### |#   #|#   #| ### ", "7": "#####|    #|   # |  #  | #   | #   | #   ",
+    "8": " ### |#   #|#   #| ### |#   #|#   #| ### ", "9": " ### |#   #|#   #| ####|    #|   # | ##  ",
+    "!": "  #  |  #  |  #  |  #  |  #  |     |  #  ", ".": "     |     |     |     |     | ##  | ##  ",
+    "-": "     |     |     |#####|     |     |     ", ":": "     | ##  | ##  |     | ##  | ##  |     ",
+    "?": " ### |#   #|    #|   # |  #  |     |  #  ", " ": "     |     |     |     |     |     |     ",
+}
+
+
+# ------------------------------------------------------------------ jogo (Tk)
+def jogo(demo=False):
+    import subprocess
+    import tkinter as tk
+
+    import marstime
+    from marstk import AMBAR, AREIA, CREME, FONTE, FUNDO, LARANJA, NOITE, ROCHA, VERMELHO, janela
+
+    VERDE = "#b8c46a"
+    SONS = "/usr/share/marsos/sons"
+    titulo_jogo = _("Pouso Marciano")
+
+    root = janela("MarsPouso", titulo_jogo)
+    root.resizable(False, False)
+    cv = tk.Canvas(root, width=LARGURA, height=ALTURA, bg=FUNDO, highlightthickness=0)
+    cv.pack()
+
+    estado = {"tela": "titulo", "nivel": 0, "pontos": 0, "vidas": 3, "som": True, "mundo": None,
+              "recorde": ler_recorde(), "ultimo": time.monotonic(), "motor_som": 0.0, "alerta": 100,
+              "pausa": False, "particulas": [], "poeira": [], "demo": demo}
+    teclas = set()
+    soltar = {}
+
+    # ---------------------------------------------------------- sons
+    def tocar(nome):
+        if not estado["som"]:
+            return
+        arq = f"{SONS}/{nome}.wav"
+        for prog in ("pw-play", "paplay", "aplay"):
+            try:
+                subprocess.Popen([prog, arq], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                return
+            except OSError:
+                continue
+
+    # ---------------------------------------------------------- sprites girados
+    def girar_sprite(angulo):
+        a = math.radians(-angulo)
+        tam = 19
+        img = tk.PhotoImage(width=tam, height=tam)
+        for y in range(tam):
+            for x in range(tam):
+                dx, dy = x - tam / 2 + 0.5, y - tam / 2 + 0.5
+                sx = dx * math.cos(a) - dy * math.sin(a) + 6.5
+                sy = dx * math.sin(a) + dy * math.cos(a) + 6.0
+                ix, iy = math.floor(sx), math.floor(sy)
+                if 0 <= iy < len(SONDA) and 0 <= ix < len(SONDA[0]):
+                    ch = SONDA[iy][ix]
+                    if ch != ".":
+                        img.put(CORES[ch], (x, y))
+        return img.zoom(ZOOM)
+
+    angulos = list(range(-90, 91, 6))
+    sprites = {ang: girar_sprite(ang) for ang in angulos}
+
+    def sprite_para(angulo):
+        return sprites[min(angulos, key=lambda a: abs(a - angulo))]
+
+    # ---------------------------------------------------------- texto pixelado
+    def texto_pixel(x, y, txt, tam, cor, sombra="#0e0a12", tag="ui", centro=True):
+        txt = txt.upper()
+        largura = len(txt) * 6 * tam - tam
+        x0 = x - largura / 2 if centro else x
+        for desloc, c in (((tam // 2 + 1), sombra), (0, cor)):
+            for k, ch in enumerate(txt):
+                linhas = FONTE5X7.get(ch, FONTE5X7["?"]).split("|")
+                for j, linha in enumerate(linhas):
+                    for i, px in enumerate(linha):
+                        if px == "#":
+                            rx = x0 + (k * 6 + i) * tam + desloc
+                            ry = y + j * tam + desloc
+                            cv.create_rectangle(rx, ry, rx + tam, ry + tam, fill=c, outline="", tags=tag)
+
+    # ---------------------------------------------------------- cenario
+    def misturar(c1, c2, t):
+        a = [int(c1[i:i + 2], 16) for i in (1, 3, 5)]
+        b = [int(c2[i:i + 2], 16) for i in (1, 3, 5)]
+        return "#%02x%02x%02x" % tuple(int(a[i] + (b[i] - a[i]) * t) for i in range(3))
+
+    def desenhar_ceu(local, rnd):
+        topo, horiz = local["ceu"]
+        niveis = 10
+        bayer = (0, 2, 1, 3)
+        for y in range(0, ALTURA, 2):
+            t = min(1.0, y / (ALTURA * 0.85))
+            v = t * (niveis - 1)
+            k = int(v) + (1 if (v - int(v)) * 4 > bayer[(y // 2) % 4] + 0.5 else 0)
+            cv.create_rectangle(0, y, LARGURA, y + 2, fill=misturar(topo, horiz, min(1, k / (niveis - 1))),
+                                outline="", tags="cenario")
+        for _i in range(local["estrelas"]):
+            x, y = rnd.randrange(LARGURA), rnd.randrange(int(ALTURA * 0.6))
+            cor = rnd.choice((CREME, AREIA, AMBAR, "#8fb0d9", ROCHA))
+            cv.create_rectangle(x, y, x + 2, y + 2, fill=cor, outline="", tags="cenario")
+        if local.get("terra"):               # a Terra: um pontinho azul no ceu (entre os paineis)
+            x, y = rnd.randrange(280, LARGURA - 300), rnd.randrange(40, 100)
+            cv.create_rectangle(x, y, x + 4, y + 4, fill="#8fb0d9", outline="", tags="cenario")
+            cv.create_rectangle(x + 1, y + 1, x + 2, y + 2, fill="#cfe0f0", outline="", tags="cenario")
+            cv.create_text(x + 8, y - 2, text=_("Terra"), anchor="w", fill="#8fb0d9",
+                           font=(FONTE, -12), tags="cenario")
+        # Fobos (a lua maior) cruza o ceu devagar
+        estado["fobos_x"] = rnd.uniform(0, LARGURA)
+        fx = estado["fobos_x"] - 30
+        estado["fobos"] = cv.create_oval(fx, 40, fx + 14, 50, fill="#9a8a86", outline="#5a4a4a", tags="cenario")
+
+    def desenhar_terreno(m):
+        local = m.local
+        pts = [0, ALTURA]
+        for i, y in enumerate(m.terreno):
+            pts += [i * CELULA, y, (i + 1) * CELULA, y]
+        pts += [LARGURA, ALTURA]
+        cv.create_polygon(pts, fill=local["rocha"], outline="", tags="cenario")
+        # estratos (linhas mais escuras acompanhando o relevo)
+        for k, cor in ((18, local["sombra"]), (44, local["sombra"]), (80, "#2a1c24")):
+            linha = []
+            for i, y in enumerate(m.terreno):
+                linha += [i * CELULA, y + k, (i + 1) * CELULA, y + k]
+            cv.create_line(linha, fill=cor, width=2, tags="cenario")
+        # borda iluminada
+        borda = []
+        for i, y in enumerate(m.terreno):
+            borda += [i * CELULA, y + 1, (i + 1) * CELULA, y + 1]
+        cv.create_line(borda, fill=local["borda"], width=2, tags="cenario")
+        # plataformas
+        estado["luzes"] = []
+        for p in m.plataformas:
+            cv.create_rectangle(p["x0"], p["y"], p["x1"], p["y"] + 6, fill="#c9a892", outline="#3d2836",
+                                tags="cenario")
+            for x in range(p["x0"] + 4, p["x1"] - 2, 8):
+                cv.create_rectangle(x, p["y"] + 2, x + 4, p["y"] + 4, fill="#ffb45e", outline="", tags="cenario")
+            for x in (p["x0"] - 2, p["x1"] - 2):
+                estado["luzes"].append(cv.create_rectangle(x, p["y"] - 6, x + 4, p["y"] - 2, fill=VERMELHO,
+                                                           outline="", tags="cenario"))
+            cv.create_text((p["x0"] + p["x1"]) / 2, p["y"] - 14, text=f"x{p['mult']}", fill=CREME,
+                           font=(FONTE, -14, "bold"), tags="cenario")
+
+    # ---------------------------------------------------------- HUD
+    def criar_hud():
+        cv.create_rectangle(8, 8, 238, 112, fill=FUNDO, outline=ROCHA, width=2, tags="hud")
+        estado["hud"] = {}
+        rotulos = [("alt", _("ALTITUDE")), ("vy", _("VEL. VERT.")), ("vx", _("VEL. HORIZ.")),
+                   ("ang", _("ÂNGULO")), ("comb", _("COMBUSTÍVEL"))]
+        for i, (k, r) in enumerate(rotulos):
+            cv.create_text(16, 18 + i * 19, text=r, anchor="w", fill=AREIA, font=(FONTE, -14), tags="hud")
+            estado["hud"][k] = cv.create_text(230, 18 + i * 19, text="", anchor="e", fill=CREME,
+                                              font=(FONTE, -14, "bold"), tags="hud")
+        estado["barra"] = cv.create_rectangle(0, 0, 0, 0, fill=VERDE, outline="", tags="hud")
+        cv.create_rectangle(LARGURA - 238, 8, LARGURA - 8, 112, fill=FUNDO, outline=ROCHA, width=2, tags="hud")
+        for k, y in (("pontos", 18), ("local", 37), ("vento", 56), ("vidas", 75), ("recorde", 94)):
+            estado["hud"][k] = cv.create_text(LARGURA - 230, y, text="", anchor="w", fill=AREIA,
+                                              font=(FONTE, -14, "bold" if k == "pontos" else ""), tags="hud")
+
+    def atualizar_hud(m):
+        h = estado["hud"]
+
+        def cor(ok):
+            return VERDE if ok else VERMELHO
+
+        cv.itemconfig(h["alt"], text=f"{m.altitude():.0f} m")
+        cv.itemconfig(h["vy"], text=f"{num(abs(m.vy), 1)} m/s {'↓' if m.vy > 0 else '↑'}", fill=cor(m.vy <= LIMITE_VY))
+        cv.itemconfig(h["vx"], text=f"{num(abs(m.vx), 1)} m/s {'→' if m.vx > 0 else '←'}",
+                      fill=cor(abs(m.vx) <= LIMITE_VX))
+        cv.itemconfig(h["ang"], text=f"{m.angulo:+.0f}°", fill=cor(abs(m.angulo) <= LIMITE_ANG))
+        cv.itemconfig(h["comb"], text=f"{m.combustivel:.0f}%", fill=cor(m.combustivel > 20))
+        largura = 214 * m.combustivel / 100
+        cv.coords(estado["barra"], 16, 104, 16 + largura, 108)
+        cv.itemconfig(estado["barra"], fill=VERDE if m.combustivel > 40 else AMBAR if m.combustivel > 20 else VERMELHO)
+        cv.itemconfig(h["pontos"], text=_("PONTOS  {p}").format(p=f"{estado['pontos']:06d}"), fill=LARANJA)
+        cv.itemconfig(h["local"], text=_("Local {n}: {nome}").format(n=m.nivel + 1, nome=m.local["nome"]))
+        v = m.vento()
+        seta = "→" if v > 0.05 else "←" if v < -0.05 else "·"
+        cv.itemconfig(h["vento"], text=_("Vento {s} {v} m/s²").format(s=seta, v=num(abs(v), 1)) if m.vento_max
+                      else _("Sem vento"))
+        cv.itemconfig(h["vidas"], text=_("Sondas  ") + "▲ " * estado["vidas"])
+        cv.itemconfig(h["recorde"], text=_("Recorde {p}").format(p=f"{max(estado['recorde'], estado['pontos']):06d}"))
+
+    # ---------------------------------------------------------- telas
+    def novo_nivel():
+        cv.delete("all")
+        m = Mundo(estado["nivel"])
+        estado["mundo"] = m
+        estado["particulas"].clear()
+        estado["poeira"] = []
+        estado["alerta"] = 100
+        rnd = random.Random(estado["nivel"] * 7 + 1)
+        desenhar_ceu(m.local, rnd)
+        desenhar_terreno(m)
+        if m.vento_max:
+            for _i in range(26):
+                estado["poeira"].append([rnd.uniform(0, LARGURA), rnd.uniform(60, ALTURA - 60),
+                                         cv.create_line(0, 0, 0, 0, fill=AREIA, width=1, tags="poeira")])
+        estado["chama"] = cv.create_polygon(0, 0, 0, 0, 0, 0, fill=LARANJA, outline=AMBAR, tags="sonda")
+        estado["sonda"] = cv.create_image(m.x, m.y, image=sprite_para(0), tags="sonda")
+        estado["seta"] = cv.create_text(0, 0, text="", fill=LARANJA, font=(FONTE, -16, "bold"), tags="sonda")
+        criar_hud()
+        atualizar_hud(m)
+        texto_pixel(LARGURA / 2, 150, m.local["nome"], 5, LARANJA, tag="aviso")
+        cv.create_text(LARGURA / 2, 205, text=_("Pouse numa plataforma: devagar e reto."), fill=CREME,
+                       font=(FONTE, -16), tags="aviso")
+        root.after(2200, lambda: cv.delete("aviso"))
+        estado["tela"] = "jogo"
+        tocar("pouso-inicio")
+
+    def tela_titulo():
+        cv.delete("all")
+        estado["tela"] = "titulo"
+        rnd = random.Random(3)
+        desenhar_ceu(dict(LOCAIS[1], terra=False), rnd)
+        m = Mundo(0, semente=11)
+        m.local = dict(LOCAIS[1])
+        desenhar_terreno(m)
+        texto_pixel(LARGURA / 2, 90, titulo_jogo, 7, LARANJA)
+        cv.create_text(LARGURA / 2, 168, text=_("Pouse a sonda em Marte sem fazer uma cratera nova."),
+                       fill=CREME, font=(FONTE, -18))
+        ajuda = [_("←  →    girar a sonda"), _("↑ ou Espaço    motor"), _("P  pausa      M  som      Esc  sair")]
+        for i, t in enumerate(ajuda):
+            cv.create_text(LARGURA / 2, 215 + i * 24, text=t, fill=AREIA, font=(FONTE, -16))
+        cv.create_text(LARGURA / 2, 300, text=_("Pouse com menos de {vy} m/s na vertical, {vx} m/s de lado "
+                                                 "e {a}° de inclinação.").format(
+            vy=num(LIMITE_VY, 0), vx=num(LIMITE_VX, 0), a=int(LIMITE_ANG)), fill="#c9a892", font=(FONTE, -14))
+        if estado["recorde"]:
+            cv.create_text(LARGURA / 2, 330, text=_("Recorde: {p} pontos").format(p=estado["recorde"]),
+                           fill=AMBAR, font=(FONTE, -16, "bold"))
+        estado["piscar"] = cv.create_text(LARGURA / 2, 375, text=_("ENTER para começar"), fill=LARANJA,
+                                          font=(FONTE, -20, "bold"))
+        sonda = cv.create_image(LARGURA / 2, 420, image=sprite_para(0))
+        estado["titulo_sonda"] = sonda
+
+    def mensagem(titulo, cor, linhas, rodape):
+        cv.create_rectangle(LARGURA / 2 - 300, 140, LARGURA / 2 + 300, 330 + 22 * max(0, len(linhas) - 3),
+                            fill=FUNDO, outline=cor, width=3, tags="msg")
+        texto_pixel(LARGURA / 2, 160, titulo, 5, cor, tag="msg")
+        for i, t in enumerate(linhas):
+            cv.create_text(LARGURA / 2, 225 + i * 24, text=t, fill=CREME if i == 0 else AREIA,
+                           font=(FONTE, -16, "bold" if i == 0 else ""), tags="msg")
+        cv.create_text(LARGURA / 2, 305 + 22 * max(0, len(linhas) - 3), text=rodape, fill=LARANJA,
+                       font=(FONTE, -16, "bold"), tags="msg")
+
+    def terminou(m):
+        tipo, info = m.resultado
+        if tipo == "pousou":
+            ganho = m.pontos()
+            estado["pontos"] += ganho
+            estado["tela"] = "pousou"
+            tocar("pouso-sucesso")
+            hm = marstime.calcular()
+            s = marstime.sinal()
+            linhas = [_("{local} · sol {sol} · {mtc} MTC").format(local=m.local["nome"], sol=marstime.milhar(hm.sol),
+                                                                  mtc=hm.mtc_hms[:5]),
+                      _("+{g} pontos (plataforma x{m}, {c}% de combustível)").format(
+                          g=ganho, m=info["mult"], c=round(m.combustivel)),
+                      _("A notícia chega à Terra em {d}.").format(d=s.duracao(s.segundos))]
+            mensagem(_("POUSO CONFIRMADO"), VERDE, linhas, _("ENTER: próximo local"))
+        else:
+            estado["vidas"] -= 1
+            explodir(m)
+            tocar("pouso-explosao")
+            motivos = {"casco": _("A sonda tombou e bateu o casco."),
+                       "angulo": _("Torta demais: mais de {a}°.").format(a=int(LIMITE_ANG)),
+                       "rapido": _("Rápido demais: {v} m/s na vertical.").format(v=num(m.vy, 1)),
+                       "lateral": _("Andando de lado: {v} m/s.").format(v=num(abs(m.vx), 1)),
+                       "terreno": _("Fora da plataforma: o terreno é irregular.")}
+            if estado["vidas"] > 0:
+                estado["tela"] = "bateu"
+                mensagem(_("CRATERA NOVA"), VERMELHO,
+                         [motivos[info], _("Sondas restantes: {n}").format(n=estado["vidas"])],
+                         _("ENTER: tentar de novo"))
+            else:
+                estado["tela"] = "fim"
+                novo = estado["pontos"] > estado["recorde"]
+                if novo:
+                    estado["recorde"] = estado["pontos"]
+                    salvar_recorde(estado["pontos"])
+                mensagem(_("FIM DE JOGO"), VERMELHO,
+                         [motivos[info], _("Pontos: {p}").format(p=estado["pontos"]),
+                          _("NOVO RECORDE!") if novo else _("Recorde: {p}").format(p=estado["recorde"])],
+                         _("ENTER: voltar ao início"))
+
+    def explodir(m):
+        cv.itemconfig(estado["sonda"], state="hidden")
+        cv.itemconfig(estado["chama"], state="hidden")
+        rnd = random.Random()
+        for _i in range(70):
+            a = rnd.uniform(math.pi, 2 * math.pi)
+            v = rnd.uniform(40, 220)
+            cor = rnd.choice((CREME, AMBAR, LARANJA, VERMELHO, ROCHA, m.local["rocha"]))
+            estado["particulas"].append({"x": m.x, "y": m.y, "vx": math.cos(a) * v, "vy": math.sin(a) * v,
+                                         "vida": rnd.uniform(0.6, 1.6), "cor": cor, "tam": rnd.choice((3, 3, 6)),
+                                         "id": cv.create_rectangle(0, 0, 0, 0, fill=cor, outline="")})
+
+    # ---------------------------------------------------------- particulas
+    def soltar_fogo(m):
+        bx, by = m.ponto(*BOCAL)
+        a = math.radians(m.angulo)
+        for _i in range(2):
+            ang = a + random.uniform(-0.3, 0.3)
+            v = random.uniform(90, 160)
+            cor = random.choice((CREME, AMBAR, LARANJA, LARANJA, VERMELHO))
+            estado["particulas"].append({"x": bx, "y": by, "vx": -math.sin(ang) * v + m.vx * PX_POR_M,
+                                         "vy": math.cos(ang) * v + m.vy * PX_POR_M, "vida": random.uniform(0.25, 0.5),
+                                         "cor": cor, "tam": 3,
+                                         "id": cv.create_rectangle(0, 0, 0, 0, fill=cor, outline="")})
+        if m.altitude() < 25:               # o jato levanta poeira do chao
+            gx = m.x + random.uniform(-10, 10)
+            gy = m.chao(gx)
+            for lado in (-1, 1):
+                estado["particulas"].append({"x": gx, "y": gy - 2, "vx": lado * random.uniform(60, 140),
+                                             "vy": -random.uniform(10, 50), "vida": random.uniform(0.3, 0.8),
+                                             "cor": m.local["borda"], "tam": 3,
+                                             "id": cv.create_rectangle(0, 0, 0, 0, fill=m.local["borda"],
+                                                                       outline="")})
+
+    def mover_particulas(dt):
+        vivas = []
+        for p in estado["particulas"]:
+            p["vida"] -= dt
+            if p["vida"] <= 0:
+                cv.delete(p["id"])
+                continue
+            p["vy"] += GRAVIDADE * PX_POR_M * dt * 4
+            p["x"] += p["vx"] * dt
+            p["y"] += p["vy"] * dt
+            t = p["tam"]
+            cv.coords(p["id"], p["x"], p["y"], p["x"] + t, p["y"] + t)
+            vivas.append(p)
+        estado["particulas"] = vivas[-160:]
+        for p in vivas[:-160]:
+            cv.delete(p["id"])
+
+    # ---------------------------------------------------------- laco principal
+    def quadro():
+        agora = time.monotonic()
+        dt = min(0.05, agora - estado["ultimo"])
+        estado["ultimo"] = agora
+        tela = estado["tela"]
+        if tela == "titulo":
+            vis = int(agora * 2) % 2 == 0
+            cv.itemconfig(estado["piscar"], state="normal" if vis else "hidden")
+            cv.coords(estado["titulo_sonda"], LARGURA / 2 + 120 * math.sin(agora * 0.7), 420 + 8 * math.sin(agora * 2))
+        elif estado["mundo"] and not estado["pausa"]:
+            m = estado["mundo"]
+            if tela == "jogo":
+                if estado["demo"]:
+                    esq, dir_, motor = m.piloto()
+                else:
+                    esq = bool(teclas & {"Left", "a", "A"})
+                    dir_ = bool(teclas & {"Right", "d", "D"})
+                    motor = bool(teclas & {"Up", "space", "w", "W"})
+                passos = max(1, int(dt / 0.01))
+                for _i in range(passos):
+                    m.passo(dt / passos, esq, dir_, motor)
+                cv.coords(estado["sonda"], m.x, m.y)
+                cv.itemconfig(estado["sonda"], image=sprite_para(m.angulo))
+                if m.motor:
+                    bx, by = m.ponto(*BOCAL)
+                    a = math.radians(m.angulo)
+                    comp = random.uniform(14, 26)
+                    px, py = -math.sin(a), math.cos(a)
+                    lx, ly = math.cos(a) * 5, math.sin(a) * 5
+                    cv.coords(estado["chama"], bx - lx, by - ly, bx + lx, by + ly, bx + px * comp, by + py * comp)
+                    cv.itemconfig(estado["chama"], state="normal")
+                    soltar_fogo(m)
+                    if agora - estado["motor_som"] > 0.33:
+                        estado["motor_som"] = agora
+                        tocar("pouso-motor")
+                    for limite in (20, 10):
+                        if m.combustivel <= limite < estado["alerta"]:
+                            estado["alerta"] = limite
+                            tocar("pouso-alerta")
+                else:
+                    cv.itemconfig(estado["chama"], state="hidden")
+                if m.y < -10:
+                    cv.coords(estado["seta"], m.x, 130)
+                    cv.itemconfig(estado["seta"], text=f"▲ {(-m.y + ALTURA) / PX_POR_M:.0f} m")
+                else:
+                    cv.itemconfig(estado["seta"], text="")
+                atualizar_hud(m)
+                if m.resultado:
+                    terminou(m)
+                    atualizar_hud(m)
+            mover_particulas(dt)
+            # vento: poeira passando
+            v = m.vento()
+            for p in estado["poeira"]:
+                p[0] = (p[0] + v * 40 * dt + (8 if v >= 0 else -8) * dt) % LARGURA
+                comp = 4 + abs(v) * 10
+                cv.coords(p[2], p[0], p[1], p[0] - comp * (1 if v >= 0 else -1), p[1])
+            # Fobos e luzes das plataformas
+            estado["fobos_x"] = (estado["fobos_x"] + 6 * dt) % (LARGURA + 60)
+            fx = estado["fobos_x"] - 30
+            cv.coords(estado["fobos"], fx, 40, fx + 14, 50)
+            liga = int(agora * 2) % 2 == 0
+            for luz in estado.get("luzes", []):
+                cv.itemconfig(luz, fill=VERMELHO if liga else "#51323e")
+            if estado["demo"] and tela in ("pousou", "bateu", "fim") and agora - estado.get("fim_demo", agora) > 2.5:
+                enter()
+            if tela in ("pousou", "bateu", "fim"):
+                estado.setdefault("fim_demo", agora)
+        cv.tag_raise("hud")
+        cv.tag_raise("msg")
+        cv.tag_raise("aviso")
+        root.after(16, quadro)
+
+    # ---------------------------------------------------------- teclado
+    def apertou(e):
+        k = e.keysym
+        if k in soltar:
+            root.after_cancel(soltar.pop(k))
+        teclas.add(k)
+        if k in ("Return", "KP_Enter"):
+            enter()
+        elif k in ("p", "P") and estado["tela"] == "jogo":
+            estado["pausa"] = not estado["pausa"]
+            if estado["pausa"]:
+                texto_pixel(LARGURA / 2, 250, _("PAUSA"), 6, AMBAR, tag="msg")
+            else:
+                cv.delete("msg")
+        elif k in ("m", "M"):
+            estado["som"] = not estado["som"]
+        elif k == "Escape":
+            if estado["tela"] == "titulo":
+                root.destroy()
+            else:
+                tela_titulo()
+
+    def largou(e):
+        k = e.keysym
+        # o X repete teclas com pares solta/aperta: so solta mesmo se nao voltar logo
+        soltar[k] = root.after(40, lambda: (teclas.discard(k), soltar.pop(k, None)))
+
+    def enter():
+        estado.pop("fim_demo", None)
+        tela = estado["tela"]
+        if tela == "titulo":
+            estado.update(nivel=0, pontos=0, vidas=3)
+            novo_nivel()
+        elif tela == "pousou":
+            estado["nivel"] += 1
+            novo_nivel()
+        elif tela == "bateu":
+            novo_nivel()
+        elif tela == "fim":
+            tela_titulo()
+
+    root.bind("<KeyPress>", apertou)
+    root.bind("<KeyRelease>", largou)
+    tela_titulo()
+    if demo:
+        root.after(800, enter)
+    root.after(16, quadro)
+    root.mainloop()
+
+
+# ------------------------------------------------------------------ teste sem janela
+def teste():
+    """Pilota sozinho 25 pousos e confere que a fisica e o terreno fazem sentido."""
+    ok = 0
+    for nivel in range(10):
+        for semente in range(5):
+            m = Mundo(nivel, semente=semente * 31 + nivel)
+            assert len(m.plataformas) == 3
+            for p in m.plataformas:
+                assert p["x1"] - p["x0"] >= 60 and all(m.terreno[i] == p["y"] for i in range(p["i0"], p["i1"] + 1))
+            for _i in range(6000):            # ate 60 s de voo
+                m.passo(0.01, *m.piloto())
+                if m.resultado:
+                    break
+            r = m.resultado
+            ok += bool(r and r[0] == "pousou")
+            print(f"nivel {nivel + 1:2} {m.local['nome']:17} semente {semente}: "
+                  f"{(r[0] + ' ' + (('x' + str(r[1]['mult'])) if r[0] == 'pousou' else r[1])) if r else 'sem resultado'}"
+                  f"  t={m.t:4.1f}s comb={m.combustivel:3.0f}% vy={m.vy:4.1f} vx={m.vx:+4.1f} ang={m.angulo:+3.0f}"
+                  f"  pontos={m.pontos()}")
+    print(f"piloto automatico pousou {ok} de 50")
+    return ok
+
+
+if __name__ == "__main__":
+    if "--teste" in sys.argv:
+        sys.exit(0 if teste() >= 25 else 1)
+    jogo(demo="--demo" in sys.argv)

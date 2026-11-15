@@ -1,4 +1,4 @@
-# ~/.fvwm/config  -  MarsOS 1.0 "Olympus"
+# ~/.fvwm/config  -  MarsOS 1.1 "Olympus"
 # Tema marciano retro para o FVWM (estilo Linux dos anos 90).
 # Paleta do logo: #3d2836 #51323e #ac2f44 #e54438 #ff8933
 
@@ -49,13 +49,18 @@ Style * MiniIcon mini-marte.xpm, NoIcon, ResizeOpaque, WindowShadeSteps 16
 Style MarsBar      !Title, !Borders, Sticky, WindowListSkip, CirculateSkip, StaysOnTop, NeverFocus, FixedPosition, FixedSize, !Iconifiable
 Style FvwmPager    !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
 Style FvwmIconMan  !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
-Style MarsClockMini !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
+# Apps Tk: o Tk muda o nome da classe (MarsPouso -> Marspouso), entao as regras usam o
+# nome de instancia, que fica como no codigo com a primeira letra minuscula (marsPouso).
+Style marsClockMini !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
+Style marsBandeja  !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
+Style marsOSAviso  !Title, !Borders, Sticky, WindowListSkip, CirculateSkip, StaysOnTop, NeverFocus
+Style marsPouso    !Maximizable, PositionPlacement Center
 Style xclock       !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
-Style MarsGlobo    !Maximizable
-Style MarsOSSobre  !Maximizable, PositionPlacement Center
-Style MarsOSEnergia !Maximizable, PositionPlacement Center, StaysOnTop
-Style MarsOSConfig PositionPlacement Center
-Style MarsOSVolume !Maximizable, !Iconifiable, StaysOnTop, PositionPlacement UnderMouse
+Style marsGlobo    !Maximizable
+Style marsOSSobre  !Maximizable, PositionPlacement Center
+Style marsOSEnergia !Maximizable, PositionPlacement Center, StaysOnTop
+Style marsOSConfig PositionPlacement Center
+Style marsOSVolume !Maximizable, !Iconifiable, StaysOnTop, PositionPlacement UnderMouse
 
 TitleStyle Centered Height 20 -- Raised
 ButtonStyle All -- UseTitleStyle
@@ -129,6 +134,13 @@ Key XF86AudioRaiseVolume A A Exec exec wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SI
 Key XF86AudioLowerVolume A A Exec exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
 Key XF86AudioMute        A A Exec exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
 
+# Captura de tela: Print = tela inteira, Alt+Print = janela ativa, Shift+Print = escolher area
+# (com Alt, muitos teclados mandam Sys_Req no lugar de Print)
+Key Print   A N Exec exec marsos-captura tela
+Key Print   A M Exec exec marsos-captura janela
+Key Sys_Req A M Exec exec marsos-captura janela
+Key Print   A S Exec exec marsos-captura area
+
 #----------------------------------------------------------------------
 # Painel "MarsBar" (rodape)
 #----------------------------------------------------------------------
@@ -145,11 +157,25 @@ DestroyModuleConfig MarsBar: *
 *MarsBar: (2x1, Icon globo.xpm, Colorset 8, ActiveColorset 9, Action(Mouse 1) "Exec exec marsos-navegador")
 *MarsBar: (2x1, Icon editor.xpm, Colorset 8, ActiveColorset 9, Action(Mouse 1) "Exec exec xfw")
 *MarsBar: (8x1, Frame 0, Swallow (UseOld, NoKill) "FvwmPager" "Module FvwmPager 0 3")
-*MarsBar: (23x1, Frame 0, Swallow (UseOld, NoKill) "FvwmIconMan" "Module FvwmIconMan")
+*MarsBar: (20x1, Frame 0, Swallow (UseOld, NoKill) "FvwmIconMan" "Module FvwmIconMan")
+*MarsBar: (5x1, Frame -1, Swallow (UseOld, NoKill, Respawn) "MarsBandeja" "Exec exec marsos-bandeja")
 *MarsBar: (2x1, Icon engrenagem.xpm, Colorset 8, ActiveColorset 9, Action(Mouse 1) "Exec exec marsos-config")
 *MarsBar: (2x1, Icon som.xpm, Colorset 8, ActiveColorset 9, Action(Mouse 1) "Exec exec marsos-volume", Action(Mouse 4) "Exec exec wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+", Action(Mouse 5) "Exec exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-")
-*MarsBar: (9x1, Frame -1, Swallow (UseOld, NoKill, Respawn) "MarsClockMini" "Exec exec marsclock --mini")
+*MarsBar: (7x1, Frame -1, Swallow (UseOld, NoKill, Respawn) "MarsClockMini" "Exec exec marsclock --mini")
 *MarsBar: (5x1, Frame -1, Swallow (UseOld, NoKill, Respawn) "xclock" "Exec exec xclock -digital -norender -update 1 -strftime ' %H:%M ' -bg '#1a1117' -fg '#ffb45e' -font '-*-terminus-bold-r-normal-*-16-*-*-*-*-*-iso10646-1'")
+
+#----------------------------------------------------------------------
+# Sons de eventos (abrir/fechar/minimizar janelas, trocar de area).
+# Ligue/desligue em Configuracoes > Som. Os sons ficam em /usr/share/marsos/sons.
+#----------------------------------------------------------------------
+DestroyModuleConfig SonsEventos: *
+*SonsEventos: Cmd Exec exec marsos-tocar
+*SonsEventos: StartDelay 4
+*SonsEventos: add_window abrir
+*SonsEventos: destroy_window fechar
+*SonsEventos: iconify minimizar
+*SonsEventos: deiconify restaurar
+*SonsEventos: new_desk area
 
 DestroyModuleConfig FvwmPager: *
 *FvwmPager: Colorset * 6

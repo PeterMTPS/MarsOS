@@ -15,7 +15,8 @@ PADRAO = {
     "teclado": {"layout": "", "variante": ""},
     "mouse": {"velocidade": "3", "canhoto": "nao"},
     "tela": {"modo": ""},
-    "som": {"inicio": "sim"},
+    "som": {"inicio": "sim", "eventos": "sim"},
+    "sistema": {"idioma": ""},
 }
 
 LAYOUTS = [

@@ -1,0 +1,18 @@
+MarsOS - a retro Linux covered in red Martian dust
+https://github.com/PeterMTPS/MarsOS
+
+Copyright (C) 2026 Pedro (PeterMTPS)
+
+MarsOS's own files (scripts, apps, the game, menus, themes, artwork and sounds)
+are free software: you can redistribute them and/or modify them under the terms
+of the GNU General Public License as published by the Free Software Foundation,
+either version 3 of the License, or (at your option) any later version.
+
+They are distributed in the hope that they will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+The full license text is in /usr/share/common-licenses/GPL-3.
+
+The rest of the system comes from Debian GNU/Linux; each package keeps its own
+license, listed in /usr/share/doc/<package>/copyright.
