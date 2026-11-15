@@ -339,6 +339,12 @@ class Configuracoes:
                 self.aviso(_("Fuso horário: {f}.").format(f=fuso))
                 marsconf.reiniciar_fvwm()   # o relogio do painel recarrega o fuso
                 self.root.after(1200, lambda: self.mostrar("hora"))
+            elif shutil.which("sudo"):
+                # sistema instalado: o sudo pede a senha, entao pergunta num terminal
+                marsconf.abrir(["xterm", "-title", _("Fuso horário"), "-geometry", "70x8", "-e", "sh", "-c",
+                                f"sudo timedatectl set-timezone {fuso} && echo OK; sleep 2"])
+                self.aviso(_("Digite sua senha no terminal para mudar o fuso."))
+                self.root.after(6000, lambda: self.mostrar("hora"))
             else:
                 self.aviso(_("Não foi possível mudar o fuso (precisa de permissão de administrador)."), erro=True)
 

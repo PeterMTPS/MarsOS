@@ -149,6 +149,7 @@ EN = {
     "Instalado no disco — seus arquivos e programas ficam salvos.":
         "Installed on disk — your files and programs are kept.",
     "Licença": "License",
+    "Digite sua senha no terminal para mudar o fuso.": "Type your password in the terminal to change the time zone.",
     # sinal Terra-Marte
     "Distância da Terra ": "Distance from Earth ", "Distância da Terra": "Distance from Earth",
     "Atraso do sinal ": "Signal delay ", "Atraso do sinal": "Signal delay", "UA": "AU",
