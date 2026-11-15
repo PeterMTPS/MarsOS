@@ -20,6 +20,10 @@ if [ -e /usr/share/fontconfig/conf.avail/70-yes-bitmaps.conf ]; then
 fi
 fc-cache -f >/dev/null 2>&1 || true
 
+# sudo so aceita arquivos em sudoers.d com permissao 0440
+chmod 0440 /etc/sudoers.d/marsos
+visudo -c -f /etc/sudoers.d/marsos
+
 # Scripts do MarsOS executaveis
 chmod 755 /usr/local/bin/* /usr/lib/marsos/*.py 2>/dev/null || true
 

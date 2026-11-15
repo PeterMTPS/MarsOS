@@ -1,0 +1,4 @@
+# MarsOS: quem esta usando o computador (grupo users, onde o instalador coloca o
+# primeiro usuario) pode desligar e reiniciar pelo menu e mudar o fuso horario nas
+# Configuracoes sem digitar senha. O resto continua pedindo a senha do sudo.
+%users ALL=(root) NOPASSWD: /usr/bin/systemctl poweroff, /usr/bin/systemctl reboot, /usr/bin/timedatectl set-timezone *
