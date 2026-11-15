@@ -8,7 +8,7 @@
 
 🇺🇸 [English](README.md) · 🇧🇷 Português
 
-[![Baixar a ISO](https://img.shields.io/badge/baixar-ISO-e54438?style=for-the-badge&labelColor=3d2836)](https://github.com/PeterMTPS/MarsOS/releases/latest/download/marsos-1.1-amd64.hybrid.iso)
+[![Baixar a ISO](https://img.shields.io/badge/baixar-ISO%20940%20MB-e54438?style=for-the-badge&labelColor=3d2836)](https://github.com/PeterMTPS/MarsOS/releases/latest/download/marsos-1.1-amd64.hybrid.iso)
 [![Site](https://img.shields.io/badge/site-MarsOS-ff8933?style=for-the-badge&labelColor=3d2836)](https://petermtps.github.io/MarsOS/pt/)
 
 ![Debian 13](https://img.shields.io/badge/base-Debian%2013%20trixie-ac2f44?labelColor=1a1117)
