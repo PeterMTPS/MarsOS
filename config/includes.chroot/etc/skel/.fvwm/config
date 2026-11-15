@@ -167,7 +167,7 @@ DestroyModuleConfig MarsBar: *
 # Ligue/desligue em Configuracoes > Som. Os sons ficam em /usr/share/marsos/sons.
 #----------------------------------------------------------------------
 DestroyModuleConfig SonsEventos: *
-*SonsEventos: Cmd "Exec exec marsos-tocar"
+*SonsEventos: Cmd Exec exec marsos-tocar
 *SonsEventos: StartDelay 4
 *SonsEventos: add_window abrir
 *SonsEventos: destroy_window fechar

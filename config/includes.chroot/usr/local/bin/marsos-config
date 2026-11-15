@@ -57,8 +57,8 @@ def ler(caminho):
 class Configuracoes:
     def __init__(self, inicial):
         self.root = janela("MarsOSConfig", _("Configurações do MarsOS"))
-        self.root.geometry("780x540")
-        self.root.minsize(720, 500)
+        self.root.geometry("780x600")
+        self.root.minsize(720, 560)
         self.conf = marsconf.ler()
         self.imagens = {}
         self.timer = None
