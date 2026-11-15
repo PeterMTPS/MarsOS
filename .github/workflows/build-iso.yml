@@ -6,6 +6,8 @@ name: Build ISO
 on:
   push:
     tags: ["v*"]
+    branches: ["marsos-1.1"]          # temporary: test builds of the 1.1 branch
+    paths-ignore: ["docs/**", "**.md"]
   workflow_dispatch:
 
 permissions:
