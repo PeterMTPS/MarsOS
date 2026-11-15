@@ -1,0 +1,61 @@
+# MarsOS - builds the ISO on GitHub's servers.
+#   * push a tag like v1.1  -> builds and publishes the ISO in that Release
+#   * "Run workflow" button -> builds and keeps the ISO as a download (artifact) for 7 days
+name: Build ISO
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  iso:
+    name: Build the MarsOS ISO
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+
+      - name: Free disk space on the runner
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost
+          df -h /
+
+      - name: Build the ISO in Debian 13 with live-build
+        run: |
+          docker run --rm --privileged -v "$PWD:/marsos" -w /marsos debian:trixie bash -c '
+            set -e
+            apt-get update
+            apt-get install -y --no-install-recommends live-build debootstrap rsync xorriso cpio wget ca-certificates
+            ./build.sh
+          '
+          ls -lh marsos-*amd64.hybrid.iso*
+          cat marsos-*amd64.hybrid.iso.sha256
+
+      - name: Keep the ISO as a download (artifact)
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: marsos-iso
+          path: |
+            marsos-*amd64.hybrid.iso
+            marsos-*amd64.hybrid.iso.sha256
+          compression-level: 0
+          retention-days: 7
+
+      - name: Publish the ISO in the Release
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="$GITHUB_REF_NAME"
+          FILES="$(ls marsos-*amd64.hybrid.iso marsos-*amd64.hybrid.iso.sha256)"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" $FILES --clobber
+          else
+            gh release create "$TAG" $FILES --title "MarsOS ${TAG#v} \"Olympus\"" --notes-file .github/release-notes.md
+          fi

@@ -1,0 +1,28 @@
+#!/bin/sh
+# marsos-captura [tela|janela|area|atraso] - captura de tela do MarsOS (scrot)
+#   Print Screen = tela inteira   Alt+Print = janela ativa   Shift+Print = escolher area
+# As imagens vao para ~/Imagens (ou ~/Pictures) e tocam o som do obturador.
+modo="${1:-tela}"
+case "${MARSOS_IDIOMA:-${LANG:-en}}" in
+	pt*) pasta="$HOME/Imagens"; t_titulo="Captura de tela"; t_salva="Salva em Imagens:"
+	     t_abrir="Abrir"; t_erro="Não consegui capturar a tela (o scrot está instalado?)" ;;
+	*)   pasta="$HOME/Pictures"; t_titulo="Screenshot"; t_salva="Saved to Pictures:"
+	     t_abrir="Open"; t_erro="Could not take the screenshot (is scrot installed?)" ;;
+esac
+mkdir -p "$pasta"
+nome="MarsOS-$(date +%Y-%m-%d-%H%M%S).png"
+arquivo="$pasta/$nome"
+
+case "$modo" in
+	janela) scrot --focused --border "$arquivo" ;;
+	area)   scrot --select --line style=dash,width=2,color="#ff8933" "$arquivo" ;;
+	atraso) scrot --delay 3 "$arquivo" ;;
+	*)      scrot "$arquivo" ;;
+esac
+if [ ! -s "$arquivo" ]; then
+	[ "$modo" = area ] && exit 0      # selecao cancelada com Esc
+	exec marsos-aviso --titulo "$t_titulo" --icone captura --som erro "$t_erro"
+fi
+marsos-tocar captura --sempre &
+exec marsos-aviso --titulo "$t_titulo" --icone captura --segundos 5 \
+	--botao "$t_abrir" --comando "xfi $arquivo" "$t_salva $nome"

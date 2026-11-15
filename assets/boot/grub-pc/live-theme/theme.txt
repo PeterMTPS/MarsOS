@@ -10,7 +10,7 @@ terminal-font: "Unifont Regular 16"
         left = 0
         width = 100%
         height = 20
-        text = "ENTER inicia   -   E edita   -   C linha de comando"
+        text = "ENTER start / iniciar   -   E edit / editar   -   C command line"
         align = "center"
         color = "#c9a892"
         font = "Unifont Regular 16"
@@ -47,5 +47,5 @@ terminal-font: "Unifont Regular 16"
         fg_color = "#e54438"
         bg_color = "#3d2836"
         border_color = "#ac2f44"
-        text = "Iniciando o MarsOS em %d s"
+        text = "Starting MarsOS in %d s"
 }

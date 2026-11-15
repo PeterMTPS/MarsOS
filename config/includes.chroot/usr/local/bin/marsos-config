@@ -252,6 +252,16 @@ class Configuracoes:
             self.aviso(_("Som de inicialização ligado.") if ini.get() else _("Som de inicialização desligado."))
 
         self.check(_("Tocar o som de inicialização do MarsOS"), ini, salvar_inicio)
+        evt = tk.BooleanVar(value=self.conf.get("som", "eventos", fallback="sim") == "sim")
+
+        def salvar_eventos():
+            self.conf["som"]["eventos"] = "sim" if evt.get() else "nao"
+            self.salvar()
+            if evt.get():
+                marssom.tocar("abrir")
+            self.aviso(_("Sons de eventos ligados.") if evt.get() else _("Sons de eventos desligados."))
+
+        self.check(_("Sons de eventos (abrir e fechar janelas, avisos, capturas de tela)"), evt, salvar_eventos)
         self.botao(_("Mixer avançado (alsamixer)"),
                    lambda: marsconf.abrir(["xterm", "-title", _("Mixer de som"), "-geometry", "100x28",
                                            "-e", "alsamixer"]))
@@ -383,6 +393,7 @@ class Configuracoes:
         disco = shutil.disk_usage("/")
         espaco = _("{u} de {t} GiB usados").format(u=num((disco.total - disco.free) / 2**30, 1),
                                                     t=num(disco.total / 2**30, 1))
+        live = os.path.isdir("/run/live")
         persist = "persistence" in ler("/proc/cmdline")
         self.secao(_("Este computador"))
         self.texto(_("Sistema:  {v}").format(v=d.get("PRETTY_NAME", "MarsOS")))
@@ -390,11 +401,47 @@ class Configuracoes:
         self.texto(_("Kernel:   {v}").format(v=platform.release()))
         self.texto(_("Memória:  {v}").format(v=memoria))
         self.texto(_("Espaço:   {v}").format(v=espaco))
-        if persist:
+        if not live:
+            self.texto(_("Instalado no disco — seus arquivos e programas ficam salvos."), VERDE)
+        elif persist:
             self.texto(_("Persistência: LIGADA — seus arquivos e programas ficam salvos."), VERDE)
         else:
             self.texto(_("Persistência: desligada — tudo some ao desligar. Use \"MarsOS com persistência\" "
                          "no menu de boot para salvar."), AMBAR)
+        self.secao(_("Idioma / Language"))
+        idioma_atual = self.conf.get("sistema", "idioma", fallback="") or os.environ.get("MARSOS_IDIOMA", "en")
+        escolha = tk.StringVar(value=idioma_atual)
+        linha_id = tk.Frame(self.corpo, bg=FUNDO)
+        linha_id.pack(anchor="w")
+
+        def trocar_idioma():
+            if not self.conf.has_section("sistema"):
+                self.conf.add_section("sistema")
+            self.conf["sistema"]["idioma"] = escolha.get()
+            self.salvar()
+            if escolha.get() == os.environ.get("MARSOS_IDIOMA", ""):
+                self.aviso(_("Este já é o idioma da sessão."))
+                return
+            self.aviso(_("Idioma salvo. Reinicie a sessão para usar o novo idioma."))
+            reiniciar.config(state="normal")
+
+        for valor, rotulo in (("en", "English"), ("pt", "Português (Brasil)")):
+            tk.Radiobutton(linha_id, text=rotulo, variable=escolha, value=valor, command=trocar_idioma,
+                           bg=FUNDO, fg=AREIA, selectcolor=NOITE, activebackground=FUNDO,
+                           activeforeground=CREME).pack(side="left", padx=(0, 16))
+
+        def reiniciar_sessao():
+            # o ~/.bash_profile ve este arquivo e abre o X de novo, ja no novo idioma
+            pasta = os.path.expanduser("~/.cache/marsos")
+            os.makedirs(pasta, exist_ok=True)
+            open(os.path.join(pasta, "reiniciar-sessao"), "w").close()
+            marsconf.rodar(["pkill", "-TERM", "-x", "fvwm"])
+            marsconf.rodar(["pkill", "-TERM", "-x", "fvwm3"])
+
+        reiniciar = tk.Button(linha_id, text=_("Reiniciar a sessão"), command=reiniciar_sessao, fg=CREME,
+                              padx=10, state="disabled")
+        reiniciar.pack(side="left")
+        self.texto(_("Reiniciar a sessão fecha todos os programas abertos."), AREIA2)
         self.secao(_("Ferramentas"))
         linha1 = tk.Frame(self.corpo, bg=FUNDO)
         linha1.pack(anchor="w")

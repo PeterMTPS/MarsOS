@@ -137,6 +137,57 @@ EN = {
         "Persistence: off — everything is lost at shutdown. Choose \"MarsOS with persistence\" in the boot menu to keep your files.",
     "Ferramentas": "Tools", "Monitor do sistema": "System monitor", "Terminal de root": "Root terminal",
     "Atualizar lista de programas": "Update package lists",
+    "Sons de eventos (abrir e fechar janelas, avisos, capturas de tela)":
+        "Event sounds (opening and closing windows, alerts, screenshots)",
+    "Sons de eventos ligados.": "Event sounds on.", "Sons de eventos desligados.": "Event sounds off.",
+    "Idioma / Language": "Language / Idioma",
+    "Este já é o idioma da sessão.": "This is already the session language.",
+    "Idioma salvo. Reinicie a sessão para usar o novo idioma.":
+        "Language saved. Restart the session to use it.",
+    "Reiniciar a sessão": "Restart session",
+    "Reiniciar a sessão fecha todos os programas abertos.": "Restarting the session closes all open programs.",
+    "Instalado no disco — seus arquivos e programas ficam salvos.":
+        "Installed on disk — your files and programs are kept.",
+    "Licença": "License",
+    # sinal Terra-Marte
+    "Distância da Terra ": "Distance from Earth ", "Distância da Terra": "Distance from Earth",
+    "Atraso do sinal ": "Signal delay ", "Atraso do sinal": "Signal delay", "UA": "AU",
+    "(ida e volta: {d})": "(round trip: {d})", "Sinal": "Signal", "{d} até a Terra": "{d} to Earth",
+    "Conjunção solar: o Sol está entre a Terra e Marte e atrapalha o rádio.":
+        "Solar conjunction: the Sun is between Earth and Mars and disrupts the radio.",
+    # bandeja (rede e bateria)
+    "Rede: desconectada": "Network: disconnected", "Rede: {t}": "Network: {t}", "LAN": "LAN",
+    "Configurações de rede": "Network settings", "A conexão de rede caiu.": "The network connection dropped.",
+    "Conectado à rede ({t}).": "Connected to the network ({t}).",
+    "Bateria: {p}%": "Battery: {p}%", "Bateria fraca": "Low battery",
+    "Restam {p}%. Ligue o carregador.": "{p}% left. Plug in the charger.",
+    "{t} para encher": "{t} until full", "{t} restantes": "{t} left",
+    "carregando": "charging", "descarregando": "discharging", "cheia": "full",
+    # jogo
+    "Pouso Marciano": "Mars Touchdown",
+    "Pouse a sonda em Marte sem fazer uma cratera nova.": "Land the probe on Mars without making a new crater.",
+    "←  →    girar a sonda": "←  →    rotate the probe", "↑ ou Espaço    motor": "↑ or Space    engine",
+    "P  pausa      M  som      Esc  sair": "P  pause      M  sound      Esc  quit",
+    "Pouse com menos de {vy} m/s na vertical, {vx} m/s de lado e {a}° de inclinação.":
+        "Touch down under {vy} m/s vertically, {vx} m/s sideways and {a}° of tilt.",
+    "Recorde: {p} pontos": "High score: {p} points", "ENTER para começar": "ENTER to start",
+    "ALTITUDE": "ALTITUDE", "VEL. VERT.": "VERT. SPEED", "VEL. HORIZ.": "HORIZ. SPEED",
+    "ÂNGULO": "ANGLE", "COMBUSTÍVEL": "FUEL", "PONTOS  {p}": "SCORE  {p}", "Local {n}: {nome}": "Site {n}: {nome}",
+    "Vento {s} {v} m/s²": "Wind {s} {v} m/s²", "Sem vento": "No wind", "Sondas  ": "Probes  ",
+    "Recorde {p}": "Best   {p}", "Terra": "Earth",
+    "Pouse numa plataforma: devagar e reto.": "Land on a pad: slow and level.",
+    "POUSO CONFIRMADO": "TOUCHDOWN CONFIRMED", "{local} · sol {sol} · {mtc} MTC": "{local} · sol {sol} · {mtc} MTC",
+    "+{g} pontos (plataforma x{m}, {c}% de combustível)": "+{g} points (x{m} pad, {c}% fuel left)",
+    "A notícia chega à Terra em {d}.": "The news reaches Earth in {d}.",
+    "ENTER: próximo local": "ENTER: next site", "CRATERA NOVA": "NEW CRATER",
+    "A sonda tombou e bateu o casco.": "The probe tipped over and hit its hull.",
+    "Torta demais: mais de {a}°.": "Too tilted: more than {a}°.",
+    "Rápido demais: {v} m/s na vertical.": "Too fast: {v} m/s vertically.",
+    "Andando de lado: {v} m/s.": "Drifting sideways: {v} m/s.",
+    "Fora da plataforma: o terreno é irregular.": "Missed the pad: the ground is too rough.",
+    "Sondas restantes: {n}": "Probes left: {n}", "ENTER: tentar de novo": "ENTER: try again",
+    "FIM DE JOGO": "GAME OVER", "Pontos: {p}": "Score: {p}", "NOVO RECORDE!": "NEW HIGH SCORE!",
+    "Recorde: {p}": "High score: {p}", "ENTER: voltar ao início": "ENTER: back to the start", "PAUSA": "PAUSED",
 }
 
 DIAS = {"pt": ["segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado", "domingo"],

@@ -26,7 +26,7 @@ c.pack()
 estrelas(c, 470, 230, 90, semente=2)
 PlanetaGirando(c, 115, 115, zoom=2)
 c.create_text(235, 70, anchor="w", text="MarsOS", fill=LARANJA, font=(FONTE, -32, "bold"))
-c.create_text(237, 108, anchor="w", text='1.0 "Olympus"', fill=AMBAR, font=(FONTE, -20, "bold"))
+c.create_text(237, 108, anchor="w", text='1.1 "Olympus"', fill=AMBAR, font=(FONTE, -20, "bold"))
 c.create_text(237, 140, anchor="w", text=_("Um Linux retrô com a\npoeira vermelha de Marte."),
               fill=AREIA, font=(FONTE, -16))
 
@@ -37,6 +37,7 @@ dados = [
     ("Terminal", "XTerm"),
     (_("Arquivos"), "Xfe"),
     (_("Navegador"), "Firefox · Dillo"),
+    (_("Licença"), "GNU GPL 3.0"),
 ]
 f = tk.Frame(root, bg=NOITE, bd=2, relief="sunken", padx=14, pady=8)
 f.pack(fill="x", padx=12)

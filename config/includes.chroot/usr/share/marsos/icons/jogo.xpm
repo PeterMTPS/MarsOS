@@ -1,0 +1,27 @@
+/* XPM */
+static char *jogo[] = {
+"16 16 7 1",
+". c None",
+"a c #1a1117",
+"b c #e8c9a8",
+"c c #5a6f8c",
+"d c #ff8933",
+"e c #ffd59a",
+"f c #ac2f44",
+"................",
+"................",
+".....aaaaaa.....",
+"....abbbbbba....",
+"....abccccba....",
+"...abbccccbba...",
+"...abbbbbbbba...",
+"...abbbbbbbba...",
+"...abaaaaaaba...",
+"...b..dddd..b...",
+"...b..ded...b...",
+"..b....dd....b..",
+".bbb...d....bbb.",
+".......d........",
+"................",
+"ffffffffffffffff"
+};

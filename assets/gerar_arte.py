@@ -492,7 +492,7 @@ def gerar_papeis_de_parede(logo):
                 if fob[y][x] != (0.0, 0.0, 0.0):
                     img.putpixel((fx + x, fy + y), quantizar(fob[y][x], fx + x, fy + y) + (255,))
         cores = [hx("#51323e")] * 7
-        txt = "MARSOS 1.0"
+        txt = "MARSOS 1.1"
         # margem larga: em telas 16:10 o feh corta as laterais
         desenhar_texto(img, txt, W - largura_texto(txt, 1) - 30, H - 26, 1, cores)
         ampliar(img.convert("RGB"), 4).save(destino / f"orbita-{prop}.png", optimize=True)
@@ -510,7 +510,7 @@ def _splash(W, H, px0, py0, tx, ty):
     img = para_imagem(render_espaco(W, H, seed=21, planeta=(cx, cy, lw / 2 - 1)), W, H).convert("RGBA")
     img.alpha_composite(logo, (cx - lw // 2, cy - lw // 2))
     desenhar_texto(img, "MARSOS", tx, ty, 3, DEGRADE_LOGO, sombra=hx("#1a1117"))
-    sub = "1.0 OLYMPUS"
+    sub = "1.1 OLYMPUS"
     desenhar_texto(img, sub, tx + (largura_texto("MARSOS", 3) - largura_texto(sub, 1)) // 2,
                    ty + 30, 1, [hx("#e8c9a8")] * 7)
     return ampliar(img.convert("RGB"), 2)
@@ -665,6 +665,26 @@ def gerar_icones(logo):
     d.point((13, 10), fill=LAR)
     icones["teclado"] = im
 
+    im, d = novo()   # jogo: sonda pousando
+    d.polygon([(5, 2), (10, 2), (12, 5), (12, 8), (3, 8), (3, 5)], fill=AREIA, outline=K)
+    d.rectangle([6, 4, 9, 5], fill=hx("#5a6f8c"))
+    d.line([(4, 8), (2, 12)], fill=AREIA)
+    d.line([(11, 8), (13, 12)], fill=AREIA)
+    d.line([(1, 12), (3, 12)], fill=AREIA)
+    d.line([(12, 12), (14, 12)], fill=AREIA)
+    d.polygon([(6, 9), (9, 9), (7, 13)], fill=LAR)
+    d.point((7, 10), fill=hx("#ffd59a"))
+    d.line([(0, 15), (15, 15)], fill=CARM)
+    icones["jogo"] = im
+
+    im, d = novo()   # captura de tela: camera
+    d.rectangle([1, 4, 14, 13], fill=ROCHA, outline=K)
+    d.rectangle([4, 2, 8, 4], fill=ROCHA, outline=K)
+    d.ellipse([5, 6, 11, 12], fill=hx("#5a6f8c"), outline=K)
+    d.point((7, 8), fill=hx("#cfe0f0"))
+    d.rectangle([12, 5, 13, 6], fill=LAR)
+    icones["captura"] = im
+
     for nome, im in icones.items():
         salvar_xpm(im, destino / f"{nome}.xpm", nome.replace("-", "_"))
         im.save(destino / f"{nome}.png")   # versao PNG para os apps Tk
@@ -693,28 +713,20 @@ def gerar_logo_assets(logo):
 ANSI16 = {"a": "1;30", "b": "1;30", "c": "0;31", "d": "1;31", "e": "1;33"}
 
 
+# Login screen. Line 7 (live user) is removed by the installer on installed systems.
 TEXTOS_ISSUE = {
-    "pt": {
-        2: r'\e[1;31mMarsOS 1.0 \e[0;33m"Olympus"\e[0m',
-        4: r"\e[0;37mBase Debian GNU/Linux 13 - kernel \r (\m)\e[0m",
-        5: r"\e[0;37mTerminal \l em \n\e[0m",
-        7: r"\e[1;33mUsuário: astronauta    Senha: live\e[0m",
-        8: r"\e[0;33mDepois do login digite startx para abrir as janelas.\e[0m",
-    },
-    "en": {
-        2: r'\e[1;31mMarsOS 1.0 \e[0;33m"Olympus"\e[0m',
-        4: r"\e[0;37mBased on Debian GNU/Linux 13 - kernel \r (\m)\e[0m",
-        5: r"\e[0;37mTerminal \l on \n\e[0m",
-        7: r"\e[1;33mUser: astronauta    Password: live\e[0m",
-        8: r"\e[0;33mAfter logging in, type startx to start the windows.\e[0m",
-    },
+    2: r'\e[1;31mMarsOS 1.1 \e[0;33m"Olympus"\e[0m',
+    4: r"\e[0;37mBased on Debian GNU/Linux 13 - kernel \r (\m)\e[0m",
+    5: r"\e[0;37mTerminal \l on \n\e[0m",
+    7: r"\e[1;33mLive session - user: astronauta  password: live\e[0m",
+    8: r"\e[0;33mAfter logging in, type startx to start the windows.\e[0m",
 }
 
 
-def gerar_issue(logo, idioma="pt"):
+def gerar_issue(logo):
     """/etc/issue com o planeta em blocos (cores da paleta do console)."""
     letras = logo_para_letras(reduzir_moda(logo, 22, 11))
-    texto = TEXTOS_ISSUE[idioma]
+    texto = TEXTOS_ISSUE
     linhas = [""]
     for i, l in enumerate(letras):
         s, atual = "  ", None
@@ -726,7 +738,7 @@ def gerar_issue(logo, idioma="pt"):
                 s += " "
             else:
                 if ANSI16[ch] != atual:
-                    s += "\\e[" + ANSI16[ch] + "m"
+                    s += r"\e[" + ANSI16[ch] + "m"
                     atual = ANSI16[ch]
                 s += "█"
         if atual is not None:
@@ -735,10 +747,9 @@ def gerar_issue(logo, idioma="pt"):
             s += "   " + texto[i]
         linhas.append(s)
     linhas += ["", ""]
-    base = CHROOT if idioma == "pt" else RAIZ / "idiomas" / idioma / "config" / "includes.chroot"
-    (base / "etc").mkdir(parents=True, exist_ok=True)
-    (base / "etc" / "issue").write_text("\n".join(linhas), encoding="utf-8")
-    print(f"  /etc/issue ({idioma})")
+    (CHROOT / "etc").mkdir(parents=True, exist_ok=True)
+    (CHROOT / "etc" / "issue").write_text("\n".join(linhas), encoding="utf-8")
+    print("  /etc/issue")
 
 
 def main():
@@ -746,8 +757,7 @@ def main():
     print("Gerando arte do MarsOS...")
     gerar_logo_assets(logo)
     gerar_icones(logo)
-    gerar_issue(logo, "pt")
-    gerar_issue(logo, "en")
+    gerar_issue(logo)
     gerar_splash(logo)
     gerar_papeis_de_parede(logo)
     print("Pronto.")

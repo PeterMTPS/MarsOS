@@ -37,4 +37,10 @@ linha(_("Estação "), _("{n} no norte · {s} no sul").format(n=h.estacao_norte,
 for nome, lon in marstime.LOCAIS:
     linha(nome + " ", _("{h} (hora local)").format(h=h.hms(h.lmst(lon))[:5]))
 linha(_("Terra (UTC) "), time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(h.unix)))
+s = marstime.sinal(h.unix)
+linha(_("Distância da Terra "), f"{marstime.milhar(int(s.km))} km ({num(s.ua, 2)} {_('UA')})")
+linha(_("Atraso do sinal "), f"{L}{s.duracao(s.segundos)}{N}  " +
+      _("(ida e volta: {d})").format(d=s.duracao(2 * s.segundos)))
+if s.conjuncao:
+    print(f"  {V}{_('Conjunção solar: o Sol está entre a Terra e Marte e atrapalha o rádio.')}{N}")
 print()

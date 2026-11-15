@@ -10,7 +10,7 @@ sys.path.insert(0, "/usr/lib/marsos")
 import marstime  # noqa: E402
 from marsi18n import _, num  # noqa: E402
 from marstk import (AMBAR, AREIA, CARMIM, CREME, FONTE, FUNDO, LARANJA, NOITE,  # noqa: E402
-                    PlanetaGirando, estrelas, janela)
+                    VERMELHO, PlanetaGirando, estrelas, janela)
 
 
 def mini():
@@ -47,9 +47,10 @@ def completo():
     corpo = tk.Frame(root, bg=NOITE, padx=14, pady=10, relief="sunken", bd=2)
     corpo.pack(fill="both", padx=10, pady=(0, 10))
     locais = [n for n, _lon in marstime.LOCAIS]
-    chaves = ["msd", "ano", "ls", "estacao"] + locais + ["terra"]
+    chaves = ["msd", "ano", "ls", "estacao"] + locais + ["terra", "distancia", "sinal"]
     rotulos = [_("Sol marciano (MSD)"), _("Ano marciano"), _("Longitude solar (Ls)"),
-               _("Estação (norte / sul)")] + locais + [_("Terra (UTC)")]
+               _("Estação (norte / sul)")] + locais + [_("Terra (UTC)"), _("Distância da Terra"),
+                                                       _("Atraso do sinal")]
     valores = {}
     for i, (chave, rot) in enumerate(zip(chaves, rotulos)):
         tk.Label(corpo, text=rot, bg=NOITE, fg=AREIA, anchor="w").grid(row=i, column=0, sticky="w", pady=1)
@@ -68,6 +69,10 @@ def completo():
         for nome, lon in marstime.LOCAIS:
             valores[nome].config(text=h.hms(h.lmst(lon))[:5])
         valores["terra"].config(text=time.strftime(_("%d/%m/%Y %H:%M:%S"), time.gmtime(h.unix)), fg=CARMIM)
+        s = marstime.sinal(h.unix)
+        valores["distancia"].config(text=f"{marstime.milhar(int(s.km))} km")
+        valores["sinal"].config(text=s.duracao(s.segundos) + (" ☀" if s.conjuncao else ""),
+                                fg=VERMELHO if s.conjuncao else CREME)
         root.after(1000, tick)
 
     tick()

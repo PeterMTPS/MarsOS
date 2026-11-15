@@ -1,0 +1,26 @@
+/* XPM */
+static char *captura[] = {
+"16 16 6 1",
+". c None",
+"a c #1a1117",
+"b c #51323e",
+"c c #ff8933",
+"d c #5a6f8c",
+"e c #cfe0f0",
+"................",
+"................",
+"....aaaaa.......",
+"....abbba.......",
+".aaaaaaaaaaaaaa.",
+".abbbbbbbbbbcca.",
+".abbbbbaaabbcca.",
+".abbbbadddabbba.",
+".abbbadedddabba.",
+".abbbadddddabba.",
+".abbbadddddabba.",
+".abbbbadddabbba.",
+".abbbbbaaabbbba.",
+".aaaaaaaaaaaaaa.",
+"................",
+"................"
+};

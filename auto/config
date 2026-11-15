@@ -1,14 +1,19 @@
 #!/bin/sh
-# MarsOS - configuracao do live-build (base Debian 13 "trixie")
+# MarsOS - live-build configuration (based on Debian 13 "trixie")
 set -e
 
-# Usuario, idioma e teclado da sessao live
-MARSOS_APPEND="hostname=marte username=astronauta user-fullname=Astronauta locales=pt_BR.UTF-8 keyboard-layouts=br timezone=America/Sao_Paulo"
+# Live session: user and host name. The language (locale, keyboard and time zone)
+# comes from the entry picked in the boot menu - see assets/boot/.
+MARSOS_APPEND="hostname=marte username=astronauta user-fullname=Astronauta"
 
-# Paleta marciana do console de texto (16 cores, vt.default_*):
+# Martian text-console palette (16 colors, vt.default_*):
 #  0 #1a1117  1 #ac2f44  2 #8f9a4a  3 #d97a2b  4 #5a6f8c  5 #8e4a6a  6 #6fa3a0  7 #e8c9a8
 #  8 #51323e  9 #e54438 10 #b8c46a 11 #ff8933 12 #8fb0d9 13 #c77a9a 14 #9fd6d0 15 #fff1dc
 MARSOS_VT="vt.default_red=26,172,143,217,90,142,111,232,81,229,184,255,143,199,159,255 vt.default_grn=17,47,154,122,111,74,163,201,50,68,196,137,176,122,214,241 vt.default_blu=23,68,74,43,140,106,160,168,62,56,106,51,217,154,208,220"
+
+# Installer (debian-installer, text mode): same palette, but color 4 - the installer's
+# blue background - becomes the Martian night #3d2836, so the dialogs look like Mars.
+MARSOS_VT_INSTALLER="vt.default_red=26,172,143,217,61,142,111,232,81,229,184,255,143,199,159,255 vt.default_grn=17,47,154,122,40,74,163,201,50,68,196,137,176,122,214,241 vt.default_blu=23,68,74,43,54,106,160,168,62,56,106,51,217,154,208,220"
 
 lb config noauto \
 	--mode debian \
@@ -16,16 +21,18 @@ lb config noauto \
 	--architectures amd64 \
 	--archive-areas "main contrib non-free-firmware" \
 	--binary-images iso-hybrid \
-	--debian-installer none \
+	--debian-installer live \
+	--debian-installer-gui false \
 	--memtest none \
 	--firmware-chroot false \
 	--firmware-binary false \
 	--apt-recommends false \
 	--apt-indices false \
 	--iso-application "MarsOS" \
-	--iso-publisher "Projeto MarsOS" \
-	--iso-volume "MarsOS 1.0" \
-	--image-name marsos-1.0 \
+	--iso-publisher "MarsOS Project" \
+	--iso-volume "MarsOS 1.1" \
+	--image-name marsos-1.1 \
 	--bootappend-live "boot=live components ${MARSOS_APPEND} ${MARSOS_VT}" \
 	--bootappend-live-failsafe "boot=live components memtest noapic noapm nodma nomce nosmp nosplash vga=normal ${MARSOS_APPEND}" \
+	--bootappend-install "${MARSOS_VT_INSTALLER}" \
 	"${@}"

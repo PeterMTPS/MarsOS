@@ -1,0 +1,95 @@
+# ~/.fvwm/textos  -  MarsOS: everything FVWM shows as text (menus and welcome).
+# English version (idiomas/en).
+
+DestroyFunc StartFunction
+AddToFunc StartFunction
++ I Module FvwmButtons -g $[vp.width]x38+0-0 MarsBar
++ I Module FvwmEvent SonsEventos
++ I Test (Init) Exec exec xterm -title "Welcome to Mars" -geometry 82x24+40+40 -e sh -c "marsfetch; exec bash"
+
+DestroyMenu MenuMars
+AddToMenu MenuMars "MarsOS 1.1  Olympus" Title
++ "%terminal.xpm%Terminal" Exec exec xterm
++ "%pasta.xpm%Files" Exec exec xfe
++ "%editor.xpm%Text editor" Exec exec xfw
++ "%globo.xpm%Web browser (Firefox)" Exec exec marsos-navegador
++ "%globo.xpm%Retro browser (Dillo)" Exec exec dillo
++ "%pasta.xpm%My downloads" Exec exec xfe $[HOME]/Downloads
++ "%captura.xpm%My screenshots" Exec exec xfe $[HOME]/Pictures
++ "" Nop
++ "%mini-marte.xpm%Mars" Popup MenuMarte
++ "%relogio.xpm%Accessories" Popup MenuAcessorios
++ "%sistema.xpm%System" Popup MenuSistema
++ "%globo.xpm%Workspaces" Popup MenuAreas
++ "" Nop
++ "%engrenagem.xpm%Settings" Exec exec marsos-config
++ "%sobre.xpm%About MarsOS" Exec exec marsos-sobre
++ "%desligar.xpm%Exit" Popup MenuSair
+
+DestroyMenu MenuMarte
+AddToMenu MenuMarte "Mars" Title
++ "%mini-marte.xpm%Mars Globe" Exec exec marsos-globo
++ "%relogio.xpm%Mars Clock" Exec exec marsclock
++ "%jogo.xpm%Mars Touchdown (game)" Exec exec marsos-pouso
++ "%terminal.xpm%Today's sol (terminal)" Exec exec xterm -hold -title "Mars sol" -geometry 64x16 -e sol
++ "" Nop
++ "Wallpaper: Orbit" Exec exec marsos-papel-de-parede orbita
++ "Wallpaper: Dusk at Gale" Exec exec marsos-papel-de-parede crepusculo
++ "Wallpaper: Noon at Jezero" Exec exec marsos-papel-de-parede dia
++ "Wallpaper: Night at Olympus" Exec exec marsos-papel-de-parede noite
+
+DestroyMenu MenuAcessorios
+AddToMenu MenuAcessorios "Accessories" Title
++ "Calculator" Exec exec xcalc
++ "Clock" Exec exec xclock
++ "Eyes" Exec exec xeyes
++ "%captura.xpm%Take a screenshot (in 3 s)" Exec exec marsos-captura atraso
++ "%captura.xpm%Capture an area" Exec exec marsos-captura area
++ "System load" Exec exec xload
++ "Image viewer" Exec exec xfi
++ "" Nop
++ "Midnight Commander" Exec exec xterm -title "Midnight Commander" -geometry 100x32 -e mc
++ "Vim" Exec exec xterm -title "Vim" -e vim
+
+DestroyMenu MenuSistema
+AddToMenu MenuSistema "System" Title
++ "%engrenagem.xpm%Settings" Exec exec marsos-config
++ "%som.xpm%Volume" Exec exec marsos-volume
++ "%som.xpm%Sound mixer (alsamixer)" Exec exec xterm -title "Sound mixer" -geometry 100x28 -e alsamixer
++ "%sistema.xpm%Monitor (htop)" Exec exec xterm -title "htop" -geometry 100x30 -e htop
++ "%rede.xpm%Network (nmtui)" Exec exec xterm -title "Network" -e nmtui
++ "%terminal.xpm%System info (marsfetch)" Exec exec xterm -hold -title "marsfetch" -geometry 82x24 -e marsfetch
++ "%terminal.xpm%Root terminal" Exec exec xterm -title "root@marte" -e sudo -i
++ "" Nop
++ "Window list" WindowList
++ "Restart FVWM" Restart
+
+DestroyMenu MenuAreas
+AddToMenu MenuAreas "Workspaces" Title
++ "Olympus" GotoDesk 0 0
++ "Valles" GotoDesk 0 1
++ "Gale" GotoDesk 0 2
++ "Jezero" GotoDesk 0 3
+
+DestroyMenu MenuSair
+AddToMenu MenuSair "Exit" Title
++ "Back to the console" Quit
++ "%desligar.xpm%Restart the computer" Exec exec marsos-energia reboot
++ "%desligar.xpm%Shut down the computer" Exec exec marsos-energia poweroff
+
+DestroyMenu MenuJanela
+AddToMenu MenuJanela
++ "Move" Move
++ "Resize" Resize
++ "Minimize" Iconify
++ "Maximize" Maximize 100 100
++ "Shade" WindowShade
++ "Stick to all workspaces" Stick
++ "" Nop
++ "Send to Olympus" MoveToDesk 0 0
++ "Send to Valles" MoveToDesk 0 1
++ "Send to Gale" MoveToDesk 0 2
++ "Send to Jezero" MoveToDesk 0 3
++ "" Nop
++ "Close" Close
++ "Kill" Destroy

@@ -1,24 +1,72 @@
-label live-@FLAVOUR@
-	menu label ^Iniciar o MarsOS
+label live-@FLAVOUR@-en
+	menu label ^Start MarsOS - English
 	menu default
 	linux @LINUX@
 	initrd @INITRD@
-	append @APPEND_LIVE@
+	append @APPEND_LIVE@ locales=en_US.UTF-8 keyboard-layouts=us timezone=Etc/UTC
 
-label live-@FLAVOUR@-persistence
-	menu label MarsOS com ^persistencia
+label live-@FLAVOUR@-pt
+	menu label ^Iniciar o MarsOS - Portugues
 	linux @LINUX@
 	initrd @INITRD@
-	append @APPEND_LIVE@ persistence
+	append @APPEND_LIVE@ locales=pt_BR.UTF-8 keyboard-layouts=br timezone=America/Sao_Paulo
 
-label live-@FLAVOUR@-toram
-	menu label MarsOS na ^RAM (sem pendrive)
+label live-@FLAVOUR@-persistence-en
+	menu label ^Persistence - English
 	linux @LINUX@
 	initrd @INITRD@
-	append @APPEND_LIVE@ toram
+	append @APPEND_LIVE@ persistence locales=en_US.UTF-8 keyboard-layouts=us timezone=Etc/UTC
 
-label live-@FLAVOUR@-failsafe
-	menu label MarsOS em ^modo seguro
+label live-@FLAVOUR@-persistence-pt
+	menu label Persist^encia - Portugues
 	linux @LINUX@
 	initrd @INITRD@
-	append @APPEND_LIVE_FAILSAFE@
+	append @APPEND_LIVE@ persistence locales=pt_BR.UTF-8 keyboard-layouts=br timezone=America/Sao_Paulo
+
+# Text-mode installer (debian-installer in "live" mode copies this system to the disk).
+# The paths are the ones live-build uses for --debian-installer live.
+label install
+	menu label I^nstall MarsOS / Instalar
+	linux /install/vmlinuz
+	initrd /install/initrd.gz
+	append vga=788 @APPEND_INSTALL@ --- quiet
+
+menu begin more
+	menu label ^More options / Mais opcoes
+	menu title More options / Mais opcoes
+	include stdmenu.cfg
+
+	label live-@FLAVOUR@-toram-en
+		menu label In ^RAM, no USB stick - English
+		linux @LINUX@
+		initrd @INITRD@
+		append @APPEND_LIVE@ toram locales=en_US.UTF-8 keyboard-layouts=us timezone=Etc/UTC
+
+	label live-@FLAVOUR@-toram-pt
+		menu label Na R^AM, sem pendrive - Portugues
+		linux @LINUX@
+		initrd @INITRD@
+		append @APPEND_LIVE@ toram locales=pt_BR.UTF-8 keyboard-layouts=br timezone=America/Sao_Paulo
+
+	label live-@FLAVOUR@-failsafe-en
+		menu label Sa^fe mode - English
+		linux @LINUX@
+		initrd @INITRD@
+		append @APPEND_LIVE_FAILSAFE@ locales=en_US.UTF-8 keyboard-layouts=us timezone=Etc/UTC
+
+	label live-@FLAVOUR@-failsafe-pt
+		menu label Modo se^guro - Portugues
+		linux @LINUX@
+		initrd @INITRD@
+		append @APPEND_LIVE_FAILSAFE@ locales=pt_BR.UTF-8 keyboard-layouts=br timezone=America/Sao_Paulo
+
+	label expert
+		menu label E^xpert install / Avancada
+		linux /install/vmlinuz
+		initrd /install/initrd.gz
+		append priority=low vga=788 @APPEND_INSTALL@
+
+	label mainmenu
+		menu label ^Back / Voltar
+		menu exit
+menu end

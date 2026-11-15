@@ -64,8 +64,9 @@ dbus-user-session
 libpulse0
 alsa-utils
 
-# --- Suporte as Configuracoes ---
+# --- Suporte as Configuracoes, captura de tela ---
 xdotool
+scrot
 
 # --- Aplicativos ---
 xfe

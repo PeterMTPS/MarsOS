@@ -1,7 +1,7 @@
 # MarsOS - envia o projeto para a VM construtora, gera a ISO e traz de volta para saida\
-# Uso:  powershell -ExecutionPolicy Bypass -File tools\construir.ps1 [-Idioma en]
-param([int]$Port = 2222, [ValidateSet("pt", "en")][string]$Idioma = "pt")
-$Iso = if ($Idioma -eq "pt") { "marsos-1.0-amd64.hybrid.iso" } else { "marsos-1.0-$Idioma-amd64.hybrid.iso" }
+# Uso:  powershell -ExecutionPolicy Bypass -File tools\construir.ps1
+# (uma ISO so, com ingles e portugues escolhidos no menu de boot)
+param([int]$Port = 2222)
 
 # 'Continue': no PowerShell 5.1, qualquer texto do ssh.exe no stderr viraria erro fatal.
 # Cada comando externo e conferido pelo $LASTEXITCODE.
@@ -29,7 +29,7 @@ if ($estado -notmatch 'running') {
 
 Write-Host ">> Empacotando o projeto"
 $tgz = Join-Path $env:TEMP "marsos-src.tgz"
-tar -czf $tgz -C $Raiz auto config assets tools idiomas build.sh
+tar -czf $tgz -C $Raiz auto config assets tools build.sh
 if ($LASTEXITCODE -ne 0) { throw "tar falhou" }
 
 Write-Host ">> Enviando para a VM"
@@ -46,7 +46,7 @@ $remoto = 'set -e; sudo mkdir -p /srv/marsos/build; sudo rm -rf /srv/marsos/src;
           'sudo rsync -a --delete --exclude=/cache/ --exclude=/chroot/ --exclude=/binary/ --exclude=/.build/ ' +
           '--exclude=/*.iso* --exclude=/build.log --exclude=/build-*/ /srv/marsos/src/ /srv/marsos/build/; ' +
           'cd /srv/marsos/build; sudo rm -f .marsos-status construir.out; ' +
-          'sudo setsid nohup bash -c ''bash ./build.sh ' + $Idioma + ' > construir.out 2>&1; echo $? > .marsos-status'' > /dev/null 2>&1 < /dev/null &'
+          'sudo setsid nohup bash -c ''bash ./build.sh > construir.out 2>&1; echo $? > .marsos-status'' > /dev/null 2>&1 < /dev/null &'
 & $ssh @opt -p $Port mars@127.0.0.1 $remoto
 if ($LASTEXITCODE -ne 0) { throw "nao consegui iniciar o build na VM" }
 
@@ -61,11 +61,12 @@ while ($true) {
     if ($linha -and $linha -ne $ultima) { Write-Host "   $linha"; $ultima = $linha }
     if ($status -ne "") {
         if ($status -ne "0") { throw "o build falhou (codigo $status) - veja /srv/marsos/build/build.log na VM" }
-        Write-Host ">> Pronto: $Iso"
         break
     }
 }
 
+$Iso = (& $ssh @opt -p $Port mars@127.0.0.1 'cd /srv/marsos/build && ls -t marsos-*amd64.hybrid.iso | head -n 1').Trim()
+Write-Host ">> Pronto: $Iso"
 Write-Host ">> Copiando a ISO para saida\"
 $saida = Join-Path $Raiz "saida"
 New-Item -ItemType Directory -Force $saida | Out-Null
