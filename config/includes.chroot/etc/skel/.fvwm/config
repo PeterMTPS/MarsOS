@@ -55,6 +55,7 @@ Style FvwmIconMan  !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
 # nome de instancia, que fica como no codigo com a primeira letra minuscula (marsPouso).
 Style marsClockMini !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
 Style marsBandeja  !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
+Style marsAreas    !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
 Style marsOSAviso  !Title, !Borders, Sticky, WindowListSkip, CirculateSkip, StaysOnTop, NeverFocus
 Style marsPouso    !Maximizable, PositionPlacement Center
 Style marsClockTerra !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
@@ -154,14 +155,14 @@ DestroyModuleConfig MarsBar: *
 *MarsBar: Rows 1
 *MarsBar: Columns 64
 # Botao MarsOS (abre o menu)
-*MarsBar: (6x1, Icon mini-marte.xpm, Title (Side) "MarsOS", Colorset 10, ActiveColorset 9, Action(Mouse 1) "Menu MenuMars Mouse -8p -100m")
+*MarsBar: (6x1, Icon mini-marte.xpm, Title (Side, Center) "MarsOS", Colorset 10, ActiveColorset 9, Action(Mouse 1) "Menu MenuMars Mouse -8p -100m")
 # Atalhos: terminal, arquivos, navegador, editor
 *MarsBar: (2x1, Icon terminal.xpm, Colorset 8, ActiveColorset 9, Action(Mouse 1) "Exec exec xterm")
 *MarsBar: (2x1, Icon pasta.xpm, Colorset 8, ActiveColorset 9, Action(Mouse 1) "Exec exec xfe")
 *MarsBar: (2x1, Icon globo.xpm, Colorset 8, ActiveColorset 9, Action(Mouse 1) "Exec exec marsos-navegador")
 *MarsBar: (2x1, Icon editor.xpm, Colorset 8, ActiveColorset 9, Action(Mouse 1) "Exec exec xfw")
 # Areas de trabalho (Olympus, Valles, Gale, Jezero)
-*MarsBar: (10x1, Frame -1, Swallow (UseOld, NoKill) "FvwmPager" "Module FvwmPager 0 3")
+*MarsBar: (10x1, Frame -1, Swallow (UseOld, NoKill, Respawn) "MarsAreas" "Exec exec marsos-areas")
 # Janelas abertas
 *MarsBar: (19x1, Frame 0, Swallow (UseOld, NoKill) "FvwmIconMan" "Module FvwmIconMan")
 # Bandeja: rede, volume e bateria (clique, rodinha e botao do meio no volume)
@@ -184,19 +185,6 @@ DestroyModuleConfig SonsEventos: *
 *SonsEventos: deiconify restaurar
 *SonsEventos: new_desk area
 
-DestroyModuleConfig FvwmPager: *
-*FvwmPager: Colorset * 6
-*FvwmPager: HilightColorset * 7
-*FvwmPager: WindowColorsets 3 4
-*FvwmPager: Font "-*-terminus-bold-r-normal-*-12-*-*-*-*-*-iso10646-1"
-*FvwmPager: SmallFont none
-*FvwmPager: Rows 1
-*FvwmPager: UseSkipList
-*FvwmPager: Balloons All
-*FvwmPager: BalloonColorset * 11
-*FvwmPager: BalloonFont "-*-terminus-medium-r-normal-*-14-*-*-*-*-*-iso10646-1"
-*FvwmPager: BalloonYOffset -3
-
 DestroyModuleConfig FvwmIconMan: *
 *FvwmIconMan: NumManagers 1
 *FvwmIconMan: Resolution desk
@@ -205,7 +193,7 @@ DestroyModuleConfig FvwmIconMan: *
 *FvwmIconMan: Format "%t"
 *FvwmIconMan: Font "-*-terminus-bold-r-normal-*-14-*-*-*-*-*-iso10646-1"
 *FvwmIconMan: ManagerGeometry 1x1
-*FvwmIconMan: ButtonGeometry 200x30
+*FvwmIconMan: ButtonGeometry 200x36
 *FvwmIconMan: MaxButtonWidth 200
 *FvwmIconMan: ReliefThickness 2
 *FvwmIconMan: Tips needed

@@ -16,8 +16,8 @@ from marstk import (AMBAR, AREIA, CARMIM, CREME, FONTE, FUNDO, LARANJA, NOITE,  
 def mini():
     """Versao de 2 linhas que fica encaixada no painel do FVWM."""
     root = janela("MarsClockMini", "MarsClockMini")
-    l1 = tk.Label(root, font=(FONTE, -16, "bold"), fg=LARANJA, bg=FUNDO, padx=4, pady=0, anchor="w")
-    l2 = tk.Label(root, font=(FONTE, -12), fg=AREIA, bg=FUNDO, padx=4, pady=0, anchor="w")
+    l1 = tk.Label(root, font=(FONTE, -16, "bold"), fg=LARANJA, bg=FUNDO, padx=4, pady=0)
+    l2 = tk.Label(root, font=(FONTE, -12), fg=AREIA, bg=FUNDO, padx=4, pady=0)
     l1.pack(fill="both", expand=True)
     l2.pack(fill="both", expand=True)
 

@@ -1,0 +1,142 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+marsos-areas - as 4 areas de trabalho no painel do MarsOS (encaixado no MarsBar do FVWM).
+
+Quatro botoes do mesmo tamanho com o nome centralizado (Olympus, Valles, Gale, Jezero);
+a area atual fica em vermelho. Clique troca de area, a rodinha passa para a proxima.
+Le e troca a area pelo padrao EWMH (_NET_CURRENT_DESKTOP), que o FVWM segue:
+  xprop -spy avisa quando a area muda; xdotool set_desktop pede a troca.
+"""
+import queue
+import re
+import subprocess
+import sys
+import threading
+import tkinter as tk
+import tkinter.font as tkfont
+
+sys.path.insert(0, "/usr/lib/marsos")
+from marstk import AREIA, CARMIM, CREME, FONTE, FUNDO, LARANJA, ROCHA, VERMELHO, janela  # noqa: E402
+
+NOMES = ["Olympus", "Valles", "Gale", "Jezero"]
+ROCHA_CLARA = "#7a5262"
+SOMBRA = "#0e0a12"
+
+
+def nomes_do_fvwm():
+    """Nomes publicados pelo FVWM (_NET_DESKTOP_NAMES); se falhar, os padroes."""
+    try:
+        r = subprocess.run(["xprop", "-root", "_NET_DESKTOP_NAMES"], capture_output=True, text=True, timeout=3)
+        achados = re.findall(r'"([^"]*)"', r.stdout)
+        if len(achados) >= 4:
+            return achados[:4]
+    except (OSError, subprocess.SubprocessError):
+        pass
+    return NOMES
+
+
+class Areas:
+    def __init__(self):
+        self.root = janela("MarsAreas", "MarsAreas")
+        self.c = tk.Canvas(self.root, width=200, height=34, bg=FUNDO, highlightthickness=0)
+        self.c.pack(fill="both", expand=True)
+        self.nomes = nomes_do_fvwm()
+        self.atual = 0
+        self.sobre = None                 # area com o mouse em cima
+        self.fonte = tkfont.Font(family=FONTE, size=-12, weight="bold")
+        self.fila = queue.Queue()
+        self.c.bind("<Configure>", lambda e: self.desenhar())
+        self.c.bind("<Button-1>", lambda e: self.trocar(self.area_em(e.x)))
+        self.c.bind("<Button-4>", lambda e: self.trocar((self.atual - 1) % 4))
+        self.c.bind("<Button-5>", lambda e: self.trocar((self.atual + 1) % 4))
+        self.c.bind("<Motion>", self.mover)
+        self.c.bind("<Leave>", lambda e: self.marcar(None))
+        self.espiao = None
+        self.vigiar()
+        self.root.protocol("WM_DELETE_WINDOW", self.sair)
+        self.root.after(100, self.ler_fila)
+
+    # ------------------------------------------------------------ area atual (EWMH)
+    def vigiar(self):
+        try:
+            self.espiao = subprocess.Popen(["xprop", "-root", "-spy", "_NET_CURRENT_DESKTOP"],
+                                           stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+        except OSError:
+            return
+        threading.Thread(target=self.ler_espiao, daemon=True).start()
+
+    def ler_espiao(self):
+        for linha in self.espiao.stdout:
+            m = re.search(r"=\s*(\d+)", linha)
+            if m:
+                self.fila.put(int(m.group(1)))
+
+    def ler_fila(self):
+        mudou = False
+        while not self.fila.empty():
+            self.atual = self.fila.get() % 4
+            mudou = True
+        if mudou:
+            self.desenhar()
+        self.root.after(100, self.ler_fila)
+
+    def trocar(self, area):
+        if area is None:
+            return
+        self.atual = area                 # resposta imediata; o xprop confirma depois
+        self.desenhar()
+        try:
+            subprocess.Popen(["xdotool", "set_desktop", str(area)],
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except OSError:
+            pass
+
+    def sair(self):
+        if self.espiao:
+            self.espiao.terminate()
+        self.root.destroy()
+
+    # ------------------------------------------------------------ mouse
+    def area_em(self, x):
+        w = max(self.c.winfo_width(), 4)
+        return min(3, max(0, int(x * 4 // w)))
+
+    def mover(self, evento):
+        self.marcar(self.area_em(evento.x))
+
+    def marcar(self, area):
+        if area != self.sobre:
+            self.sobre = area
+            self.desenhar()
+
+    # ------------------------------------------------------------ desenho
+    def desenhar(self):
+        c = self.c
+        c.delete("all")
+        w, h = max(c.winfo_width(), 40), max(c.winfo_height(), 20)
+        # nomes inteiros se todos couberem; senao todos abreviados (OLY VAL GAL JEZ)
+        vaga = w / 4 - 4
+        inteiros = all(self.fonte.measure(n) <= vaga for n in self.nomes)
+        for i, nome in enumerate(self.nomes):
+            x0 = round(i * w / 4)
+            x1 = round((i + 1) * w / 4) - 1
+            ativo = i == self.atual
+            if ativo:
+                fundo, luz, sombra, cor = VERMELHO, LARANJA, CARMIM, CREME
+            elif i == self.sobre:
+                fundo, luz, sombra, cor = ROCHA_CLARA, "#9a7282", ROCHA, CREME
+            else:
+                fundo, luz, sombra, cor = ROCHA, ROCHA_CLARA, SOMBRA, AREIA
+            c.create_rectangle(x0, 0, x1, h - 1, fill=fundo, outline="")
+            # bevel retro: claro em cima/esquerda, escuro embaixo/direita (afundado se ativo)
+            cima, baixo = (sombra, luz) if ativo else (luz, sombra)
+            c.create_line(x0, h - 1, x0, 0, x1, 0, fill=cima, width=2)
+            c.create_line(x1, 0, x1, h - 1, x0, h - 1, fill=baixo, width=2)
+            texto = nome if inteiros else nome[:3].upper()
+            c.create_text((x0 + x1) / 2 + (1 if ativo else 0), h / 2 + (1 if ativo else 0),
+                          text=texto, fill=cor, font=self.fonte)
+
+
+if __name__ == "__main__":
+    Areas().root.mainloop()
