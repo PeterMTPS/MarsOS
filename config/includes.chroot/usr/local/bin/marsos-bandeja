@@ -17,6 +17,7 @@ import re
 import subprocess
 import sys
 import tkinter as tk
+import tkinter.font as tkfont
 
 sys.path.insert(0, "/usr/lib/marsos")
 from marsi18n import _  # noqa: E402
@@ -167,6 +168,7 @@ class Bandeja:
         self.root = janela("MarsBandeja", "MarsBandeja")
         self.c = tk.Canvas(self.root, width=150, height=34, bg=FUNDO, highlightthickness=0)
         self.c.pack(fill="both", expand=True)
+        self.fonte = tkfont.Font(family=FONTE, size=-12, weight="bold")
         self.estado_rede = None          # (tipo, sinal, interface)
         self.estado_bat = None
         self.estado_vol = (None, False)  # (porcentagem, mudo)
@@ -221,7 +223,11 @@ class Bandeja:
 
     # ------------------------------------------------------------ volume
     def no_volume(self, evento):
-        return any(nome == "vol" and x0 <= evento.x < x1 for nome, x0, x1 in self.segmentos)
+        if not self.segmentos:
+            return False
+        perto = min(self.segmentos, key=lambda seg: 0 if seg[1] <= evento.x < seg[2]
+                    else min(abs(evento.x - seg[1]), abs(evento.x - seg[2])))
+        return perto[0] == "vol"
 
     def mudar_volume(self, passo):
         pct, _mudo = self.estado_vol
@@ -254,58 +260,57 @@ class Bandeja:
                                             fill=cor if ch == "#" else tela, outline="")
 
     def desenhar(self):
+        """Desenha rede | volume | bateria com espacos iguais e o conjunto centralizado."""
         c = self.c
         c.delete("all")
         self.segmentos = []
-        h = max(c.winfo_height(), 24)
+        w, h = max(c.winfo_width(), 60), max(c.winfo_height(), 24)
         cy = h // 2
-        x = 4
+        vao = 14                          # espaco entre segmentos; o separador fica no meio
+        x = 0
 
         # --- rede
         tipo, sinal, _if = self.estado_rede or ("off", None, None)
-        x0 = x
         if tipo == "wifi":
             cheias = 4 if sinal is None else (1 + (sinal >= 25) + (sinal >= 50) + (sinal >= 75))
             for i in range(4):
                 alt = 4 + i * 3
                 c.create_rectangle(x + i * 5, cy + 7 - alt, x + i * 5 + 3, cy + 7,
                                    fill=VERDE if i < cheias else ROCHA, outline="")
-            x += 20
+            largura = 18
         else:
             self.pixels(x, cy - 8, ICONE_CABO, AREIA if tipo == "cabo" else ROCHA,
                         tela="#5a6f8c" if tipo == "cabo" else FUNDO)
             if tipo == "off":
                 c.create_line(x, cy - 7, x + 15, cy + 8, fill=VERMELHO, width=3)
                 c.create_line(x, cy + 8, x + 15, cy - 7, fill=VERMELHO, width=3)
-            x += 16
-        x += 6
-        self.segmentos.append(("rede", x0 - 4, x))
-        self.separador(x - 3, h)
+            largura = 16
+        self.segmentos.append(("rede", x, x + largura))
+        x += largura
 
         # --- volume
+        x = self.separar(x, vao, h)
         pct, mudo = self.estado_vol
         x0 = x
         self.pixels(x, cy - 8, ICONE_ALTO_FALANTE, AREIA if pct is not None else ROCHA)
         if pct is None or mudo:
-            c.create_line(x + 10, cy - 4, x + 18, cy + 4, fill=VERMELHO, width=2)
-            c.create_line(x + 10, cy + 4, x + 18, cy - 4, fill=VERMELHO, width=2)
+            c.create_line(x + 11, cy - 4, x + 19, cy + 4, fill=VERMELHO, width=2)
+            c.create_line(x + 11, cy + 4, x + 19, cy - 4, fill=VERMELHO, width=2)
         else:
             ondas = 0 if pct == 0 else 1 if pct <= 33 else 2 if pct <= 66 else 3
             for k in range(ondas):
                 r = 4 + k * 4
                 c.create_arc(x + 8 - r, cy - r, x + 8 + r, cy + r, start=-45, extent=90,
                              style="arc", outline=AREIA, width=2)
-        x += 26
+        x += 24
         texto = "--" if pct is None else (_("mudo") if mudo else f"{pct}%")
-        c.create_text(x, cy, text=texto, anchor="w", fill=CREME if not mudo else VERMELHO,
-                      font=(FONTE, -12, "bold"))
-        x += 34
-        self.segmentos.append(("vol", x0 - 3, x))
+        c.create_text(x, cy, text=texto, anchor="w", fill=VERMELHO if mudo else CREME, font=self.fonte)
+        x += self.fonte.measure(texto)
+        self.segmentos.append(("vol", x0, x))
 
         # --- bateria (so se existir)
         if self.estado_bat:
-            self.separador(x - 1, h)
-            x += 3
+            x = self.separar(x, vao, h)
             x0 = x
             pct_b, estado, _min = self.estado_bat
             cor = VERDE if pct_b > 40 else AMBAR if pct_b > 15 else VERMELHO
@@ -316,20 +321,21 @@ class Bandeja:
             if estado == "carregando":
                 c.create_polygon(x + 11, by - 3, x + 6, by + 6, x + 10, by + 6, x + 8, by + 13,
                                  x + 15, by + 3, x + 11, by + 3, fill=AMBAR, outline=FUNDO)
-            x += 27
-            c.create_text(x, cy, text=f"{pct_b}%", anchor="w", fill=CREME, font=(FONTE, -12, "bold"))
-            x += 30
-            self.segmentos.append(("bat", x0 - 3, x))
+            x += 28
+            c.create_text(x, cy, text=f"{pct_b}%", anchor="w", fill=CREME, font=self.fonte)
+            x += self.fonte.measure(f"{pct_b}%")
+            self.segmentos.append(("bat", x0, x))
 
-        # encosta tudo a direita (perto da engrenagem e dos relogios)
-        caixa = c.bbox("all")
-        if caixa:
-            dx = max(0, c.winfo_width() - caixa[2] - 8)
-            c.move("all", dx, 0)
-            self.segmentos = [(nome, x0 + dx, x1 + dx) for nome, x0, x1 in self.segmentos]
+        # --- centraliza o conjunto na caixa da bandeja
+        dx = max(0, (w - x) // 2)
+        c.move("all", dx, 0)
+        self.segmentos = [(nome, a + dx, b + dx) for nome, a, b in self.segmentos]
 
-    def separador(self, x, h):
-        self.c.create_line(x, 5, x, h - 5, fill=ROCHA)
+    def separar(self, x, vao, h):
+        """Separador vertical no meio do vao entre dois segmentos; devolve o novo x."""
+        meio = x + vao // 2
+        self.c.create_line(meio, 7, meio, h - 7, fill=ROCHA)
+        return x + vao
 
     # ------------------------------------------------------------ textos
     def texto_rede(self, completo=False):

@@ -164,7 +164,7 @@ DestroyModuleConfig MarsBar: *
 # Areas de trabalho (Olympus, Valles, Gale, Jezero)
 *MarsBar: (10x1, Frame -1, Swallow (UseOld, NoKill, Respawn) "MarsAreas" "Exec exec marsos-areas")
 # Janelas abertas
-*MarsBar: (19x1, Frame 0, Swallow (UseOld, NoKill) "FvwmIconMan" "Module FvwmIconMan")
+*MarsBar: (19x1, Frame 0, Padding 6 0, Swallow (UseOld, NoKill) "FvwmIconMan" "Module FvwmIconMan")
 # Bandeja: rede, volume e bateria (clique, rodinha e botao do meio no volume)
 *MarsBar: (9x1, Frame -1, Swallow (UseOld, NoKill, Respawn) "MarsBandeja" "Exec exec marsos-bandeja")
 *MarsBar: (2x1, Icon engrenagem.xpm, Colorset 8, ActiveColorset 9, Action(Mouse 1) "Exec exec marsos-config")
