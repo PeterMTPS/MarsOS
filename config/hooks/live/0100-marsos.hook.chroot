@@ -75,7 +75,7 @@ if [ -d /usr/lib/firefox-esr ]; then
 	cat > /usr/lib/firefox-esr/distribution/distribution.ini <<'EOF'
 [Global]
 id=marsos
-version=1.1
+version=1.2
 about=MarsOS
 
 [Preferences]

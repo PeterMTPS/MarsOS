@@ -150,6 +150,14 @@ FONTE = {
     "U": ["X...X", "X...X", "X...X", "X...X", "X...X", "X...X", ".XXX."],
     "1": ["..X..", ".XX..", "..X..", "..X..", "..X..", "..X..", ".XXX."],
     "0": [".XXX.", "X...X", "X..XX", "X.X.X", "XX..X", "X...X", ".XXX."],
+    "2": [".XXX.", "X...X", "....X", "...X.", "..X..", ".X...", "XXXXX"],
+    "3": ["XXXXX", "...X.", "..X..", "...X.", "....X", "X...X", ".XXX."],
+    "4": ["...X.", "..XX.", ".X.X.", "X..X.", "XXXXX", "...X.", "...X."],
+    "5": ["XXXXX", "X....", "XXXX.", "....X", "....X", "X...X", ".XXX."],
+    "6": ["..XX.", ".X...", "X....", "XXXX.", "X...X", "X...X", ".XXX."],
+    "7": ["XXXXX", "....X", "...X.", "..X..", ".X...", ".X...", ".X..."],
+    "8": [".XXX.", "X...X", "X...X", ".XXX.", "X...X", "X...X", ".XXX."],
+    "9": [".XXX.", "X...X", "X...X", ".XXXX", "....X", "...X.", ".XX.."],
     ".": [".....", ".....", ".....", ".....", ".....", ".XX..", ".XX.."],
     " ": [".....", ".....", ".....", ".....", ".....", ".....", "....."],
 }
@@ -492,7 +500,7 @@ def gerar_papeis_de_parede(logo):
                 if fob[y][x] != (0.0, 0.0, 0.0):
                     img.putpixel((fx + x, fy + y), quantizar(fob[y][x], fx + x, fy + y) + (255,))
         cores = [hx("#51323e")] * 7
-        txt = "MARSOS 1.1"
+        txt = "MARSOS 1.2"
         # margem larga: em telas 16:10 o feh corta as laterais
         desenhar_texto(img, txt, W - largura_texto(txt, 1) - 30, H - 26, 1, cores)
         ampliar(img.convert("RGB"), 4).save(destino / f"orbita-{prop}.png", optimize=True)
@@ -510,7 +518,7 @@ def _splash(W, H, px0, py0, tx, ty):
     img = para_imagem(render_espaco(W, H, seed=21, planeta=(cx, cy, lw / 2 - 1)), W, H).convert("RGBA")
     img.alpha_composite(logo, (cx - lw // 2, cy - lw // 2))
     desenhar_texto(img, "MARSOS", tx, ty, 3, DEGRADE_LOGO, sombra=hx("#1a1117"))
-    sub = "1.1 OLYMPUS"
+    sub = "1.2 OLYMPUS"
     desenhar_texto(img, sub, tx + (largura_texto("MARSOS", 3) - largura_texto(sub, 1)) // 2,
                    ty + 30, 1, [hx("#e8c9a8")] * 7)
     return ampliar(img.convert("RGB"), 2)
@@ -756,7 +764,7 @@ ANSI16 = {"a": "1;30", "b": "1;30", "c": "0;31", "d": "1;31", "e": "1;33"}
 
 # Login screen. Line 7 (live user) is removed by the installer on installed systems.
 TEXTOS_ISSUE = {
-    2: r'\e[1;31mMarsOS 1.1 \e[0;33m"Olympus"\e[0m',
+    2: r'\e[1;31mMarsOS 1.2 \e[0;33m"Olympus"\e[0m',
     4: r"\e[0;37mBased on Debian GNU/Linux 13 - kernel \r (\m)\e[0m",
     5: r"\e[0;37mTerminal \l on \n\e[0m",
     7: r"\e[1;33mLive session - user: astronauta  password: live\e[0m",

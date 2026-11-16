@@ -5,7 +5,7 @@ case "$-" in *i*) ;; *) return 0 ;; esac
 
 case "${LANG:-}" in
 pt*)
-	printf '\n  \033[1;31mBem-vindo ao %s\033[0m (base Debian GNU/Linux 13)\n\n' "${MARSOS_NOME:-MarsOS 1.1 \"Olympus\"}"
+	printf '\n  \033[1;31mBem-vindo ao %s\033[0m (base Debian GNU/Linux 13)\n\n' "${MARSOS_NOME:-MarsOS 1.2 \"Olympus\"}"
 	printf '  Comandos marcianos:\n'
 	printf '    sol ........... hora e data em Marte (e o atraso do sinal até a Terra)\n'
 	printf '    marsfetch ..... informações do sistema\n'
@@ -14,7 +14,7 @@ pt*)
 	[ -d /run/live ] && printf '    sudo -i ....... vira root  (usuário live: astronauta / senha: live)\n'
 	;;
 *)
-	printf '\n  \033[1;31mWelcome to %s\033[0m (based on Debian GNU/Linux 13)\n\n' "${MARSOS_NOME:-MarsOS 1.1 \"Olympus\"}"
+	printf '\n  \033[1;31mWelcome to %s\033[0m (based on Debian GNU/Linux 13)\n\n' "${MARSOS_NOME:-MarsOS 1.2 \"Olympus\"}"
 	printf '  Martian commands:\n'
 	printf '    sol ........... date and time on Mars (and the signal delay to Earth)\n'
 	printf '    marsfetch ..... system information\n'

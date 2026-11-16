@@ -1,35 +1,34 @@
-## MarsOS 1.1 "Olympus"
+## MarsOS 1.2 "Olympus"
 
 🇺🇸 **English** · 🇧🇷 **Português** below
 
-A retro live Linux covered in red Martian dust, based on **Debian GNU/Linux 13**. One ISO for everyone: pick **English** or **Português** in the boot menu.
+A retro Linux covered in red Martian dust, based on **Debian GNU/Linux 13**. One ISO for everyone: pick **English** or **Português** in the boot menu, run it live or install it.
 
-### What's new in 1.1
-- **Install to disk**: a text-mode installer in Martian colors (boot menu → *Install MarsOS*)
-- **One ISO, two languages**: English or Portuguese picked at boot, and switchable later in Settings
-- **Mars Touchdown**, an original game: land a probe at Jezero, Gale, Elysium, Valles Marineris and Olympus Mons
-- **Earth–Mars signal delay**: distance and radio delay in `sol`, `marsfetch` and the Mars Clock (with solar-conjunction warning)
-- **Print Screen**: whole screen, window (Alt) or an area (Shift), saved to Pictures
-- **Network and battery** in the panel, with alerts when the network drops or the battery runs low
-- **Event sounds**: opening/closing windows, switching workspaces, screenshots, shutdown
-- Licensed under the **GNU GPL 3.0**
-- The ISO is now built automatically by GitHub Actions
+### What's new in 1.2
+- **Mission Control**: the active missions (Perseverance and Curiosity) with their current sol, local time and day/night
+- **Mail to Mars**: send a message to a rover — it arrives after the real Earth–Mars signal delay and the rover's reply comes back just as long later. Also from the terminal: `correio-marte "hello, Mars!"`
+- **Real Mars sound theme**: system sounds made from recordings NASA's Perseverance made on Mars — wind, a dust devil, its laser and the Ingenuity helicopter (Settings → Sound)
+- **New panel**: red MarsOS button, named workspaces, full window titles, one tray for network, volume and battery, and an Earth clock with the date
+- **Everyday apps**: AbiWord (documents), Gnumeric (spreadsheets), mpv (video and music), mtPaint (pixel art), xarchiver (zip/7z/rar), GParted, newsboat (RSS), irssi (IRC) and cmus — in the Martian colours, with new Internet, Office, Graphics and Multimedia menus
+- Files open in the right app, from the file manager or from Firefox downloads
+
+Since 1.1: disk installer, one ISO for both languages, Mars Touchdown game, Earth–Mars signal delay, Print Screen, event sounds, GPL 3.0.
 
 **How to use:** write the ISO to a USB stick (Rufus in DD mode or balenaEtcher) or open it in a VM, boot it and pick your language. Live session user: `astronauta` (password `live`).
+
+The "Real Mars" sounds are excerpts of NASA recordings (NASA/JPL-Caltech/LANL/CNES/CNRS/ISAE-Supaero), used under NASA's media guidelines; they are not covered by the GPL.
 
 ---
 
 ### Português
 
-Linux live retrô com a poeira vermelha de Marte, baseado no **Debian GNU/Linux 13**. Uma ISO só: escolha **English** ou **Português** no menu de boot.
+Linux retrô com a poeira vermelha de Marte, baseado no **Debian GNU/Linux 13**. Uma ISO só: escolha **English** ou **Português** no boot, use live ou instale.
 
-- **Instalação no disco**: instalador em modo texto com as cores de Marte (menu de boot → *Install MarsOS / Instalar*)
-- **Uma ISO, dois idiomas**: escolhido no boot e trocável depois nas Configurações
-- **Pouso Marciano**, um jogo original: pouse uma sonda em Jezero, Gale, Elysium, Valles Marineris e Olympus Mons
-- **Atraso do sinal Terra–Marte**: distância e atraso do rádio no `sol`, no `marsfetch` e no Relógio Marciano
-- **Print Screen**: tela inteira, janela (Alt) ou área (Shift), salvas em Imagens
-- **Rede e bateria** no painel, com avisos quando a rede cai ou a bateria fica fraca
-- **Sons de eventos**: abrir/fechar janelas, trocar de área, capturas de tela, desligar
-- Licença **GNU GPL 3.0** · ISO gerada automaticamente pelo GitHub Actions
+- **Controle da Missão**: as missões ativas (Perseverance e Curiosity) com o sol atual, a hora local e se é dia ou noite
+- **Correio para Marte**: mande uma mensagem a um rover — ela chega com o atraso real do sinal Terra–Marte e a resposta volta depois do mesmo tempo. Também pelo terminal: `correio-marte "olá, Marte!"`
+- **Tema de sons "Marte de verdade"**: sons do sistema feitos com gravações da Perseverance em Marte — vento, redemoinho de poeira, o laser e o helicóptero Ingenuity (Configurações → Som)
+- **Painel novo**: botão MarsOS vermelho, áreas de trabalho com nome, títulos inteiros, bandeja única de rede, volume e bateria, e relógio da Terra com data
+- **Apps do dia a dia**: AbiWord (textos), Gnumeric (planilhas), mpv (vídeos e músicas), mtPaint (pixel art), xarchiver (zip/7z/rar), GParted, newsboat (RSS), irssi (IRC) e cmus — com as cores de Marte e menus novos de Internet, Escritório, Gráficos e Multimídia
+- Cada arquivo abre no programa certo, pelo gerenciador de arquivos ou pelos downloads do Firefox
 
 Website: https://petermtps.github.io/MarsOS/ · Português: https://petermtps.github.io/MarsOS/pt/

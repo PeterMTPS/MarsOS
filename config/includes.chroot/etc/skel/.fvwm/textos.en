@@ -8,7 +8,7 @@ AddToFunc StartFunction
 + I Test (Init) Exec exec xterm -title "Welcome to Mars" -geometry 82x24+40+40 -e sh -c "marsfetch; exec bash"
 
 DestroyMenu MenuMars
-AddToMenu MenuMars "MarsOS 1.1  Olympus" Title
+AddToMenu MenuMars "MarsOS 1.2  Olympus" Title
 + "%terminal.xpm%Terminal" Exec exec xterm
 + "%pasta.xpm%Files" Exec exec xfe
 + "%editor.xpm%Text editor" Exec exec xfw

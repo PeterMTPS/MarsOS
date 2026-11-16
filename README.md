@@ -2,13 +2,13 @@
 
 <img src="docs/img/marte-girando.gif" width="160" alt="Spinning Mars">
 
-# MarsOS 1.1 "Olympus"
+# MarsOS 1.2 "Olympus"
 
 **A retro Linux covered in red Martian dust.**
 
 🇺🇸 English · 🇧🇷 [Português](README.pt-BR.md)
 
-[![Download the ISO](https://img.shields.io/badge/download-ISO%20940%20MB-e54438?style=for-the-badge&labelColor=3d2836)](https://github.com/PeterMTPS/MarsOS/releases/latest/download/marsos-1.1-amd64.hybrid.iso)
+[![Download the ISO](https://img.shields.io/badge/download-ISO-e54438?style=for-the-badge&labelColor=3d2836)](https://github.com/PeterMTPS/MarsOS/releases/latest/download/marsos-1.2-amd64.hybrid.iso)
 [![Website](https://img.shields.io/badge/website-MarsOS-ff8933?style=for-the-badge&labelColor=3d2836)](https://petermtps.github.io/MarsOS/)
 
 ![Debian 13](https://img.shields.io/badge/base-Debian%2013%20trixie-ac2f44?labelColor=1a1117)
@@ -89,7 +89,7 @@ from a USB stick, or install it to the disk.
 ### On GitHub (automatic)
 
 The [Build ISO](.github/workflows/build-iso.yml) workflow builds the ISO in a Debian 13 container.
-Pushing a tag such as `v1.1` builds it and publishes it in that release; the **Run workflow**
+Pushing a tag such as `v1.2` builds it and publishes it in that release; the **Run workflow**
 button on the Actions tab builds it and keeps it as a download for 7 days.
 
 ### On a Debian 13 machine

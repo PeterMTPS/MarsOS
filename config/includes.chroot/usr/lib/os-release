@@ -1,7 +1,7 @@
-PRETTY_NAME="MarsOS 1.1 (Olympus)"
+PRETTY_NAME="MarsOS 1.2 (Olympus)"
 NAME="MarsOS"
-VERSION_ID="1.1"
-VERSION="1.1 (Olympus)"
+VERSION_ID="1.2"
+VERSION="1.2 (Olympus)"
 VERSION_CODENAME=olympus
 ID=marsos
 ID_LIKE=debian

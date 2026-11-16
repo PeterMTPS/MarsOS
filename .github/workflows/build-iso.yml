@@ -1,5 +1,5 @@
 # MarsOS - builds the ISO on GitHub's servers.
-#   * push a tag like v1.1  -> builds and publishes the ISO in that Release
+#   * push a tag like v1.2  -> builds and publishes the ISO in that Release
 #   * "Run workflow" button -> builds and keeps the ISO as a download (artifact) for 7 days
 name: Build ISO
 

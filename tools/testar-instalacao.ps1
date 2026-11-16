@@ -5,7 +5,7 @@
 #       ... -DoDisco     tira o DVD e liga pelo disco, para ver o MarsOS instalado
 #       ... -Recriar     apaga a VM e o disco e comeca do zero
 param(
-    [string]$Iso      = (Join-Path (Split-Path -Parent $PSScriptRoot) "saida\marsos-1.1-amd64.hybrid.iso"),
+    [string]$Iso      = (Join-Path (Split-Path -Parent $PSScriptRoot) "saida\marsos-1.2-amd64.hybrid.iso"),
     [string]$VmName   = "MarsOS-Instalacao",
     [int]$MemoryMB    = 1536,
     [int]$DiscoGB     = 10,

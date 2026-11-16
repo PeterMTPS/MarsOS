@@ -26,7 +26,7 @@ c.pack()
 estrelas(c, 470, 230, 90, semente=2)
 PlanetaGirando(c, 115, 115, zoom=2)
 c.create_text(235, 70, anchor="w", text="MarsOS", fill=LARANJA, font=(FONTE, -32, "bold"))
-c.create_text(237, 108, anchor="w", text='1.1 "Olympus"', fill=AMBAR, font=(FONTE, -20, "bold"))
+c.create_text(237, 108, anchor="w", text='1.2 "Olympus"', fill=AMBAR, font=(FONTE, -20, "bold"))
 c.create_text(237, 140, anchor="w", text=_("Um Linux retrô com a\npoeira vermelha de Marte."),
               fill=AREIA, font=(FONTE, -16))
 

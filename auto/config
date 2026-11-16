@@ -31,8 +31,8 @@ lb config noauto \
 	--apt-indices false \
 	--iso-application "MarsOS" \
 	--iso-publisher "MarsOS Project" \
-	--iso-volume "MarsOS 1.1" \
-	--image-name marsos-1.1 \
+	--iso-volume "MarsOS 1.2" \
+	--image-name marsos-1.2 \
 	--bootappend-live "boot=live components ${MARSOS_APPEND} ${MARSOS_VT}" \
 	--bootappend-live-failsafe "boot=live components memtest noapic noapm nodma nomce nosmp nosplash vga=normal ${MARSOS_APPEND}" \
 	--bootappend-install "fb=false ${MARSOS_VT_INSTALLER}" \
