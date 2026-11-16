@@ -24,6 +24,11 @@ fc-cache -f >/dev/null 2>&1 || true
 chmod 0440 /etc/sudoers.d/marsos
 visudo -c -f /etc/sudoers.d/marsos
 
+# Tema marciano tambem para apps GTK abertos como root (ex.: GParted)
+mkdir -p /root/.config
+cp -a /etc/skel/.config/gtk-3.0 /root/.config/
+cp /etc/skel/.gtkrc-2.0 /root/
+
 # Scripts do MarsOS executaveis
 chmod 755 /usr/local/bin/* /usr/lib/marsos/*.py 2>/dev/null || true
 
