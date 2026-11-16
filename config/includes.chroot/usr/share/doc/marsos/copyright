@@ -14,5 +14,12 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 The full license text is in /usr/share/common-licenses/GPL-3.
 
+The "Real Mars" sound theme (/usr/share/marsos/sons/marte) is NOT covered by the GPL:
+it is made of short excerpts of recordings made on Mars by NASA's Perseverance rover
+(SuperCam microphone: wind, laser shots, a dust devil and the Ingenuity helicopter).
+Credit: NASA/JPL-Caltech/LANL/CNES/CNRS/ISAE-Supaero, https://www.nasa.gov/sounds-from-beyond/
+They are used under NASA's media usage guidelines (NASA credited as the source; no NASA
+endorsement is implied).
+
 The rest of the system comes from Debian GNU/Linux; each package keeps its own
 license, listed in /usr/share/doc/<package>/copyright.

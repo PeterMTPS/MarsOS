@@ -166,6 +166,51 @@ EN = {
     "carregando": "charging", "descarregando": "discharging", "cheia": "full",
     "Volume: sem saída de som": "Volume: no sound output", "Volume: {p}%": "Volume: {p}%", "mudo": "mute",
     "Configurações de som": "Sound settings",
+    # controle da missao e correio para Marte
+    "Controle da Missão": "Mission Control", "CONTROLE DA MISSÃO": "MISSION CONTROL",
+    "Missões ativas": "Active missions", "Correio para Marte": "Mail to Mars",
+    "amanhecer": "dawn", "dia": "day", "entardecer": "dusk", "noite": "night",
+    "%d/%m/%Y": "%Y-%m-%d", "Para:": "To:", "Transmitir": "Transmit", "Ler": "Read", "você": "you",
+    "Cratera {local} · pousou em {data}": "{local} crater · landed {data}",
+    "Hora local {h} · {parte}": "Local time {h} · {parte}",
+    "Atraso do sinal Terra → Marte: {d}": "Earth → Mars signal delay: {d}",
+    "Distância: {km} milhões de km · ida e volta: {d}": "Distance: {km} million km · round trip: {d}",
+    "Conjunção solar: o Sol atrapalha o rádio, os comandos estão suspensos.":
+        "Solar conjunction: the Sun disrupts the radio, commands are on hold.",
+    "Escreva uma mensagem primeiro.": "Write a message first.",
+    "Transmitindo para {rover}: chega em {d}.": "Transmitting to {rover}: arrives in {d}.",
+    "a caminho, chega em {t}": "on its way, arrives in {t}",
+    "entregue, resposta em {t}": "delivered, reply in {t}", "resposta recebida": "reply received",
+    "Nenhuma mensagem ainda. Escreva acima e clique em Transmitir.":
+        "No messages yet. Write one above and click Transmit.",
+    "Você → {rover} ({hora}): «{texto}»": "You → {rover} ({hora}): «{texto}»",
+    "A resposta ainda está a caminho...": "The reply is still on its way...",
+    "Mensagem entregue em Marte": "Message delivered on Mars",
+    "Chegou a {rover} ({local}, sol {sol}, {hora}). A resposta volta em {d}.":
+        "It reached {rover} ({local}, sol {sol}, {hora}). The reply comes back in {d}.",
+    "Resposta de {rover}": "Reply from {rover}",
+    "Uso: correio-marte [perseverance|curiosity] MENSAGEM": "Usage: correio-marte [perseverance|curiosity] MESSAGE",
+    "Nenhuma mensagem ainda. Mande uma: correio-marte \"olá, Marte!\"":
+        "No messages yet. Send one: correio-marte \"hello, Mars!\"",
+    "Transmitindo para {rover}... a mensagem chega em {d} (às {hora}).":
+        "Transmitting to {rover}... the message arrives in {d} (at {hora}).",
+    "A resposta volta {d} depois. Você recebe um aviso na tela.":
+        "The reply comes back {d} later. You'll get a notice on screen.",
+    "a caminho de Marte — chega em {t}": "on its way to Mars — arrives in {t}",
+    "entregue — a resposta chega em {t}": "delivered — the reply arrives in {t}",
+    "Mensagem recebida no sol {sol}, às {hora} em {local}.": "Message received on sol {sol}, at {hora} in {local}.",
+    "Bom dia de Marte: o Sol nasceu há pouco e estou aquecendo os instrumentos.":
+        "Good morning from Mars: the Sun just rose and I'm warming up my instruments.",
+    "É tarde em {local} e estou {atividade}.": "It's afternoon in {local} and I'm {atividade}.",
+    "O Sol está se pondo — em Marte o pôr do sol é azul.": "The Sun is setting — on Mars, sunsets are blue.",
+    "Aqui é noite: estou guardando energia até o amanhecer.": "It's night here: I'm saving energy until dawn.",
+    "Sua mensagem viajou {km} milhões de km em {d}.": "Your message travelled {km} million km in {d}.",
+    "Abraços de Marte! — {rover}": "Greetings from Mars! — {rover}",
+    "Tema de sons": "Sound theme", "Tema de sons: {t}.": "Sound theme: {t}.",
+    "Marte de verdade": "Real Mars", "Clássico": "Classic",
+    "Clássico (chiptune feito para o MarsOS)": "Classic (chiptune made for MarsOS)",
+    "Marte de verdade (gravações da NASA: vento, laser do Perseverance, Ingenuity)":
+        "Real Mars (NASA recordings: wind, Perseverance's laser, Ingenuity)",
     # jogo
     "Pouso Marciano": "Mars Touchdown",
     "Pouse a sonda em Marte sem fazer uma cratera nova.": "Land the probe on Mars without making a new crater.",

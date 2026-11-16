@@ -173,8 +173,31 @@ def sinal(unix: float | None = None) -> Sinal:
     return Sinal(ua=dist, elongacao=math.degrees(math.acos(max(-1.0, min(1.0, cos_el)))))
 
 
+# ---------------------------------------------------------------- missoes ativas
+# Pouso (UTC) e longitude leste de cada rover. O sol da missao conta os dias solares locais
+# desde o pouso (sol 0 = dia do pouso). Conferido com a NASA: Curiosity sol 1000 = 30/05/2015,
+# Perseverance sol 1000 = 13/12/2023.
+MISSOES = (
+    {"nome": "Perseverance", "local": "Jezero", "pouso": 1613681700, "longitude": 77.4509},   # 18/02/2021 20:55
+    {"nome": "Curiosity", "local": "Gale", "pouso": 1344230220, "longitude": 137.4417},       # 06/08/2012 05:17
+)
+
+
+def missao(nome: str) -> dict:
+    return next(m for m in MISSOES if m["nome"].lower() == nome.lower())
+
+
+def sol_da_missao(m: dict, unix: float | None = None) -> int:
+    if unix is None:
+        unix = time.time()
+    local = m["longitude"] / 360.0
+    return math.floor(calcular(unix).msd + local) - math.floor(calcular(m["pouso"]).msd + local)
+
+
 if __name__ == "__main__":
     h = calcular()
     s = sinal()
+    for m in MISSOES:
+        print(f"{m['nome']}: sol {sol_da_missao(m)}, {h.hms(h.lmst(m['longitude']))[:5]} em {m['local']}")
     print(f"MSD {h.msd:.5f}  MTC {h.mtc_hms}  Ls {h.ls:.2f}  MY {h.ano}")
     print(f"Terra-Marte {s.km:,.0f} km ({s.ua:.4f} UA)  sinal {s.duracao(s.segundos)}  elongacao {s.elongacao:.1f}")

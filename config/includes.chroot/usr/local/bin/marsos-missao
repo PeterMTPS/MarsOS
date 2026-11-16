@@ -1,0 +1,358 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+marsos-missao - "Controle da Missao" / "Mission Control" do MarsOS.
+
+  * Missoes ativas: sol de cada rover (Perseverance e Curiosity), hora local onde ele
+    esta e se e dia ou noite, alem do atraso do sinal Terra-Marte agora.
+  * Correio para Marte: mande uma mensagem a um rover; ela chega depois do atraso real
+    do sinal e a resposta volta depois do mesmo tempo (com aviso na tela).
+
+Uso: marsos-missao                       abre a janela
+     marsos-missao --enviar [rover] TEXTO manda pelo terminal (rover: perseverance|curiosity)
+     marsos-missao --caixa                mostra as mensagens no terminal
+     (tambem: correio-marte TEXTO)
+"""
+import os
+import subprocess
+import sys
+import time
+
+sys.path.insert(0, "/usr/lib/marsos")
+import marscorreio  # noqa: E402
+import marstime  # noqa: E402
+from marsi18n import IDIOMA, _, milhar, num  # noqa: E402
+
+ROVERS = [m["nome"] for m in marstime.MISSOES]
+
+
+def contagem(segundos):
+    s = max(0, int(segundos))
+    return f"{s // 60:02d}:{s % 60:02d}"
+
+
+def parte_do_dia(hora):
+    if 5 <= hora < 7:
+        return _("amanhecer")
+    if 7 <= hora < 17:
+        return _("dia")
+    if 17 <= hora < 19.5:
+        return _("entardecer")
+    return _("noite")
+
+
+def abrir(*cmd):
+    try:
+        subprocess.Popen(list(cmd), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+    except OSError:
+        pass
+
+
+# ------------------------------------------------------------------ vigia (avisos na tela)
+def vigiar():
+    """Fica em segundo plano avisando quando cada mensagem chega e quando a resposta volta."""
+    trava = None
+    try:
+        import fcntl
+        os.makedirs(os.path.expanduser("~/.cache/marsos"), exist_ok=True)
+        trava = open(os.path.expanduser("~/.cache/marsos/correio.lock"), "w")
+        fcntl.flock(trava, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        return                       # ja tem um vigia rodando
+    except (ImportError, OSError):
+        pass
+    while True:
+        agora = time.time()
+        lista = marscorreio.ler()
+        avisos = {}
+        proximo = None
+        for m in lista:
+            if not m.get("avisou_chegada"):
+                if agora >= marscorreio.chegada(m):
+                    c = marscorreio.contexto(m)
+                    abrir("marsos-aviso", "--titulo", _("Mensagem entregue em Marte"), "--icone", "missao",
+                          "--som", "mensagem", "--segundos", "8",
+                          _("Chegou a {rover} ({local}, sol {sol}, {hora}). A resposta volta em {d}.").format(
+                              rover=m["para"], local=c["local"], sol=milhar(c["sol"]), hora=c["hora"],
+                              d=marstime.Sinal.duracao(m["atraso"])))
+                    avisos.setdefault(m["id"], {})["avisou_chegada"] = True
+                else:
+                    proximo = min(proximo or 1e18, marscorreio.chegada(m))
+            if not m.get("avisou_resposta"):
+                if agora >= marscorreio.retorno(m):
+                    texto = marscorreio.resposta(m)
+                    abrir("marsos-aviso", "--titulo", _("Resposta de {rover}").format(rover=m["para"]),
+                          "--icone", "missao", "--som", "mensagem", "--segundos", "15",
+                          "--botao", _("Ler"), "--comando", "marsos-missao",
+                          texto if len(texto) <= 110 else texto[:107] + "...")
+                    avisos.setdefault(m["id"], {})["avisou_resposta"] = True
+                else:
+                    proximo = min(proximo or 1e18, marscorreio.retorno(m))
+        if avisos:
+            # rele antes de gravar para nao perder uma mensagem mandada agora
+            atual = marscorreio.ler()
+            for m in atual:
+                m.update(avisos.get(m["id"], {}))
+            marscorreio.salvar(atual)
+        if proximo is None:
+            return
+        time.sleep(max(1.0, min(30.0, proximo - time.time() + 0.5)))
+
+
+def iniciar_vigia():
+    abrir(sys.argv[0] if os.path.isabs(sys.argv[0]) else "marsos-missao", "--vigiar")
+
+
+# ------------------------------------------------------------------ terminal
+def terminal_enviar(args):
+    para = "Perseverance"
+    if args and args[0].lower() in [r.lower() for r in ROVERS]:
+        para = marstime.missao(args[0])["nome"]
+        args = args[1:]
+    texto = " ".join(args).strip()
+    if not texto:
+        print(_("Uso: correio-marte [perseverance|curiosity] MENSAGEM"))
+        return 1
+    msg = marscorreio.enviar(para, texto)
+    hora = time.strftime("%H:%M:%S", time.localtime(marscorreio.chegada(msg)))
+    print(_("Transmitindo para {rover}... a mensagem chega em {d} (às {hora}).").format(
+        rover=para, d=marstime.Sinal.duracao(msg["atraso"]), hora=hora))
+    print(_("A resposta volta {d} depois. Você recebe um aviso na tela.").format(
+        d=marstime.Sinal.duracao(msg["atraso"])))
+    iniciar_vigia()
+    return 0
+
+
+def terminal_caixa():
+    lista = marscorreio.ler()
+    if not lista:
+        print(_("Nenhuma mensagem ainda. Mande uma: correio-marte \"olá, Marte!\""))
+        return 0
+    agora = time.time()
+    for m in reversed(lista[-10:]):
+        est = marscorreio.estado(m, agora)
+        print(f"\n\033[1;31m{m['para']}\033[0m  \033[0;33m{time.strftime('%d/%m %H:%M', time.localtime(m['enviado']))}"
+              f"\033[0m  «{m['texto']}»")
+        if est == "a_caminho":
+            print("  " + _("a caminho de Marte — chega em {t}").format(t=contagem(marscorreio.chegada(m) - agora)))
+        elif est == "entregue":
+            print("  " + _("entregue — a resposta chega em {t}").format(t=contagem(marscorreio.retorno(m) - agora)))
+        else:
+            print("  \033[1;33m" + marscorreio.resposta(m) + "\033[0m")
+    print()
+    return 0
+
+
+# ------------------------------------------------------------------ janela
+def janela_missao():
+    import tkinter as tk
+
+    from marstk import (AMBAR, AREIA, CREME, FONTE, FUNDO, LARANJA, NOITE, ROCHA, VERMELHO,  # noqa: F401
+                        PlanetaGirando, estrelas, janela)
+    VERDE = "#b8c46a"
+    AREIA2 = "#c9a892"
+
+    root = janela("MarsMissao", _("Controle da Missão"))
+    root.geometry("780x620")
+    root.minsize(740, 600)
+
+    topo = tk.Canvas(root, width=780, height=118, bg=FUNDO, highlightthickness=0)
+    topo.pack(fill="x")
+    estrelas(topo, 780, 118, 70, semente=9)
+    PlanetaGirando(topo, 64, 59, zoom=1)
+    topo.create_text(130, 26, anchor="w", text=_("CONTROLE DA MISSÃO"), fill=LARANJA, font=(FONTE, -22, "bold"))
+    t_sinal = topo.create_text(132, 60, anchor="w", text="", fill=CREME, font=(FONTE, -18, "bold"))
+    t_dist = topo.create_text(132, 86, anchor="w", text="", fill=AREIA2, font=(FONTE, -14))
+    t_conj = topo.create_text(132, 106, anchor="w", text="", fill=VERMELHO, font=(FONTE, -14, "bold"))
+
+    corpo = tk.Frame(root, bg=FUNDO, padx=14)
+    corpo.pack(fill="both", expand=True)
+
+    def secao(texto):
+        tk.Label(corpo, text=texto, fg=AMBAR, bg=FUNDO, font=(FONTE, -16, "bold"), anchor="w").pack(fill="x", pady=(10, 4))
+
+    # --- missoes ativas
+    secao(_("Missões ativas"))
+    cartoes = tk.Frame(corpo, bg=FUNDO)
+    cartoes.pack(fill="x")
+    widgets = {}
+    for i, m in enumerate(marstime.MISSOES):
+        f = tk.Frame(cartoes, bg=NOITE, bd=2, relief="sunken", padx=12, pady=8)
+        f.grid(row=0, column=i, sticky="nsew", padx=(0 if i == 0 else 8, 0))
+        cartoes.columnconfigure(i, weight=1)
+        tk.Label(f, text=m["nome"], fg=LARANJA, bg=NOITE, font=(FONTE, -18, "bold"), anchor="w").grid(
+            row=0, column=0, sticky="w")
+        pouso = time.strftime(_("%d/%m/%Y"), time.gmtime(m["pouso"]))
+        tk.Label(f, text=_("Cratera {local} · pousou em {data}").format(local=m["local"], data=pouso),
+                 fg=AREIA2, bg=NOITE, anchor="w").grid(row=1, column=0, columnspan=2, sticky="w")
+        sol = tk.Label(f, text="", fg=CREME, bg=NOITE, font=(FONTE, -24, "bold"), anchor="w")
+        sol.grid(row=2, column=0, sticky="w", pady=(4, 0))
+        ceu = tk.Canvas(f, width=28, height=28, bg=NOITE, highlightthickness=0)
+        ceu.grid(row=2, column=1, rowspan=2, sticky="e")
+        hora = tk.Label(f, text="", fg=AREIA, bg=NOITE, anchor="w")
+        hora.grid(row=3, column=0, sticky="w")
+        f.columnconfigure(0, weight=1)
+        widgets[m["nome"]] = (sol, hora, ceu)
+
+    def desenhar_ceu(c, h):
+        c.delete("all")
+        if 7 <= h < 17:
+            c.create_oval(5, 5, 23, 23, fill=AMBAR, outline=LARANJA, width=2)
+        elif 5 <= h < 7 or 17 <= h < 19.5:
+            c.create_oval(5, 12, 23, 30, fill=LARANJA, outline=VERMELHO, width=2)
+            c.create_rectangle(0, 21, 28, 28, fill=NOITE, outline="")
+            c.create_line(2, 21, 26, 21, fill=AREIA2)
+        else:
+            c.create_oval(6, 5, 22, 21, fill=AREIA, outline="")
+            c.create_oval(11, 3, 27, 19, fill=NOITE, outline="")
+
+    # --- correio
+    secao(_("Correio para Marte"))
+    linha = tk.Frame(corpo, bg=FUNDO)
+    linha.pack(fill="x")
+    tk.Label(linha, text=_("Para:"), fg=AREIA, bg=FUNDO).pack(side="left")
+    para = tk.StringVar(value=ROVERS[0])
+    for r in ROVERS:
+        tk.Radiobutton(linha, text=r, variable=para, value=r, bg=FUNDO, fg=AREIA, selectcolor=NOITE,
+                       activebackground=FUNDO, activeforeground=CREME).pack(side="left", padx=(8, 0))
+    linha2 = tk.Frame(corpo, bg=FUNDO)
+    linha2.pack(fill="x", pady=(4, 2))
+    texto = tk.StringVar()
+    entrada = tk.Entry(linha2, textvariable=texto, bg=NOITE, fg=CREME, insertbackground=LARANJA, bd=2,
+                       relief="sunken", highlightthickness=0, font=(FONTE, -16))
+    entrada.pack(side="left", fill="x", expand=True)
+    contador = tk.Label(linha2, text=f"0/{marscorreio.LIMITE}", fg=AREIA2, bg=FUNDO, width=8)
+    contador.pack(side="left")
+    status = tk.Label(corpo, text="", fg=VERDE, bg=FUNDO, anchor="w")
+
+    def limitar(*_args):
+        t = texto.get()
+        if len(t) > marscorreio.LIMITE:
+            texto.set(t[:marscorreio.LIMITE])
+        contador.config(text=f"{len(texto.get())}/{marscorreio.LIMITE}")
+
+    texto.trace_add("write", limitar)
+
+    def transmitir(_evento=None):
+        t = texto.get().strip()
+        if not t:
+            status.config(text=_("Escreva uma mensagem primeiro."), fg=VERMELHO)
+            return
+        msg = marscorreio.enviar(para.get(), t)
+        texto.set("")
+        status.config(text=_("Transmitindo para {rover}: chega em {d}.").format(
+            rover=msg["para"], d=marstime.Sinal.duracao(msg["atraso"])), fg=VERDE)
+        abrir("marsos-tocar", "abrir")
+        iniciar_vigia()
+        atualizar_lista()
+
+    tk.Button(linha2, text=_("Transmitir"), command=transmitir, bg=VERMELHO, fg=CREME, padx=12).pack(side="left")
+    entrada.bind("<Return>", transmitir)
+    status.pack(fill="x", pady=(2, 4))
+
+    lista_w = tk.Listbox(corpo, height=6, bg=NOITE, fg=AREIA, selectbackground=VERMELHO, selectforeground=CREME,
+                         highlightthickness=0, bd=2, relief="sunken", activestyle="none", font=(FONTE, -14),
+                         exportselection=False)
+    lista_w.pack(fill="x")
+    detalhe = tk.Text(corpo, height=4, bg=FUNDO, fg=CREME, bd=0, wrap="word", font=(FONTE, -14),
+                      highlightthickness=0)
+    detalhe.pack(fill="x", pady=(6, 0))
+    detalhe.config(state="disabled")
+    rodape = tk.Frame(root, bg=FUNDO)
+    rodape.pack(fill="x", padx=14, pady=(4, 10))
+    tk.Button(rodape, text=_("Fechar"), width=10, command=root.destroy, fg=CREME).pack(side="right")
+    mensagens = []
+
+    def linha_da(m, agora):
+        est = marscorreio.estado(m, agora)
+        if est == "a_caminho":
+            situ = "» " + _("a caminho, chega em {t}").format(t=contagem(marscorreio.chegada(m) - agora))
+        elif est == "entregue":
+            situ = "✓ " + _("entregue, resposta em {t}").format(t=contagem(marscorreio.retorno(m) - agora))
+        else:
+            situ = "✉ " + _("resposta recebida")
+        t = m["texto"] if len(m["texto"]) <= 34 else m["texto"][:33] + "…"
+        return f"{situ:<34} {m['para']:<13} «{t}»"
+
+    def atualizar_lista():
+        nonlocal mensagens
+        agora = time.time()
+        sel = lista_w.curselection()
+        mensagens = list(reversed(marscorreio.ler()))
+        lista_w.delete(0, "end")
+        for m in mensagens:
+            lista_w.insert("end", linha_da(m, agora))
+        if not mensagens:
+            lista_w.insert("end", "  " + _("Nenhuma mensagem ainda. Escreva acima e clique em Transmitir."))
+        if sel and sel[0] < len(mensagens):
+            lista_w.selection_set(sel[0])
+        mostrar_detalhe()
+
+    def mostrar_detalhe(_evento=None):
+        sel = lista_w.curselection()
+        detalhe.config(state="normal")
+        detalhe.delete("1.0", "end")
+        if sel and sel[0] < len(mensagens):
+            m = mensagens[sel[0]]
+            enviado = time.strftime("%d/%m %H:%M:%S", time.localtime(m["enviado"]))
+            detalhe.insert("end", _("Você → {rover} ({hora}): «{texto}»").format(
+                rover=m["para"], hora=enviado, texto=m["texto"]) + "\n")
+            if marscorreio.estado(m) == "respondida":
+                detalhe.insert("end", m["para"] + " → " + _("você") + ": " + marscorreio.resposta(m))
+            else:
+                detalhe.insert("end", _("A resposta ainda está a caminho..."))
+        detalhe.config(state="disabled")
+
+    lista_w.bind("<<ListboxSelect>>", mostrar_detalhe)
+
+    def tick():
+        agora = time.time()
+        s = marstime.sinal(agora)
+        topo.itemconfig(t_sinal, text=_("Atraso do sinal Terra → Marte: {d}").format(d=s.duracao(s.segundos)))
+        topo.itemconfig(t_dist, text=_("Distância: {km} milhões de km · ida e volta: {d}").format(
+            km=num(s.km / 1e6, 1), d=s.duracao(2 * s.segundos)))
+        topo.itemconfig(t_conj, text=_("Conjunção solar: o Sol atrapalha o rádio, os comandos estão suspensos.")
+                        if s.conjuncao else "")
+        h = marstime.calcular(agora)
+        for m in marstime.MISSOES:
+            sol, hora, ceu = widgets[m["nome"]]
+            hl = h.lmst(m["longitude"])
+            sol.config(text=f"SOL {milhar(marstime.sol_da_missao(m, agora))}")
+            hora.config(text=_("Hora local {h} · {parte}").format(h=h.hms(hl)[:5], parte=parte_do_dia(hl)))
+            desenhar_ceu(ceu, hl)
+        contador_tick[0] += 1
+        if contador_tick[0] % 5 == 0:          # pega mensagens mandadas pelo terminal
+            atualizar_lista()
+        else:
+            sel = lista_w.curselection()
+            for i, m in enumerate(mensagens):
+                lista_w.delete(i)
+                lista_w.insert(i, linha_da(m, agora))
+            if sel:
+                lista_w.selection_set(sel[0])
+            mostrar_detalhe()
+        root.after(1000, tick)
+
+    contador_tick = [0]
+    atualizar_lista()
+    if mensagens:
+        lista_w.selection_set(0)
+        mostrar_detalhe()
+    tick()
+    entrada.focus_set()
+    root.bind("<Escape>", lambda e: root.destroy())
+    if marscorreio.pendentes():
+        iniciar_vigia()
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    args = sys.argv[1:]
+    if args[:1] == ["--vigiar"]:
+        vigiar()
+    elif args[:1] == ["--enviar"]:
+        sys.exit(terminal_enviar(args[1:]))
+    elif args[:1] == ["--caixa"]:
+        sys.exit(terminal_caixa())
+    else:
+        janela_missao()

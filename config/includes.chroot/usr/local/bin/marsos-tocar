@@ -1,16 +1,22 @@
 #!/bin/sh
-# marsos-tocar <som> [--sempre] - toca /usr/share/marsos/sons/<som>.wav
-# Usado pelo FVWM (FvwmEvent) e pelos apps. Respeita "Sons de eventos" nas Configuracoes,
-# a nao ser com --sempre.
+# marsos-tocar <som> [--sempre] - toca um som do MarsOS
+# Usado pelo FVWM (FvwmEvent) e pelos apps. Respeita as Configuracoes > Som:
+#   "Sons de eventos" (desligado = nao toca, a nao ser com --sempre)
+#   "Tema de sons": classico (chiptune) ou marte (gravacoes reais da NASA)
 som="$1"
-arquivo="/usr/share/marsos/sons/$som.wav"
-[ -f "$arquivo" ] || exit 0
-if [ "$2" != "--sempre" ]; then
-	conf="$HOME/.config/marsos/config.ini"
-	if [ -f "$conf" ] && sed -n '/^\[som\]/,/^\[/p' "$conf" | grep -q '^eventos *= *nao'; then
+conf="$HOME/.config/marsos/config.ini"
+tema=classico
+if [ -f "$conf" ]; then
+	secao=$(sed -n '/^\[som\]/,/^\[/p' "$conf")
+	if [ "$2" != "--sempre" ] && printf '%s\n' "$secao" | grep -q '^eventos *= *nao'; then
 		exit 0
 	fi
+	t=$(printf '%s\n' "$secao" | sed -n 's/^tema *= *\([a-z]*\).*/\1/p' | head -n 1)
+	[ -n "$t" ] && tema="$t"
 fi
+arquivo="/usr/share/marsos/sons/$som.wav"
+[ "$tema" = marte ] && [ -f "/usr/share/marsos/sons/marte/$som.wav" ] && arquivo="/usr/share/marsos/sons/marte/$som.wav"
+[ -f "$arquivo" ] || exit 0
 for prog in pw-play paplay; do
 	command -v "$prog" >/dev/null 2>&1 && exec "$prog" "$arquivo" 2>/dev/null
 done

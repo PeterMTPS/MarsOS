@@ -54,8 +54,9 @@ from a USB stick, or install it to the disk.
 | 🪟 **Windows** | FVWM 2.7 with the **MarsBar** panel (menu, launchers, pager, tasks, network and battery, Mars clock and volume) and 4 workspaces: Olympus, Valles, Gale and Jezero |
 | 🕰️ **Time on Mars** | `sol`, `marsclock` and the panel clock: Mars Sol Date, MTC, season and local time at Gale and Jezero (NASA GISS Mars24 algorithm) |
 | 📡 **Signal delay** | Distance to Earth and how long a radio message takes (3 to 22 minutes), from JPL orbital elements, with a warning during solar conjunction |
+| 📡 **Mission Control** | The active missions (Perseverance and Curiosity) with their current sol, local time and day/night, and **Mail to Mars**: send a message to a rover, it arrives after the real signal delay and the rover's reply comes back just as long later (also from the terminal: `correio-marte "hello, Mars!"`) |
 | 🎮 **Mars Touchdown** | An original lander game: land a probe at Jezero, Gale, Elysium, Valles Marineris and Olympus Mons, against Mars gravity, low fuel and dust-storm winds |
-| 🔊 **Sound** | PipeWire, panel volume (scroll to adjust), volume keys, a chiptune startup sound and event sounds (windows, workspaces, screenshots, shutdown) |
+| 🔊 **Sound** | PipeWire, panel volume (scroll to adjust), volume keys, a chiptune startup sound and event sounds (windows, workspaces, screenshots, shutdown). Optional **Real Mars** sound theme made from recordings NASA's Perseverance made on Mars: wind, a dust devil, its laser and the Ingenuity helicopter |
 | 📸 **Screenshots** | `Print Screen` (whole screen), `Alt+Print` (window), `Shift+Print` (pick an area), saved to `~/Pictures` |
 | 🔋 **Network and battery** | Panel indicator for cable / Wi-Fi signal / offline and battery, with alerts when the network drops or the battery runs low |
 | ⚙️ **Settings** | `marsos-config`: wallpaper, resolution, sound, keyboard, mouse, time zone, network, language and system |
@@ -121,6 +122,8 @@ Settings → System can switch the language of the session later.
 MarsOS's own code, menus, artwork and sounds are free software under the
 [GNU General Public License 3.0](LICENSE) (or any later version). The packages that come
 from Debian keep their own licenses.
+The optional "Real Mars" sounds (`usr/share/marsos/sons/marte`) are excerpts of NASA recordings
+(NASA/JPL-Caltech/LANL/CNES/CNRS/ISAE-Supaero) used under NASA's media guidelines, not the GPL.
 
 ---
 

@@ -262,6 +262,23 @@ class Configuracoes:
             self.aviso(_("Sons de eventos ligados.") if evt.get() else _("Sons de eventos desligados."))
 
         self.check(_("Sons de eventos (abrir e fechar janelas, avisos, capturas de tela)"), evt, salvar_eventos)
+        self.secao(_("Tema de sons"))
+        tema = tk.StringVar(value=self.conf.get("som", "tema", fallback="classico"))
+
+        def salvar_tema():
+            self.conf["som"]["tema"] = tema.get()
+            self.salvar()
+            marssom.tocar("inicio")
+            self.aviso(_("Tema de sons: {t}.").format(
+                t=_("Marte de verdade") if tema.get() == "marte" else _("Clássico")))
+
+        for valor, rotulo in (("classico", _("Clássico (chiptune feito para o MarsOS)")),
+                              ("marte", _("Marte de verdade (gravações da NASA: vento, laser do "
+                                          "Perseverance, Ingenuity)"))):
+            tk.Radiobutton(self.corpo, text=rotulo, variable=tema, value=valor, command=salvar_tema,
+                           bg=FUNDO, fg=AREIA, selectcolor=NOITE, activebackground=FUNDO,
+                           activeforeground=CREME, anchor="w", wraplength=520,
+                           justify="left").pack(fill="x", pady=1)
         self.botao(_("Mixer avançado (alsamixer)"),
                    lambda: marsconf.abrir(["xterm", "-title", _("Mixer de som"), "-geometry", "100x28",
                                            "-e", "alsamixer"]))

@@ -15,7 +15,7 @@ PADRAO = {
     "teclado": {"layout": "", "variante": ""},
     "mouse": {"velocidade": "3", "canhoto": "nao"},
     "tela": {"modo": ""},
-    "som": {"inicio": "sim", "eventos": "sim"},
+    "som": {"inicio": "sim", "eventos": "sim", "tema": "classico"},
     "sistema": {"idioma": ""},
 }
 

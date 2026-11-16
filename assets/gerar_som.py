@@ -157,6 +157,9 @@ def main():
     seq = ["E5", "C5", "A4", "E4", "A3"]
     ev = [(i * 0.14, nota(n), 0.4, 0.32, "p") for i, n in enumerate(seq)]
     salvar("desligar", volume(renderizar(1.6, ev, drone=(nota("A2"), 0.15), eco=(0.2, 0.3)), 0.8))
+    bipes = renderizar(0.9, [(0.15, nota("E6"), 0.12, 0.5, "s"), (0.32, nota("E6"), 0.12, 0.5, "s"),
+                             (0.49, nota("B6"), 0.25, 0.5, "s")], eco=(0.09, 0.25))
+    salvar("mensagem", volume(somar(bipes, volume(ruido(0.9, ataque=0.01, queda=4.0, filtro=0.6, semente=9), 0.12)), 0.6))
 
     # --- Jogo "Pouso Marciano"
     salvar("pouso-motor", volume(ruido(0.42, ataque=0.06, queda=0.6, filtro=0.06, semente=3), 0.55))

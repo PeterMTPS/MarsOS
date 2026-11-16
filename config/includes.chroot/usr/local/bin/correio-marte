@@ -1,0 +1,5 @@
+#!/bin/sh
+# correio-marte [perseverance|curiosity] MENSAGEM - manda uma mensagem a um rover em Marte
+# (ela chega com o atraso real do sinal). Sem argumentos, mostra a caixa de mensagens.
+[ $# -eq 0 ] && exec marsos-missao --caixa
+exec marsos-missao --enviar "$@"

@@ -700,6 +700,32 @@ def gerar_icones(logo):
     d.rectangle([12, 5, 13, 6], fill=LAR)
     icones["captura"] = im
 
+    im, d = novo()   # controle da missao: torre de transmissao mandando sinal (pixel a pixel)
+    desenho = (
+        "................",
+        "................",
+        "..O..........O..",
+        ".O..O..KK..O..O.",
+        ".O.O..KBBK..O.O.",
+        ".O.O..KBBK..O.O.",
+        ".O..O..KK..O..O.",
+        "..O....AA....O..",
+        ".......AA.......",
+        "......A..A......",
+        "......AAAA......",
+        ".....A....A.....",
+        ".....AAAAAA.....",
+        "....A......A....",
+        "....A......A....",
+        "................",
+    )
+    cores_px = {"K": K, "A": AREIA, "B": VERM, "O": LAR}
+    for y, linha in enumerate(desenho):
+        for x, ch in enumerate(linha):
+            if ch in cores_px:
+                im.putpixel((x, y), cores_px[ch] + (255,))
+    icones["missao"] = im
+
     for nome, im in icones.items():
         salvar_xpm(im, destino / f"{nome}.xpm", nome.replace("-", "_"))
         im.save(destino / f"{nome}.png")   # versao PNG para os apps Tk

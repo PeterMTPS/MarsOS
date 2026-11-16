@@ -58,6 +58,7 @@ Style marsBandeja  !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
 Style marsAreas    !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
 Style marsOSAviso  !Title, !Borders, Sticky, WindowListSkip, CirculateSkip, StaysOnTop, NeverFocus
 Style marsPouso    !Maximizable, PositionPlacement Center
+Style marsMissao   PositionPlacement Center
 Style marsClockTerra !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
 Style marsGlobo    !Maximizable
 Style marsOSSobre  !Maximizable, PositionPlacement Center

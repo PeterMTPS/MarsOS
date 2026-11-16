@@ -28,6 +28,7 @@ AddToMenu MenuMars "MarsOS 1.1  Olympus" Title
 
 DestroyMenu MenuMarte
 AddToMenu MenuMarte "Marte" Title
++ "%missao.xpm%Controle da Missão (correio para Marte)" Exec exec marsos-missao
 + "%mini-marte.xpm%Globo de Marte" Exec exec marsos-globo
 + "%relogio.xpm%Relógio Marciano" Exec exec marsclock
 + "%jogo.xpm%Pouso Marciano (jogo)" Exec exec marsos-pouso

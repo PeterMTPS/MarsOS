@@ -47,9 +47,25 @@ def nome_saida():
     return m.group(1) if m else "Saída padrão"
 
 
+def tema() -> str:
+    """Tema de sons escolhido nas Configuracoes: 'classico' ou 'marte'."""
+    import configparser
+    import os
+    c = configparser.ConfigParser()
+    c.read(os.path.expanduser("~/.config/marsos/config.ini"), encoding="utf-8")
+    return c.get("som", "tema", fallback="classico")
+
+
+def arquivo_do_som(nome: str) -> str:
+    import os
+    if tema() == "marte" and os.path.exists(f"{SONS}/marte/{nome}.wav"):
+        return f"{SONS}/marte/{nome}.wav"
+    return f"{SONS}/{nome}.wav"
+
+
 def tocar(nome: str, atraso: float = 0.0) -> bool:
-    """Toca /usr/share/marsos/sons/<nome>.wav em segundo plano."""
-    arquivo = f"{SONS}/{nome}.wav"
+    """Toca o som <nome> do tema escolhido, em segundo plano."""
+    arquivo = arquivo_do_som(nome)
     for prog, extra in (("pw-play", []), ("paplay", []), ("aplay", ["-q"])):
         if shutil.which(prog):
             cmd = [prog, *extra, arquivo]

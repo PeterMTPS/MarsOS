@@ -55,8 +55,9 @@ do pendrive (live) ou instale no disco.
 | 🪟 **Janelas** | FVWM 2.7 com painel **MarsBar** (menu, atalhos, pager, tarefas, rede e bateria, relógio marciano e volume) e 4 áreas de trabalho: Olympus, Valles, Gale e Jezero |
 | 🕰️ **Hora em Marte** | `sol`, `marsclock` e o relógio do painel: sol marciano, MTC, estação e hora local em Gale e Jezero (algoritmo Mars24 da NASA GISS) |
 | 📡 **Atraso do sinal** | Distância até a Terra e quanto tempo leva uma mensagem de rádio (de 3 a 22 minutos), pelas órbitas do JPL, com aviso na conjunção solar |
+| 📡 **Controle da Missão** | As missões ativas (Perseverance e Curiosity) com o sol atual, a hora local e se é dia ou noite, e o **Correio para Marte**: mande uma mensagem a um rover, ela chega com o atraso real do sinal e a resposta volta depois do mesmo tempo (também pelo terminal: `correio-marte "olá, Marte!"`) |
 | 🎮 **Pouso Marciano** | Um jogo original: pouse uma sonda em Jezero, Gale, Elysium, Valles Marineris e Olympus Mons, contra a gravidade de Marte, pouco combustível e o vento das tempestades de poeira |
-| 🔊 **Som** | PipeWire, volume no painel (a rodinha do mouse ajusta), teclas de volume, som de inicialização chiptune e sons de eventos (janelas, áreas de trabalho, capturas, desligar) |
+| 🔊 **Som** | PipeWire, volume no painel (a rodinha do mouse ajusta), teclas de volume, som de inicialização chiptune e sons de eventos (janelas, áreas de trabalho, capturas, desligar). Tema opcional **Marte de verdade**, com gravações feitas em Marte pela Perseverance da NASA: vento, redemoinho de poeira, o laser e o helicóptero Ingenuity |
 | 📸 **Captura de tela** | `Print Screen` (tela inteira), `Alt+Print` (janela), `Shift+Print` (escolher área), salvas em `~/Imagens` |
 | 🔋 **Rede e bateria** | Indicador no painel de cabo / sinal do Wi-Fi / sem rede e da bateria, com avisos quando a rede cai ou a bateria fica fraca |
 | ⚙️ **Configurações** | `marsos-config`: papel de parede, resolução, som, teclado, mouse, fuso horário, rede, idioma e sistema |
@@ -145,6 +146,8 @@ tools/                       scripts do Windows (VM construtora, build, teste)
 O código, os menus, a arte e os sons do MarsOS são software livre sob a
 [GNU General Public License 3.0](LICENSE) (ou qualquer versão posterior). Os pacotes que vêm
 do Debian mantêm as licenças deles.
+Os sons opcionais "Marte de verdade" (`usr/share/marsos/sons/marte`) são trechos de gravações da NASA
+(NASA/JPL-Caltech/LANL/CNES/CNRS/ISAE-Supaero) usados conforme as diretrizes de mídia da NASA, não a GPL.
 
 ---
 
