@@ -26,7 +26,11 @@ $disco = Join-Path $raizVMs "$VmName\$VmName.vdi"
 if (Existe) {
     $estado = (& $VB showvminfo $VmName --machinereadable | Select-String '^VMState=').ToString()
     if ($estado -match 'running') { & $VB controlvm $VmName poweroff | Out-Null; Start-Sleep 3 }
-    if ($Recriar) { VB unregistervm $VmName --delete-all }
+    if ($Recriar) {
+        # solta a ISO antes: --delete apagaria o arquivo da ISO junto com a VM
+        & $VB storageattach $VmName --storagectl SATA --port 1 --device 0 --type dvddrive --medium emptydrive 2>$null
+        VB unregistervm $VmName --delete
+    }
 }
 
 if (-not (Existe)) {
