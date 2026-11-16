@@ -23,6 +23,9 @@ if [ ! -f "$HOME/.dillo/dillorc" ] && [ -f /etc/dillo/dillorc ]; then
 	sed "s|^save_dir=.*|save_dir=$HOME/Downloads/|" /etc/dillo/dillorc > "$HOME/.dillo/dillorc"
 fi
 
+# Apps GTK sem o aviso de acessibilidade (nao ha leitor de tela na sessao)
+export NO_AT_BRIDGE=1
+
 xrdb -merge "$HOME/.Xresources"
 
 # Retro resolution: if the screen is narrower than 1024 px (common in VMs), go to 1024x768

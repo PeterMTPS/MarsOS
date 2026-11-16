@@ -14,3 +14,23 @@ scrollbarcolor=#51323e
 use_clearlooks=0
 single_click=0
 file_tooltips=1
+
+[PROGS]
+txtviewer=xfw -r
+txteditor=xfw
+imgviewer=xfi
+imgeditor=mtpaint
+pdfviewer=firefox-esr
+audioplayer=mpv --force-window=yes
+videoplayer=mpv
+archiver=xarchiver
+
+[FILETYPES]
+odt=abiword,abiword,abiword;OpenDocument Text;odt_32x32.png;odt_16x16.png;;
+rtf=abiword,abiword,abiword;RTF Document;doc_32x32.png;doc_16x16.png;;
+doc=abiword,abiword,abiword;Word Document;doc_32x32.png;doc_16x16.png;;
+docx=abiword,abiword,abiword;Word OOXML Document;doc_32x32.png;doc_16x16.png;;
+ods=gnumeric,gnumeric,gnumeric;OpenDocument Spreadsheet;ods_32x32.png;ods_16x16.png;;
+xls=gnumeric,gnumeric,gnumeric;Excel Spreadsheet;xls_32x32.png;xls_16x16.png;;
+xlsx=gnumeric,gnumeric,gnumeric;Excel OOXML Spreadsheet;xls_32x32.png;xls_16x16.png;;
+csv=gnumeric,gnumeric,xfw;CSV Spreadsheet;xls_32x32.png;xls_16x16.png;;

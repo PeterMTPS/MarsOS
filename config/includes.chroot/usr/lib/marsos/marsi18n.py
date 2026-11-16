@@ -206,6 +206,8 @@ EN = {
     "Aqui é noite: estou guardando energia até o amanhecer.": "It's night here: I'm saving energy until dawn.",
     "Sua mensagem viajou {km} milhões de km em {d}.": "Your message travelled {km} million km in {d}.",
     "Abraços de Marte! — {rover}": "Greetings from Mars! — {rover}",
+    "Tocar vídeo ou música": "Play a video or music", "Vídeos e músicas": "Videos and music",
+    "Todos os arquivos": "All files",
     "Tema de sons": "Sound theme", "Tema de sons: {t}.": "Sound theme: {t}.",
     "Marte de verdade": "Real Mars", "Clássico": "Classic",
     "Clássico (chiptune feito para o MarsOS)": "Classic (chiptune made for MarsOS)",

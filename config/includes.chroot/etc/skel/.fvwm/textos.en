@@ -18,6 +18,10 @@ AddToMenu MenuMars "MarsOS 1.1  Olympus" Title
 + "%captura.xpm%My screenshots" Exec exec xfe $[HOME]/Pictures
 + "" Nop
 + "%mini-marte.xpm%Mars" Popup MenuMarte
++ "%globo.xpm%Internet" Popup MenuInternet
++ "%editor.xpm%Office" Popup MenuEscritorio
++ "%captura.xpm%Graphics" Popup MenuGraficos
++ "%som.xpm%Multimedia" Popup MenuMultimidia
 + "%relogio.xpm%Accessories" Popup MenuAcessorios
 + "%sistema.xpm%System" Popup MenuSistema
 + "%globo.xpm%Workspaces" Popup MenuAreas
@@ -60,6 +64,7 @@ AddToMenu MenuSistema "System" Title
 + "%sistema.xpm%Monitor (htop)" Exec exec xterm -title "htop" -geometry 100x30 -e htop
 + "%rede.xpm%Network (nmtui)" Exec exec xterm -title "Network" -e nmtui
 + "%terminal.xpm%System info (marsfetch)" Exec exec xterm -hold -title "marsfetch" -geometry 82x24 -e marsfetch
++ "%sistema.xpm%Disk partitions (GParted)" Exec exec marsos-gparted
 + "%terminal.xpm%Root terminal" Exec exec xterm -title "root@marte" -e sudo -i
 + "" Nop
 + "Window list" WindowList
@@ -94,3 +99,33 @@ AddToMenu MenuJanela
 + "" Nop
 + "Close" Close
 + "Kill" Destroy
+
+DestroyMenu MenuInternet
+AddToMenu MenuInternet "Internet" Title
++ "%globo.xpm%Web browser (Firefox)" Exec exec marsos-navegador
++ "%globo.xpm%Retro browser (Dillo)" Exec exec dillo
++ "%terminal.xpm%News feeds (newsboat)" Exec exec xterm -title "News" -geometry 100x32 -e newsboat
++ "%terminal.xpm%IRC chat (irssi)" Exec exec xterm -title "IRC" -geometry 100x32 -e irssi
++ "%missao.xpm%Mail to Mars" Exec exec marsos-missao
+
+DestroyMenu MenuEscritorio
+AddToMenu MenuEscritorio "Office" Title
++ "%editor.xpm%Word processor (AbiWord)" Exec exec abiword
++ "%sistema.xpm%Spreadsheets (Gnumeric)" Exec exec gnumeric
++ "%editor.xpm%Plain text editor" Exec exec xfw
++ "Calculator" Exec exec xcalc
++ "%pasta.xpm%Archives (zip, 7z, rar)" Exec exec xarchiver
+
+DestroyMenu MenuGraficos
+AddToMenu MenuGraficos "Graphics" Title
++ "%captura.xpm%Pixel art painting (mtPaint)" Exec exec mtpaint
++ "Image viewer" Exec exec xfi
++ "%captura.xpm%Take a screenshot (in 3 s)" Exec exec marsos-captura atraso
++ "%captura.xpm%Capture an area" Exec exec marsos-captura area
+
+DestroyMenu MenuMultimidia
+AddToMenu MenuMultimidia "Multimedia" Title
++ "%som.xpm%Play a video or music (mpv)" Exec exec marsos-midia
++ "%terminal.xpm%Music in the terminal (cmus)" Exec exec xterm -title "cmus" -geometry 100x32 -e cmus
++ "%som.xpm%Volume" Exec exec marsos-volume
++ "%som.xpm%Sound mixer (alsamixer)" Exec exec xterm -title "Sound mixer" -geometry 100x28 -e alsamixer

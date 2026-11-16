@@ -75,3 +75,27 @@ firefox-esr-l10n-pt-br
 dillo
 python3
 python3-tk
+
+# --- Apps do dia a dia (leves, que combinam com o estilo retro) ---
+# escritorio: textos (abre .doc/.docx/.odt) e planilhas (.xls/.xlsx/.ods/.csv)
+abiword
+gnumeric
+# multimidia: videos e musicas (mpv) e musica no terminal (cmus)
+mpv
+cmus
+# graficos: desenho em pixel art
+mtpaint
+# arquivos compactados
+xarchiver
+7zip
+zip
+unzip
+# disco: particoes (ex.: criar a particao de persistencia no pendrive)
+gparted
+# internet no terminal: noticias por RSS e chat IRC
+newsboat
+irssi
+# abrir arquivos baixados no programa certo
+xdg-utils
+# icones SVG dos apps GTK (marcas, setas) - sem ele aparecem quadrados vazios
+librsvg2-common

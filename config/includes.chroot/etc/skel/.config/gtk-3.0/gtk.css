@@ -1,0 +1,39 @@
+/* MarsOS - cores de Marte por cima do Adwaita escuro (AbiWord, Gnumeric, mtPaint, GParted...) */
+@define-color mars_fundo #1a1117;
+@define-color mars_noite #2a1c24;
+@define-color mars_painel #3d2836;
+@define-color mars_rocha #51323e;
+@define-color mars_rocha_clara #7a5262;
+@define-color mars_vermelho #e54438;
+@define-color mars_laranja #ff8933;
+@define-color mars_areia #e8c9a8;
+@define-color mars_creme #fff1dc;
+
+window, .background, dialog, popover, .popup { background-color: @mars_noite; color: @mars_areia; }
+headerbar, .titlebar, menubar, toolbar, .toolbar, .inline-toolbar, statusbar, notebook > header {
+    background-image: none; background-color: @mars_painel; color: @mars_areia;
+    border-color: @mars_fundo; box-shadow: none; }
+menu, .menu, .context-menu { background-color: @mars_painel; color: @mars_areia; border: 2px solid @mars_rocha; }
+menu menuitem:hover, .menu menuitem:hover, menubar > menuitem:hover {
+    background-color: @mars_vermelho; color: @mars_creme; }
+entry, spinbutton, textview, textview text, treeview.view, .view, iconview, list, row, .cell {
+    background-color: @mars_fundo; color: @mars_creme; caret-color: @mars_laranja; }
+*:selected, selection, row:selected, treeview.view:selected, .view:selected, iconview:selected,
+textview text selection, entry selection {
+    background-color: @mars_vermelho; color: @mars_creme; }
+button, .button, combobox button, notebook > header tab:checked {
+    background-image: none; background-color: @mars_rocha; color: @mars_creme;
+    border: 1px solid @mars_fundo; box-shadow: inset 1px 1px @mars_rocha_clara; text-shadow: none; }
+button:hover, combobox button:hover { background-color: @mars_vermelho; }
+button:active, button:checked { background-color: #ac2f44; box-shadow: inset 1px 1px @mars_fundo; }
+button.flat { background-color: transparent; border-color: transparent; box-shadow: none; }
+button.flat:hover { background-color: @mars_rocha; }
+scrollbar { background-color: @mars_fundo; }
+scrollbar slider { background-color: @mars_rocha_clara; border-radius: 0; min-width: 8px; min-height: 8px; }
+scrollbar slider:hover { background-color: @mars_vermelho; }
+progressbar progress, scale highlight, levelbar block.filled { background-color: @mars_vermelho; border-color: #ac2f44; }
+checkbutton check:checked, radiobutton radio:checked { background-color: @mars_vermelho; color: @mars_creme; }
+tooltip, tooltip.background { background-color: @mars_noite; color: @mars_areia; border: 1px solid @mars_vermelho; }
+tooltip * { color: @mars_areia; }
+*:link, link { color: @mars_laranja; }
+separator { background-color: @mars_rocha; }

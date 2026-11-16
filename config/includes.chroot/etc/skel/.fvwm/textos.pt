@@ -18,6 +18,10 @@ AddToMenu MenuMars "MarsOS 1.1  Olympus" Title
 + "%captura.xpm%Minhas capturas de tela" Exec exec xfe $[HOME]/Imagens
 + "" Nop
 + "%mini-marte.xpm%Marte" Popup MenuMarte
++ "%globo.xpm%Internet" Popup MenuInternet
++ "%editor.xpm%Escritório" Popup MenuEscritorio
++ "%captura.xpm%Gráficos" Popup MenuGraficos
++ "%som.xpm%Multimídia" Popup MenuMultimidia
 + "%relogio.xpm%Acessórios" Popup MenuAcessorios
 + "%sistema.xpm%Sistema" Popup MenuSistema
 + "%globo.xpm%Áreas de trabalho" Popup MenuAreas
@@ -60,6 +64,7 @@ AddToMenu MenuSistema "Sistema" Title
 + "%sistema.xpm%Monitor (htop)" Exec exec xterm -title "htop" -geometry 100x30 -e htop
 + "%rede.xpm%Rede (nmtui)" Exec exec xterm -title "Rede" -e nmtui
 + "%terminal.xpm%Informações (marsfetch)" Exec exec xterm -hold -title "marsfetch" -geometry 82x24 -e marsfetch
++ "%sistema.xpm%Partições do disco (GParted)" Exec exec marsos-gparted
 + "%terminal.xpm%Terminal de root" Exec exec xterm -title "root@marte" -e sudo -i
 + "" Nop
 + "Lista de janelas" WindowList
@@ -94,3 +99,33 @@ AddToMenu MenuJanela
 + "" Nop
 + "Fechar" Close
 + "Destruir" Destroy
+
+DestroyMenu MenuInternet
+AddToMenu MenuInternet "Internet" Title
++ "%globo.xpm%Navegador (Firefox)" Exec exec marsos-navegador
++ "%globo.xpm%Navegador retrô (Dillo)" Exec exec dillo
++ "%terminal.xpm%Notícias por RSS (newsboat)" Exec exec xterm -title "Notícias" -geometry 100x32 -e newsboat
++ "%terminal.xpm%Bate-papo IRC (irssi)" Exec exec xterm -title "IRC" -geometry 100x32 -e irssi
++ "%missao.xpm%Correio para Marte" Exec exec marsos-missao
+
+DestroyMenu MenuEscritorio
+AddToMenu MenuEscritorio "Escritório" Title
++ "%editor.xpm%Textos (AbiWord)" Exec exec abiword
++ "%sistema.xpm%Planilhas (Gnumeric)" Exec exec gnumeric
++ "%editor.xpm%Editor de texto simples" Exec exec xfw
++ "Calculadora" Exec exec xcalc
++ "%pasta.xpm%Arquivos compactados (zip, 7z, rar)" Exec exec xarchiver
+
+DestroyMenu MenuGraficos
+AddToMenu MenuGraficos "Gráficos" Title
++ "%captura.xpm%Desenho em pixel art (mtPaint)" Exec exec mtpaint
++ "Visualizador de imagens" Exec exec xfi
++ "%captura.xpm%Capturar a tela (em 3 s)" Exec exec marsos-captura atraso
++ "%captura.xpm%Capturar uma área" Exec exec marsos-captura area
+
+DestroyMenu MenuMultimidia
+AddToMenu MenuMultimidia "Multimídia" Title
++ "%som.xpm%Tocar vídeo ou música (mpv)" Exec exec marsos-midia
++ "%terminal.xpm%Músicas no terminal (cmus)" Exec exec xterm -title "cmus" -geometry 100x32 -e cmus
++ "%som.xpm%Volume" Exec exec marsos-volume
++ "%som.xpm%Mixer de som (alsamixer)" Exec exec xterm -title "Mixer de som" -geometry 100x28 -e alsamixer

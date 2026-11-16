@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""marsos-midia [arquivos...] - toca videos e musicas no mpv; sem arquivos, abre um seletor."""
+import os
+import sys
+import tkinter as tk
+from tkinter import filedialog
+
+sys.path.insert(0, "/usr/lib/marsos")
+from marsi18n import _  # noqa: E402
+from marstk import janela  # noqa: E402
+
+arquivos = sys.argv[1:]
+if not arquivos:
+    root = janela("MarsMidia", _("Tocar vídeo ou música"))
+    root.withdraw()
+    inicio = next((p for p in (os.path.expanduser(d) for d in ("~/Downloads", "~/Músicas", "~/Music", "~"))
+                   if os.path.isdir(p)), os.path.expanduser("~"))
+    arquivos = filedialog.askopenfilenames(
+        parent=root, title=_("Tocar vídeo ou música"), initialdir=inicio,
+        filetypes=[(_("Vídeos e músicas"), "*.mp4 *.mkv *.webm *.avi *.mov *.mp3 *.ogg *.oga *.flac *.wav *.m4a *.opus"),
+                   (_("Todos os arquivos"), "*")])
+    root.destroy()
+if arquivos:
+    os.execvp("mpv", ["mpv", "--force-window=yes", "--keep-open=yes", *arquivos])

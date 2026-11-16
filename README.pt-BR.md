@@ -63,7 +63,7 @@ do pendrive (live) ou instale no disco.
 | ⚙️ **Configurações** | `marsos-config`: papel de parede, resolução, som, teclado, mouse, fuso horário, rede, idioma e sistema |
 | 🌐 **Internet** | Firefox ESR (em português ou inglês, conforme o idioma) e o Dillo como navegador retrô; downloads em `~/Downloads` |
 | 💾 **Persistência** | Opção "Persistência" no boot: arquivos e programas sobrevivem ao reinício sem instalar |
-| 🖥️ **Apps** | XTerm, Xfe, Xfw, Midnight Commander, htop, vim, xcalc, xclock, xeyes, `marsfetch`, `marsos-globo` |
+| 🖥️ **Apps** | AbiWord (textos, abre .doc/.docx/.odt), Gnumeric (planilhas), mpv (vídeos e músicas), mtPaint (pixel art), xarchiver (zip, 7z, rar), GParted, newsboat (RSS), irssi (IRC), cmus (músicas), XTerm, Xfe, Midnight Commander, htop, vim, `marsfetch`, `marsos-globo` — todos com as cores de Marte. PDFs abrem no Firefox |
 
 ## Baixar e usar
 

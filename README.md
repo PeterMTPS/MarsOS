@@ -62,7 +62,7 @@ from a USB stick, or install it to the disk.
 | ⚙️ **Settings** | `marsos-config`: wallpaper, resolution, sound, keyboard, mouse, time zone, network, language and system |
 | 🌐 **Internet** | Firefox ESR and Dillo as a retro browser; downloads go to `~/Downloads` |
 | 💾 **Persistence** | "Persistence" boot option: files and programs survive a reboot without installing |
-| 🖥️ **Apps** | XTerm, Xfe, Xfw, Midnight Commander, htop, vim, xcalc, xclock, xeyes, `marsfetch`, `marsos-globo` |
+| 🖥️ **Apps** | AbiWord (documents, opens .doc/.docx/.odt), Gnumeric (spreadsheets), mpv (video and music), mtPaint (pixel art), xarchiver (zip, 7z, rar), GParted, newsboat (RSS), irssi (IRC), cmus (music), XTerm, Xfe, Midnight Commander, htop, vim, `marsfetch`, `marsos-globo` — all in the Martian colours. PDFs open in Firefox |
 
 ## Download and use
 

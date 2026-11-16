@@ -1,0 +1,19 @@
+# MarsOS - cores de Marte para apps GTK2
+gtk-font-name = "xos4 Terminus 12"
+gtk_color_scheme = "bg_color:#2a1c24\nfg_color:#e8c9a8\nbase_color:#1a1117\ntext_color:#fff1dc\nselected_bg_color:#e54438\nselected_fg_color:#fff1dc\ntooltip_bg_color:#2a1c24\ntooltip_fg_color:#e8c9a8"
+style "marsos" {
+    bg[NORMAL] = "#2a1c24"
+    bg[PRELIGHT] = "#e54438"
+    bg[SELECTED] = "#e54438"
+    bg[ACTIVE] = "#51323e"
+    fg[NORMAL] = "#e8c9a8"
+    fg[PRELIGHT] = "#fff1dc"
+    fg[SELECTED] = "#fff1dc"
+    fg[ACTIVE] = "#fff1dc"
+    base[NORMAL] = "#1a1117"
+    base[SELECTED] = "#e54438"
+    base[ACTIVE] = "#ac2f44"
+    text[NORMAL] = "#fff1dc"
+    text[SELECTED] = "#fff1dc"
+}
+class "GtkWidget" style "marsos"
