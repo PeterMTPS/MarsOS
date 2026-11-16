@@ -35,6 +35,8 @@ Colorset 6 fg #ffb45e, bg #1a1117, hi #51323e, sh #0e0a12
 Colorset 7 fg #fff1dc, bg #ac2f44, hi #e54438, sh #3d2836
 Colorset 8 fg #fff1dc, bg #51323e, hi #7a5262, sh #1a1117
 Colorset 9 fg #fff1dc, bg #e54438, hi #ff8933, sh #ac2f44
+Colorset 10 fg #fff1dc, bg #ac2f44, hi #e54438, sh #3d2836
+Colorset 11 fg #e8c9a8, bg #2a1c24, fgsh #0e0a12, hi #e54438, sh #e54438
 
 #----------------------------------------------------------------------
 # Janelas
@@ -55,7 +57,7 @@ Style marsClockMini !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
 Style marsBandeja  !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
 Style marsOSAviso  !Title, !Borders, Sticky, WindowListSkip, CirculateSkip, StaysOnTop, NeverFocus
 Style marsPouso    !Maximizable, PositionPlacement Center
-Style xclock       !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
+Style marsClockTerra !Title, !Borders, Sticky, WindowListSkip, CirculateSkip
 Style marsGlobo    !Maximizable
 Style marsOSSobre  !Maximizable, PositionPlacement Center
 Style marsOSEnergia !Maximizable, PositionPlacement Center, StaysOnTop
@@ -148,21 +150,26 @@ DestroyModuleConfig MarsBar: *
 *MarsBar: Colorset 0
 *MarsBar: Font "-*-terminus-bold-r-normal-*-14-*-*-*-*-*-iso10646-1"
 *MarsBar: Frame 1
-*MarsBar: Padding 2 2
+*MarsBar: Padding 3 2
 *MarsBar: Rows 1
 *MarsBar: Columns 64
-*MarsBar: (7x1, Icon mini-marte.xpm, Title "MarsOS", Colorset 8, ActiveColorset 9, Action(Mouse 1) "Menu MenuMars Mouse -8p -100m")
+# Botao MarsOS (abre o menu)
+*MarsBar: (6x1, Icon mini-marte.xpm, Title (Side) "MarsOS", Colorset 10, ActiveColorset 9, Action(Mouse 1) "Menu MenuMars Mouse -8p -100m")
+# Atalhos: terminal, arquivos, navegador, editor
 *MarsBar: (2x1, Icon terminal.xpm, Colorset 8, ActiveColorset 9, Action(Mouse 1) "Exec exec xterm")
 *MarsBar: (2x1, Icon pasta.xpm, Colorset 8, ActiveColorset 9, Action(Mouse 1) "Exec exec xfe")
 *MarsBar: (2x1, Icon globo.xpm, Colorset 8, ActiveColorset 9, Action(Mouse 1) "Exec exec marsos-navegador")
 *MarsBar: (2x1, Icon editor.xpm, Colorset 8, ActiveColorset 9, Action(Mouse 1) "Exec exec xfw")
-*MarsBar: (8x1, Frame 0, Swallow (UseOld, NoKill) "FvwmPager" "Module FvwmPager 0 3")
-*MarsBar: (20x1, Frame 0, Swallow (UseOld, NoKill) "FvwmIconMan" "Module FvwmIconMan")
-*MarsBar: (5x1, Frame -1, Swallow (UseOld, NoKill, Respawn) "MarsBandeja" "Exec exec marsos-bandeja")
+# Areas de trabalho (Olympus, Valles, Gale, Jezero)
+*MarsBar: (10x1, Frame -1, Swallow (UseOld, NoKill) "FvwmPager" "Module FvwmPager 0 3")
+# Janelas abertas
+*MarsBar: (19x1, Frame 0, Swallow (UseOld, NoKill) "FvwmIconMan" "Module FvwmIconMan")
+# Bandeja: rede, volume e bateria (clique, rodinha e botao do meio no volume)
+*MarsBar: (9x1, Frame -1, Swallow (UseOld, NoKill, Respawn) "MarsBandeja" "Exec exec marsos-bandeja")
 *MarsBar: (2x1, Icon engrenagem.xpm, Colorset 8, ActiveColorset 9, Action(Mouse 1) "Exec exec marsos-config")
-*MarsBar: (2x1, Icon som.xpm, Colorset 8, ActiveColorset 9, Action(Mouse 1) "Exec exec marsos-volume", Action(Mouse 4) "Exec exec wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+", Action(Mouse 5) "Exec exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-")
-*MarsBar: (7x1, Frame -1, Swallow (UseOld, NoKill, Respawn) "MarsClockMini" "Exec exec marsclock --mini")
-*MarsBar: (5x1, Frame -1, Swallow (UseOld, NoKill, Respawn) "xclock" "Exec exec xclock -digital -norender -update 1 -strftime ' %H:%M ' -bg '#1a1117' -fg '#ffb45e' -font '-*-terminus-bold-r-normal-*-16-*-*-*-*-*-iso10646-1'")
+# Relogios: Marte (sol e MTC) e Terra (hora e data)
+*MarsBar: (6x1, Frame -1, Swallow (UseOld, NoKill, Respawn) "MarsClockMini" "Exec exec marsclock --mini")
+*MarsBar: (4x1, Frame -1, Swallow (UseOld, NoKill, Respawn) "MarsClockTerra" "Exec exec marsclock --terra")
 
 #----------------------------------------------------------------------
 # Sons de eventos (abrir/fechar/minimizar janelas, trocar de area).
@@ -181,10 +188,14 @@ DestroyModuleConfig FvwmPager: *
 *FvwmPager: Colorset * 6
 *FvwmPager: HilightColorset * 7
 *FvwmPager: WindowColorsets 3 4
-*FvwmPager: Font none
+*FvwmPager: Font "-*-terminus-bold-r-normal-*-12-*-*-*-*-*-iso10646-1"
 *FvwmPager: SmallFont none
 *FvwmPager: Rows 1
 *FvwmPager: UseSkipList
+*FvwmPager: Balloons All
+*FvwmPager: BalloonColorset * 11
+*FvwmPager: BalloonFont "-*-terminus-medium-r-normal-*-14-*-*-*-*-*-iso10646-1"
+*FvwmPager: BalloonYOffset -3
 
 DestroyModuleConfig FvwmIconMan: *
 *FvwmIconMan: NumManagers 1
@@ -194,8 +205,13 @@ DestroyModuleConfig FvwmIconMan: *
 *FvwmIconMan: Format "%t"
 *FvwmIconMan: Font "-*-terminus-bold-r-normal-*-14-*-*-*-*-*-iso10646-1"
 *FvwmIconMan: ManagerGeometry 1x1
-*FvwmIconMan: ButtonGeometry 540x30
-*FvwmIconMan: MaxButtonWidth 170
+*FvwmIconMan: ButtonGeometry 200x30
+*FvwmIconMan: MaxButtonWidth 200
+*FvwmIconMan: ReliefThickness 2
+*FvwmIconMan: Tips needed
+*FvwmIconMan: TipsPlacement up
+*FvwmIconMan: TipsColorset 11
+*FvwmIconMan: TipsFont "-*-terminus-medium-r-normal-*-14-*-*-*-*-*-iso10646-1"
 *FvwmIconMan: Colorset 0
 *FvwmIconMan: PlainColorset 8
 *FvwmIconMan: FocusColorset 4

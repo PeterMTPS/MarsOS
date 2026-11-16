@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""marsclock - Relogio Marciano do MarsOS.   Uso: marsclock [--mini]"""
+"""marsclock - Relogio Marciano do MarsOS.   Uso: marsclock [--mini | --terra]"""
 import subprocess
 import sys
 import time
@@ -8,7 +8,7 @@ import tkinter as tk
 
 sys.path.insert(0, "/usr/lib/marsos")
 import marstime  # noqa: E402
-from marsi18n import _, num  # noqa: E402
+from marsi18n import DIAS, IDIOMA, _, num  # noqa: E402
 from marstk import (AMBAR, AREIA, CARMIM, CREME, FONTE, FUNDO, LARANJA, NOITE,  # noqa: E402
                     VERMELHO, PlanetaGirando, estrelas, janela)
 
@@ -16,8 +16,8 @@ from marstk import (AMBAR, AREIA, CARMIM, CREME, FONTE, FUNDO, LARANJA, NOITE,  
 def mini():
     """Versao de 2 linhas que fica encaixada no painel do FVWM."""
     root = janela("MarsClockMini", "MarsClockMini")
-    l1 = tk.Label(root, font=(FONTE, -14, "bold"), fg=LARANJA, bg=FUNDO, padx=4, pady=0, anchor="w")
-    l2 = tk.Label(root, font=(FONTE, -14), fg=AREIA, bg=FUNDO, padx=4, pady=0, anchor="w")
+    l1 = tk.Label(root, font=(FONTE, -16, "bold"), fg=LARANJA, bg=FUNDO, padx=4, pady=0, anchor="w")
+    l2 = tk.Label(root, font=(FONTE, -12), fg=AREIA, bg=FUNDO, padx=4, pady=0, anchor="w")
     l1.pack(fill="both", expand=True)
     l2.pack(fill="both", expand=True)
 
@@ -29,6 +29,29 @@ def mini():
 
     for w in (root, l1, l2):
         w.bind("<Button-1>", lambda e: subprocess.Popen(["marsclock"]))
+    tick()
+    root.mainloop()
+
+
+def terra():
+    """Relogio da Terra para o painel, no mesmo estilo do marciano: hora e dia/data."""
+    root = janela("MarsClockTerra", "MarsClockTerra")
+    l1 = tk.Label(root, font=(FONTE, -16, "bold"), fg=CREME, bg=FUNDO, padx=4, pady=0)
+    l2 = tk.Label(root, font=(FONTE, -12), fg=AREIA, bg=FUNDO, padx=4, pady=0)
+    l1.pack(fill="both", expand=True)
+    l2.pack(fill="both", expand=True)
+
+    def tick():
+        getattr(time, "tzset", lambda: None)()   # segue trocas de fuso horario
+        t = time.localtime()
+        l1.config(text=time.strftime("%H:%M", t))
+        dia = DIAS[IDIOMA][t.tm_wday][:3]
+        data = f"{t.tm_mday:02d}/{t.tm_mon:02d}" if IDIOMA == "pt" else f"{t.tm_mon:02d}/{t.tm_mday:02d}"
+        l2.config(text=f"{dia} {data}")
+        root.after(1000 - int(time.time() * 1000) % 1000 + 5, tick)
+
+    for w in (root, l1, l2):
+        w.bind("<Button-1>", lambda e: subprocess.Popen(["marsos-config", "hora"]))
     tick()
     root.mainloop()
 
@@ -80,4 +103,9 @@ def completo():
 
 
 if __name__ == "__main__":
-    mini() if "--mini" in sys.argv else completo()
+    if "--mini" in sys.argv:
+        mini()
+    elif "--terra" in sys.argv:
+        terra()
+    else:
+        completo()

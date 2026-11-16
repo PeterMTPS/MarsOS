@@ -164,6 +164,8 @@ EN = {
     "Restam {p}%. Ligue o carregador.": "{p}% left. Plug in the charger.",
     "{t} para encher": "{t} until full", "{t} restantes": "{t} left",
     "carregando": "charging", "descarregando": "discharging", "cheia": "full",
+    "Volume: sem saída de som": "Volume: no sound output", "Volume: {p}%": "Volume: {p}%", "mudo": "mute",
+    "Configurações de som": "Sound settings",
     # jogo
     "Pouso Marciano": "Mars Touchdown",
     "Pouse a sonda em Marte sem fazer uma cratera nova.": "Land the probe on Mars without making a new crater.",
