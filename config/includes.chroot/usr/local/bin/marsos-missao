@@ -49,6 +49,20 @@ def abrir(*cmd):
 
 
 # ------------------------------------------------------------------ vigia (avisos na tela)
+def tela_disponivel():
+    """O X ainda esta de pe? O vigia pode sobrar depois que a sessao fecha (ou ser
+    iniciado no console pelo correio-marte), e ai os avisos nao teriam onde aparecer."""
+    if not os.environ.get("DISPLAY"):
+        return False
+    try:
+        return subprocess.run(["xdpyinfo"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                              timeout=5).returncode == 0
+    except subprocess.SubprocessError:
+        return False
+    except OSError:                  # sem xdpyinfo: nao da para saber, segue avisando
+        return True
+
+
 def vigiar():
     """Fica em segundo plano avisando quando cada mensagem chega e quando a resposta volta."""
     trava = None
@@ -64,6 +78,10 @@ def vigiar():
     while True:
         agora = time.time()
         lista = marscorreio.ler()
+        vencidos = any((not m.get("avisou_chegada") and agora >= marscorreio.chegada(m))
+                       or (not m.get("avisou_resposta") and agora >= marscorreio.retorno(m)) for m in lista)
+        if vencidos and not tela_disponivel():
+            return                   # sem tela: nao marca como avisado; o vigia da proxima sessao avisa
         avisos = {}
         proximo = None
         for m in lista:

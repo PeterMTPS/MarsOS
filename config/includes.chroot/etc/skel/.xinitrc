@@ -45,6 +45,10 @@ marsos-aplicar-config
 xsetroot -cursor_name left_ptr -fg '#ff8933' -bg '#1a1117'
 marsos-papel-de-parede --restaurar &
 
+# Mail to Mars: deliver the arrivals and replies still pending from earlier sessions
+# (exits right away when there are none). Waits for the desktop and the startup sound.
+(sleep 6; exec marsos-missao --vigiar) &
+
 if command -v fvwm >/dev/null 2>&1; then
 	exec fvwm
 else
